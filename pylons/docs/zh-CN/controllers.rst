@@ -1,8 +1,12 @@
 .. _controllers:
 
 ===========
-Controllers
+控制器
 ===========
+
+译者：alswl_
+
+.. _alswl: http://log4d.com/
 
 .. image:: _static/pylon2.jpg
    :alt: 
@@ -10,37 +14,38 @@ Controllers
    :height: 450px
    :width: 368px
 
-In the :term:`MVC` paradigm the *controller* interprets the inputs, commanding
-the model and/or the view to change as appropriate. Under Pylons, this concept
-is extended slightly in that a Pylons controller is not directly interpreting
-the client's request, but is acting to determine the appropriate way to
-assemble data from the model, and render it with the correct template.
+在 :term:`MVC` 模型中， *控制器* 处理输入内容，按预设的方法操作模型和展示视图。
+Pylons 控制器的理念是进行优雅地扩展，一个 Pylons 控制器不直接处理输入内容，
+而仅仅使用模型层合适的方法来装配数据，并返回给恰当的模板。
 
-The controller interprets requests from the user and calls portions of the model and view as necessary to fulfill the request. So when the user clicks a Web link or submits an HTML form, the controller itself doesn’t output anything or perform any real processing. It takes the request and determines which model components to invoke and which formatting to apply to the resulting data.
+控制器响应用户的请求，并调用所需要的模型和视图。
+每当用户点击一个超链接或提交一个表单时候，
+控制器本身不产生任何内容或进行实际的操作。
+而是获取请求，并决定使用哪些模型渲染，哪种格式来生成返回数据。
 
-Pylons uses a class, where the superclass provides the :term:`WSGI` interface
-and the subclass implements the application-specific controller logic.
+Pylons 的控制器的父类提供 :term:`WSGI` 接口，它自身则处理分发具体的应用逻辑。
 
-The Pylons WSGI Controller handles incoming web requests that are dispatched from the Pylons WSGI application :class:`~pylons.wsgiapp.PylonsApp`.
+Pylons WSGI 控制器处理从 Pylons WSGI 应用 :class:`~pylons.wsgiapp.PylonsApp`
+分配过来的 web 请求。
 
-These requests result in a new instance of the :class:`~pylons.controllers.core.WSGIController` being created, which is then called with the dict options from the Routes match. The standard WSGI response is then returned with start_response called as per the WSGI spec.
+请求发生时候，一个 :class:`~pylons.controllers.core.WSGIController` 实例被创建，
+然后通过被路由匹配捕捉。随后通过 start_response 方法返回标准 WSGI 响应。
 
-Since Pylons controllers are actually called with the WSGI interface, normal WSGI applications can also be Pylons ‘controllers’.
+尽管 Pylons 控制器是被 WSGI 接口调用的，
+但标准 WSGI 应用也同样可以直接作为 Pylons 控制器使用。
 
-Standard Controllers
+标准控制器
 ====================
 
-Standard Controllers intended for subclassing by web developers
+标准控制器为 web 开发者们提供了下面方法：
 
-Keeping methods private
+使用私有方法
 -----------------------
 
-The default route maps any controller and action, so you will likely want to
-prevent some controller methods from being callable from a URL.
+默认情况下，url 路由可能映射并调用任意控制器方法，有时候我们需要避免这种情况。
 
-Pylons uses the default Python convention of private methods beginning with
-``_``. To hide a method ``edit_generic`` in this class, just changing its name
-to begin with ``_`` will be sufficient:
+Pylons 使用常规 Python 办法：以 ``_`` 开头的方法就是私有方法。
+比如要隐藏 ``edit_generic`` 这个类方法，只需将 ``_`` 添加到方法名之前。
 
 .. code-block:: python
 
@@ -52,31 +57,29 @@ to begin with ``_`` will be sufficient:
             """I can't be called from the web!"""
             return True
 
-Special methods
+特殊方法
 ---------------
 
-Special controller methods you may define:
+有一些特殊方法你也许用的上：
 
 ``__before__``
-    This method is called before your action is, and should be used for
-    setting up variables/objects, restricting access to other actions,
-    or other tasks which should be executed before the action is called.
+    这个方法将在控制器方法作用之前触发，一般用来设定变量、对象，
+    权限控制和其他需要在控制器方法作用之前被调用的地方。
 
 ``__after__``
-    This method is called after the action is, unless an unexpected
-    exception was raised. Subclasses of
-    :class:`~webob.exc.HTTPException` (such as those raised by
-    ``redirect_to`` and ``abort``) are expected; e.g. ``__after__``
-    will be called on redirects.
+    这个方法在控制器作用之后触发，除非出现预料之外的异常。而所有 
+    :class:`~webob.exc.HTTPException` 的子类都是预料中的（比如 ``redirect_to``
+    和 ``abort`` 这些就是）， ``__after__`` 就能被触发成功并做一些跳转动作。
     
-Adding Controllers dynamically
+动态添加控制器
 ------------------------------
 
-It is possible for an application to add controllers without restarting the application. This requires telling Routes to re-scan the controllers directory.
+我们也能添加控制器而不需重启应用。只需要告诉路由重新扫描控制器文件夹目录即可。
 
-New controllers may be added from the command line with the paster command (recommended as that also creates the test harness file), or any other means of creating the controller file.
+新控制器可以通过 paster 命令添加，或者通过其他方法来创建控制器文件。
 
-For Routes to become aware of new controllers present in the controller directory, an internal flag is toggled to indicate that Routes should rescan the directory:
+要想路由发现控制器目录多了一个东西，
+可以通过一个内部标志来提醒路由需要重新扫描目录。
 
 .. code-block:: python
 
@@ -85,16 +88,16 @@ For Routes to become aware of new controllers present in the controller director
     mapper = request_config().mapper
     mapper._created_regs = False
 
+那么下次请求时候，路由会重新扫描控制器目录，
+新增加的部分能够被路由匹配到。
 
-On the next request, Routes will rescan the controllers directory and those routes that use the ``:controller`` dynamic part of the path will be able to match the new controller.
-
-Customizing the Controller Name
+自定义控制器名称
 -------------------------------
 
-By default, Pylons looks for a controller named 'Something'Controller. This
-naming scheme can be overridden by supplying an optional module-level variable
-called ``__controller__`` to indicate the desired controller class::
-    
+默认情况下，Pylons 会查找名为 XXXController 的控制器。
+这种命名方法可以通过定义一个模块级的变量来设定：定义一个名为 ``__controller__``
+的变量来标明控制器的名称::
+
     import logging
 
     from pylons import request, response, session, tmpl_context as c
@@ -113,8 +116,6 @@ called ``__controller__`` to indicate the desired controller class::
             #return render('/hello.mako')
             # or, return a string
             return 'Hello World'
-    
-
 
 Attaching WSGI apps
 -------------------

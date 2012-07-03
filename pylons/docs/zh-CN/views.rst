@@ -13,11 +13,16 @@ Views
 
 In the MVC paradigm the *view* manages the presentation of the model. 
 
-The view is the interface the user sees and interacts with. For Web applications, this has historically been an HTML interface. HTML remains the dominant interface for Web apps but new view options are rapidly appearing. 
+在 MVC 模型中， *视图* 用来管理模型的表现形式。
 
-These include Macromedia Flash, JSON and views expressed in alternate markup languages like XHTML, XML/XSL, WML, and Web services. It is becoming increasingly common for web apps to provide specialised views in the form of a REST API that allows programmatic read/write access to the data model. 
+用户看到并与之交互的是视图。对于 web 应用来说，一般是 HTML 界面。
+目前 Web 应用界面绝大部分还是 HTML，但也有一些变得常见的其他形式。
 
-More complex APIs are quite readily implemented via SOAP services, yet another type of view on to the data model.
+这些界面技术包括 Macromedia Flash，JSON 和另外一些标记型语言比如 XHTML、XML/XSL、
+WML 和 Web services。另外在界面层提供 REST API 形式的 web 应用也越来越多，
+它们提供实效的方法从数据模型读写数据。
+
+还有一些其他稍微复杂的数据展示方法，比如通过 SOAP 服务。
 
 The growing adoption of RDF, the graph-based representation scheme that underpins the Semantic Web, brings a perspective that is strongly weighted towards machine-readability.
 
@@ -29,36 +34,39 @@ The growing adoption of RDF, the graph-based representation scheme that underpin
 .. .. __: http://simile.mit.edu/longwell/
 .. .. __: http://simile.mit.edu/welkin/
 
-Handling all of these interfaces in an application is becoming increasingly challenging. One big advantage of MVC is that it makes it easier to create these interfaces and develop a web app that supports many different views and thereby provides a broad range of services.
+如何把这些应用界面都处理好是一种大挑战。
+MVC 的一大优势就是可以轻松在这一堆方法中创建多种视图。
 
-Typically, no significant processing occurs in the view; it serves only as a means of outputting data and allowing the user (or the application) to act on that data, irrespective of whether it is an online store or an employee list.
+通常情况下，无论是在线商店或雇员列表应用，
+视图不会对数据进行重大操作，它仅仅提供展现数据并向用户提供操作。
 
 .. _templates:
 
 *********
-Templates
+模板
 *********
 
-Template rendering engines are a popular choice for handling the task of view presentation.
+模板渲染引擎经常被用来处理视图展现。
 
-To return a processed template, it must be rendered and returned by the controller::
-    
+控制器会调用模板引擎来渲染并返回::
+
     from helloworld.lib.base import BaseController, render
 
     class HelloController(BaseController):
         def sample(self):
             return render('/sample.mako')
 
-Using the default Mako template engine, this will cause Mako to look in the :file:`helloworld/templates` directory (assuming the project is called 'helloworld') for a template filed called :file:`sample.mako`.
+使用 Mako 引擎的话，Mako 会主动查找 :file:`helloworld/templates` 目录
+（假设项目的名字叫做 'helloworld'）下面叫做 file:`sample.mako` 的文件。
 
-The :func:`render` function used here is actually an alias defined in your projects' :file:`base.py` for Pylons' :func:`~pylons.templating.render_mako` function.
+:func:`render` 方法是在项目中 `base.py` 中定义的，是
+:func:`~pylons.templating.render_mako` 的别名。
 
-
-Directly-supported template engines
+内建支持的模板引擎
 ===================================
 
-Pylons provides pre-configured options for using the `Mako`__, `Genshi`__ and `Jinja2`__ template rendering engines. They are setup automatically during the creation of a new Pylons project, or can be added later manually.
-
+Pylons 内建支持的模板渲染引擎有 `Mako`__, `Genshi`__ 和 `Jinja2`__ 。
+它们会在新项目创建时自动配置好，也可以随时手动添加并配置。
 
 .. __: http://www.makotemplates.org/
 .. __: http://genshi.edgewall.org/
@@ -66,10 +74,11 @@ Pylons provides pre-configured options for using the `Mako`__, `Genshi`__ and `J
 
 
 ******************************
-Passing Variables to Templates
+向模板引擎传递变量
 ******************************
 
-To pass objects to templates, the standard Pylons method is to attach them to the :term:`tmpl_context` (aliased as `c` in controllers and templates, by default) object in the :ref:`controllers`::
+Pylons 在控制器中使用 :term:`tmpl_context` 来传递变量到模板
+（默认情况是使用 `c` 作为别名）::
 
     import logging
 
@@ -86,7 +95,7 @@ To pass objects to templates, the standard Pylons method is to attach them to th
             c.name = "Fred Smith"
             return render('/sample.mako')
 
-Using the variable in the template:
+在模板中使用变量：
 
 .. code-block:: html+mako
     
