@@ -7,6 +7,10 @@ Pylons 参考手册
    :height: 255
    :width: 780
 
+译者：alswl_
+
+.. _alswl: http://log4d.com/
+
 Pylons 入门
 ---------------------------
 

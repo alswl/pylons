@@ -4,6 +4,9 @@
 Views
 =====
 
+译者：alswl_
+
+.. _alswl: http://log4d.com/
 
 .. image:: _static/pylon4.jpg
    :alt: 
