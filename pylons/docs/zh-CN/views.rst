@@ -104,60 +104,65 @@ Pylons 在控制器中使用 :term:`tmpl_context` 来传递变量到模板
     
     Hi there ${c.name}!
 
-Strict vs Attribute-Safe tmpl_context objects
+tmpl_context 模板上下文对象的严格模式和非严格模式
 =============================================
 
-The :term:`tmpl_context` object is created at the beginning of every request, and by default is an instance of the :class:`~pylons.util.AttribSafeContextObj` class, which is an Attribute-Safe object. This means that accessing attributes on it that do **not** exist will return an empty string **instead** of raising an :exc:`AttributeError` error.
+`tmpl_context` 对象是在每次请求时候被创建的。它是
+:class:`~pylons.util.AttribSafeContextObj` 的子类，也是属性读取安全的。
+这意味着当尝试获取一个 **不** 存在的属性时，它不会抛出异常
+:exec:`AttribSafeContextObj` ，而是返回一个空字符串。
 
-This can be convenient for use in templates since it can act as a default:
+这种默认设置，可以为开发者带来很多方便：
 
 .. code-block:: html+mako
     
     Hi there ${c.name}
 
-That will work when `c.name` has not been set, and is a bit shorter than what would be needed with the strict :class:`~pylons.util.ContextObj` context object.
+当 `c.name` 不存在时候，上述代码依然可以工作，这种写法比使用
+严格的上下文内容对象 :class:`~pylons.util.ContextObj` 代码要精简很多。
 
-Switching to the strict version of the :term:`tmpl_context` object can be done in the :file:`config/environment.py` by adding (after the config.init_app)::
-    
+如果想切换到严格版本的 :term:`tmpl_context` ，在 :file:`config/environment.py`
+中（在 config.init_app）中加入::
+
     config['pylons.strict_c'] = True
 
 
 .. _template-globals:
 
 **************************
-Default Template Variables
+默认模板参数
 **************************
 
-By default, all templates have a set of variables present in them to make it easier to get to common objects. The full list of available names present in the templates global scope:
+默认状态下，所有的模板页都自带一些通用对象来帮助开发。完整的变量列表如下：
 
-- :term:`c` -- Template context object (Alias for :term:`tmpl_context`)
-- :term:`tmpl_context` -- Template context object
+- :term:`c` -- 模板页上下文对象 (是 :term:`tmpl_context` 的别名)
+- :term:`tmpl_context` -- 模板页上下文对象
 - :data:`config` -- Pylons :class:`~pylons.configuration.PylonsConfig`
-  object (acts as a dict)
-- :term:`g` -- Project application globals object (Alias for :term:`app_globals`)
-- :term:`app_globals` -- Project application globals object
-- :term:`h` -- Project helpers module reference
+  对象 (字典结构)
+- :term:`g` -- 项目全局对象 (:term:`app_globals` 的别名)
+- :term:`app_globals` -- 项目全局对象
+- :term:`h` -- 项目助手模块
 - :data:`request` -- Pylons :class:`~pylons.controllers.util.Request`
-  object for this request
+  当前请求对象
 - :data:`response` -- Pylons :class:`~pylons.controllers.util.Response`
-  object for this request
-- :class:`session` -- Pylons session object (unless Sessions are
-  removed)
-- :class:`translator` -- Gettext translator object configured for
-  current locale
-- :func:`ungettext` -- Unicode capable version of gettext's ngettext
-  function (handles plural translations)
-- :func:`_` -- Unicode capable gettext translate function
+  当前响应对象
+- :class:`session` -- Pylons session 对象 (除非 Session 被禁用了)
+- :class:`translator` -- 从配置文件获取当前 i18 对象
+- :func:`ungettext` -- gettext 的 ngettext Unicode 版本 (用来处理多语言的复数)
+- :func:`_` -- Unicode 版本的获取多语言函数
 - :func:`N_` -- gettext no-op function to mark a string for
   translation, but doesn't actually translate
-- :class:`url <routes.util.URLGenerator>` -- An instance of the :class:`routes.util.URLGenerator` configured for this request.
+- :class:`url <routes.util.URLGenerator>` -- :class:`routes.util.URLGenerator`
+  的实例
 
 
 ****************************
-Configuring Template Engines
+配置模板引擎
 ****************************
 
-A new Pylons project comes with the template engine setup inside the projects' :file:`config/environment.py` file. This section creates the Mako template lookup object and attaches it to the :term:`app_globals` object, for use by the template rendering function.
+新的 Pylons 项目在项目文件 :file:`config/environment.py` 中配置模板引擎。
+在这里面会创建 Mako 模板查找器，并将其载入 :term:`app_globals` 对象，
+这样就可以使用模板的渲染方法了。
 
 .. code-block:: python
 
@@ -175,7 +180,7 @@ A new Pylons project comes with the template engine setup inside the projects' :
         imports=['from webhelpers.html import escape'])
 
 
-Using Multiple Template Engines
+使用多个模板引擎
 ===============================
 
 Since template engines are configured in the :file:`config/environment.py` section, then used by render functions, it's trivial to setup additional template engines, or even differently configured versions of a single template engine. However, custom render functions will frequently be needed to utilize the additional template engine objects.
@@ -225,7 +230,7 @@ The only change from the :func:`~pylons.templating.render_mako` function that co
 .. _custom-render:
 
 *******************************
-Custom :func:`render` functions
+自定义 :func:`render` 函数
 *******************************
 
 Writing custom render functions can be used to access specific features in a template engine, such as Genshi, that go beyond the default :func:`~pylons.templating.render_genshi` functionality or to add support for additional template engines.
@@ -268,28 +273,30 @@ Using the :func:`~pylons.templating.pylons_globals` function also makes it easy 
 
 
 ********************
-Templating with Mako
+使用 Mako 模板引擎
 ********************
 
-Introduction
+介绍
 ============
 
-The template library deals with the *view*, presenting the model. It generates (X)HTML code, CSS and Javascript that is sent to the browser. *(In the examples for this section, the project root is ``myapp``.)* 
+这个模板库是用来处理 *视图* 的，他会生成 (X)HTML、CSS 和 Javascript 代码。
+*（在这节案例中，项目根目录是 ``myapp`` 。）*
 
-Static vs. dynamic
+静态还是动态？
 ------------------
 
-Templates to generate dynamic web content are stored in `myapp/templates`, static files are stored in `myapp/public`.
+需要动态生成的模板保存在 `myapp/templates` 里，
+静态文件存放在 `myapp/public` 里。
 
-Both are served from the server root, **if there is a name conflict the static files will be served in preference**
+服务器运行后，他们都是相对于根目录的， **如果名称冲突，静态文件会优被使用** 。
 
-Making a template hierarchy
+使用结构化的模板
 ===========================
 
-Create a base template
+创建公共基础模板
 ----------------------
 
-In `myapp/templates` create a file named `base.mako` and edit it to appear as follows:
+在 `myapp/templates` 下创建名为 `base.mako` 的文件并按如下编辑：
 
 .. code-block:: html+mako
 
@@ -304,16 +311,17 @@ In `myapp/templates` create a file named `base.mako` and edit it to appear as fo
       </body>
     </html>
 
-A base template such as the very basic one above can be used for all pages rendered by Mako. This is useful for giving a consistent look to the application. 
+一个公共基础模板会被所有页面是使用，这样可以给应用提供一个统一的界面。
 
-* Expressions wrapped in `${...}` are evaluated by Mako and returned as text 
-* `${` and `}` may span several lines but the closing brace should not be on a line by itself (or Mako throws an error)
-* Functions that are part of the `self` namespace are defined in the Mako templates
 
-Create child templates
+* `${...}` 中的表达式将被执行并返回文本结果
+* `${` 和 `}` may span several lines but the closing brace should not be on a line by itself (or Mako throws an error)
+* `self` 下面的方法是在 Mako 模板中定义的方法
+
+创建子模板
 ----------------------
 
-Create another file in `myapp/templates` called `my_action.mako` and edit it to appear as follows:
+在 `myapp/templates` 里创建一个名为 `my_action.mako` 的文件，并编辑：
 
 .. code-block:: html+mako
 
@@ -327,25 +335,28 @@ Create another file in `myapp/templates` called `my_action.mako` and edit it to 
 
     <p>Lorem ipsum dolor ...</p>
 
-This file  define the functions called by `base.mako`. 
+这个文件中定义了一个教 `base.mako` 的方法。
 
-* The `inherit` tag specifies a parent file to pass program flow to
-* Mako defines functions with `<%def name="function_name()">...</%def>`, the contents of the tag are returned
-* Anything left after the Mako tags are parsed out is automatically put into the `body()` function
+* `inherit` 指明继承的模板
+* Mako 用 `<%def name="function_name()">...</%def>` 定义方法，
+  返回的结果将显示出来
+* Mako 标签之外的所有内容将被自动输出到 `body()` 方法。
 
-A consistent feel to an application can be more readily achieved if all application pages refer back to single file (in this case `base.mako`)..
+如果所有的页面都继承自同一个文件，那么很容易形成统一的风格。
+（在这里这个文件是 `base.mako` ）
 
-Check that it works
+检查是否正常工作
 -------------------
 
-In the controller action, use the following as a `return()` value,
+在控制器的 action 里面，使用 `return` 来返回模板数据。
 
 .. code-block:: python
 
     return render('/my_action.mako')
 
-
-Now run the action, usually by visiting something like ``http://localhost:5000/my_controller/my_action`` in a browser. Selecting 'View Source' in the browser should reveal the following output:
+现在我们来运行这个 action，通常是访问类似
+``http://localhost:5000/my_controller/my_action`` 的网页。
+在浏览器点击「查看源码」应该会看到下面这样的输出：
 
 .. code-block:: html
 
