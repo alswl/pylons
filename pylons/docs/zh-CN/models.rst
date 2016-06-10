@@ -1,10 +1,10 @@
 .. _models:
 
 ======
-Models
+模型
 ======
 
-About the model
+关于模型
 ===============
 
 .. image:: _static/pylon3.jpg
@@ -13,23 +13,33 @@ About the model
    :height: 450px
    :width: 368px
 
-In the MVC paradigm the *model* manages the behavior and data of the application domain, responds to requests for information about its state and responds to instructions to change state.
+在 MVC 模式中， *模型* 控制应用业务的数据表现，
+包括展现自身状态和响应响应外部指令来改变状态。
 
-The model represents enterprise data and business rules. It is where most of the processing takes place when using the MVC design pattern. Databases are in the remit of the model, as are component objects such as :term:`EJBs` and :term:`ColdFusion Components`.
+模型描述业务数据和逻辑规则。在 MVC 设计模式中，模型层负责处理大部分这类任务。
+数据库在模型层的职责范围之内，经常被模块化为 :term:`EJCs` 和
+:term:`ColdFusion Components` 这类的形式。
 
-The data returned by the model is display-neutral, i.e. the model applies no formatting. A single model can provide data for any number of display interfaces. This reduces code duplication as model code is written only once and is then reused by all of the views.
+模型返回的数据应该是原始没经过处理的。这样模型可以给很多数据展示方式提供数据。
+从而可以保证只要一次代码撰写，就可以将数据提供给所有的视图。
 
-Because the model returns data without applying any formatting, the same components can be used with any interface. For example, most data is typically formatted with HTML but it could also be formatted with Macromedia Flash or WAP.
+比如，大部分数据通常以 HTML 展现，但是有时候也会通过 Flash 或 WAP 展示。
 
-The model also isolates and handles state management and data persistence. For example, a Flash site or a wireless application can both rely on the same session-based shopping cart and e-commerce processes.
+模型同时会隔离并持久化数据。比如一个 Flash 站点或一个移动应用，
+都可以使用基于 session 的购物车，完成电子上午处理。
 
-Because the model is self-contained and separate from the controller and the view, changing the data layer or business rules is less painful. If it proves necessary to switch databases, e.g. from MySQL to Oracle, or change a data source from an RDBMS to LDAP, the only required task is that of altering the model. If the view is written correctly, it won’t care at all whether a list of users came from a database or an LDAP server.
+由于模型独立并不依赖于控制器和视图，修改数据和业务逻辑不会带来太多的麻烦。
+当必须要迁移数据库时候，比如从 MySQL 到 Oracle，从 RDBMS 到 LDAP，
+唯一需要做的就是修改模型层。如果视图写的优美，
+它根本不会关注数据是来自数据库还是 LDAP。
 
-This freedom arises from the way that the three parts of an MVC-based application act as `black boxes`, the inner workings of each one are hidden from, and are independent of, the other two. The approach promotes well-defined interfaces and self-contained components.
+这种选择的自由要感谢基于 MVC 的应用内部有互为 `黑盒` 的三个部分。
+他们各自内部的处理流程都被隐藏了，相互之间耦合低。
+它提倡优雅的接口和独立的模块化组件。
 
 .. note:: *adapted from an Oct 2002 TechRepublic article by by Brian Kotek: "MVC design pattern brings about better organization and code reuse"* - http://articles.techrepublic.com.com/5100-10878_11-1049862.html
 
-Model Basics
+模型基础应用
 ============
 
 Pylons provides a :data:`model` package to put your database code in but does not offer a database engine or API.  Instead there are several third-party APIs to choose from.
