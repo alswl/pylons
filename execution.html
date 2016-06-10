@@ -1,0 +1,867 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pylons Execution Analysis &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Pylons Modules" href="modules/index.html" />
+    <link rel="prev" title="Using Entry Points to Write Plugins" href="advanced_pylons/entry_points_and_plugins.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules/index.html" title="Pylons Modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="advanced_pylons/entry_points_and_plugins.html" title="Using Entry Points to Write Plugins"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pylons-execution-analysis">
+<h1>Pylons Execution Analysis<a class="headerlink" href="#pylons-execution-analysis" title="Permalink to this headline">¶</a></h1>
+<p><em>By Mike Orr and Alfredo Deza</em></p>
+<p>This chapter shows how Pylons calls your application, and how Pylons interacts
+with Paste, Routes, Mako, and its other dependencies.  We&#8217;ll create
+a simple application and then analyze the Python code executed starting from
+the moment we run the &#8220;paster serve&#8221; command.</p>
+<p><strong>Abbreviations:</strong> <strong>$APP</strong> is your top-level application directory.
+<strong>$SP</strong> is the site-packages directory where Pylons is installed.
+<strong>$BIN</strong> is the location of <code class="docutils literal"><span class="pre">paster</span></code> and other executables. $SP paths are
+shown in pip style ($SP/pylons) rather than easy_install style
+($SP/Pylons-VERSION.egg/pylons).</p>
+<div class="section" id="the-sample-application">
+<h2>The sample application<a class="headerlink" href="#the-sample-application" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Create an application called &#8220;Analysis&#8221; with a controller called &#8220;main&#8221;:</p>
+<div class="highlight-default"><div class="highlight"><pre>$ paster create -t pylons Analysis
+$ cd Analysis
+$ paster controller main
+</pre></div>
+</div>
+<p>Press Enter at all question prompts.</p>
+</li>
+<li><p class="first">Edit <strong>analysis/controllers/main.py</strong> to look like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">analysis.lib.base</span> <span class="k">import</span> <span class="n">BaseController</span>
+
+<span class="k">class</span> <span class="nc">MainController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;h1&gt;Welcome to the Analysis Demo&lt;/h1&gt;Here is a &lt;a href=&quot;/page2&quot;&gt;link&lt;/a&gt;.&#39;</span>
+
+    <span class="k">def</span> <span class="nf">page2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;Thank you for using the Analysis Demo. &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&#39;</span>
+</pre></div>
+</div>
+<p>There are two shortcuts here which you would not use in a normal
+application. One, we&#8217;re returning incomplete HTML documents. Two, we&#8217;ve
+hardcoded the URLs to make the analysis easier to follow, rather than using
+the <code class="docutils literal"><span class="pre">url</span></code> object.</p>
+</li>
+<li><p class="first">Now edit <strong>analysis/config/routing.py</strong>.  Add these lines after &#8220;CUSTOM
+ROUTES HERE&#8221; (line 21):</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;home&quot;</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="n">controller</span><span class="o">=</span><span class="s">&quot;main&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&quot;index&quot;</span><span class="p">)</span>
+<span class="nb">map</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;page2&quot;</span><span class="p">,</span> <span class="s">&quot;/page2&quot;</span><span class="p">,</span> <span class="n">controller</span><span class="o">=</span><span class="s">&quot;main&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&quot;page2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Delete the file <strong>analysis/public/index.html</strong>.</p>
+</li>
+<li><p class="first">Now run the server.  (Press ctrl-C to quit it.)</p>
+<div class="highlight-default"><div class="highlight"><pre>$ paster serve development.ini
+Starting server in PID 7341.
+serving on http://127.0.0.1:5000
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="pylons-dependencies">
+<h2>Pylons&#8217; dependencies<a class="headerlink" href="#pylons-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Pylons 1.0 has the following direct and indirect dependencies, which will be
+found in your site-packages directory ($SP):</p>
+<ul class="simple">
+<li>Beaker 1.5.4</li>
+<li>decorator 3.2.0</li>
+<li>FormEncode 1.2.2</li>
+<li>Mako 0.3.4</li>
+<li>MarkupSafe 0.9.3</li>
+<li>Nose 0.11.4</li>
+<li>Paste 1.7.3.1</li>
+<li>PasteDeploy 1.3.3</li>
+<li>PasteScript 1.7.3</li>
+<li>Routes 1.12.3</li>
+<li>simplejson 2.0.9 (if Python &lt; 2.6)</li>
+<li>Tempita 0.4</li>
+<li>WebError 0.10.2</li>
+<li>WebHelpers 1.2</li>
+<li>WebOb 0.9.8</li>
+<li>Webtest 1.2.1</li>
+</ul>
+<p>These are the current versions as of August 29, 2010. Your installation may have
+slightly newer or older versions.</p>
+</div>
+<div class="section" id="the-analysis">
+<h2>The analysis<a class="headerlink" href="#the-analysis" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="startup-pastescript">
+<h3>Startup (PasteScript)<a class="headerlink" href="#startup-pastescript" title="Permalink to this headline">¶</a></h3>
+<p>When you run <code class="docutils literal"><span class="pre">paster</span> <span class="pre">serve</span> <span class="pre">development.ini</span></code>, it runs the &#8220;$BIN/paster&#8221; program.
+This is a platform-specific stub created by <code class="docutils literal"><span class="pre">pip</span></code> or <code class="docutils literal"><span class="pre">easy_install</span></code>.  It
+does this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">__requires__</span> <span class="o">=</span> <span class="s">&#39;PasteScript==1.7.3&#39;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">load_entry_point</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span>
+   <span class="n">load_entry_point</span><span class="p">(</span><span class="s">&#39;PasteScript==1.7.3&#39;</span><span class="p">,</span> <span class="s">&#39;console_scripts&#39;</span><span class="p">,</span> <span class="s">&#39;paster&#39;</span><span class="p">)()</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This says to load a Python object &#8220;paster&#8221; located in an egg &#8220;PasteScript&#8221;,
+version 1.7.3, under the entry point group <code class="docutils literal"><span class="pre">[console_scripts]</span></code>.</p>
+<p>To explain what this means we have to get into Setuptools. Setuptools is
+Python&#8217;s de facto package manager, and was installed as part of your virtualenv
+or Pylons installation. (If you&#8217;re using Distribute 0.6, an alternative
+package manager, it works the same way.) <code class="docutils literal"><span class="pre">load_entry_point</span></code> is a function
+that looks up a Python object via entry point and returns it.</p>
+<p>So what&#8217;s an entry point? It&#8217;s an alias for a Python object. Here&#8217;s the entry
+point itself:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="p">[</span><span class="n">console_scripts</span><span class="p">]</span>
+<span class="n">paster</span><span class="o">=</span><span class="n">paste</span><span class="o">.</span><span class="n">script</span><span class="o">.</span><span class="n">command</span><span class="p">:</span><span class="n">run</span>
+</pre></div>
+</div>
+<p>This is from $SP/PasteScript-VERSION.egg-info/entry_points.txt.
+(If you used easy_install rather than pip, the path would be slightly
+different: $APP/PasteScript-VERSION.egg/EGG-INFO/entry_points.txt.)</p>
+<p>&#8220;console_scripts&#8221; is the entry point group. &#8220;paster&#8221; is the
+entry point. The right side of the value tells which module to import
+(<code class="docutils literal"><span class="pre">paste.script.command</span></code>) and which object in it to return (the <code class="docutils literal"><span class="pre">run</span></code>
+function). (To create an entry point, define it in your package&#8217;s setup.py. Pip
+or easy_install will create the egg_info metadata from that. If you modify a
+package&#8217;s entry points, you must reinstall the package to update the egg_info.)</p>
+<p>The most common use case for entry points is for plugins. So Nose for instance
+defines an entry point group by which it will look for plugins. Any other
+package can provide plugins for Nose by defining entry points in that group.
+Paster uses plugins extensively, as we&#8217;ll soon see.</p>
+<p>So to make a long story short, &#8220;paster serve&#8221; calls this <code class="docutils literal"><span class="pre">run</span></code> function. I
+inserted print statements into <code class="docutils literal"><span class="pre">paste.script.command</span></code> to figure out what it
+does. Here&#8217;s a simplified description:</p>
+<ol class="arabic">
+<li><p class="first">The <code class="docutils literal"><span class="pre">run()</span></code> function parses the command-line options into a subcommand
+<code class="docutils literal"><span class="pre">&quot;serve&quot;</span></code> with arguments <code class="docutils literal"><span class="pre">[&quot;development.ini&quot;]</span></code>.</p>
+</li>
+<li><p class="first">It calls <code class="docutils literal"><span class="pre">get_commands()</span></code>, which loads Paster commands from plugins
+located at various entry points.  (You can add custom commands with the
+&#8220;&#8211;plugin&#8221; command-line argument.)  Paste&#8217;s standard commands are listed in
+the same entry_points.txt file we saw above:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="p">[</span><span class="n">paste</span><span class="o">.</span><span class="n">global_paster_command</span><span class="p">]</span>
+<span class="n">serve</span><span class="o">=</span><span class="n">paste</span><span class="o">.</span><span class="n">script</span><span class="o">.</span><span class="n">serve</span><span class="p">:</span><span class="n">ServeCommand</span> <span class="p">[</span><span class="n">Config</span><span class="p">]</span>
+<span class="c">#... other commands like &quot;make-config&quot;, &quot;setup-app&quot;, etc ...</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">It calls <code class="docutils literal"><span class="pre">invoke()</span></code>, which essentially does
+<code class="docutils literal"><span class="pre">paste.script.serve.ServeCommand([&quot;development.ini&quot;]).run()</span></code>. This in turn
+calls <code class="docutils literal"><span class="pre">ServeCommand.command()</span></code>, which handles daemonizing and other
+top-level stuff.  Since our command line is short, there&#8217;s no top-level
+stuff to do. It creates &#8216;server&#8217; and &#8216;app&#8217; objects based on the
+configuration file, and calls <code class="docutils literal"><span class="pre">server(app)</span></code>.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="loading-the-server-and-the-application-pastedeploy">
+<h3>Loading the server and the application (PasteDeploy)<a class="headerlink" href="#loading-the-server-and-the-application-pastedeploy" title="Permalink to this headline">¶</a></h3>
+<p>This all happens during step 3 of the application startup. We need to find and
+instantiate the WSGI application and server based on the configuration file.
+The application is our Analysis application.  The server is Paste&#8217;s built-in
+multithreaded HTTP server.  A simplified version of the code is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Inside paste.script.serve module, ServeCommand.command() method.</span>
+<span class="kn">from</span> <span class="nn">paste.deploy.loadwsgi</span> <span class="k">import</span> <span class="n">loadapp</span><span class="p">,</span> <span class="n">loadserver</span>
+<span class="n">server</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadserver</span><span class="p">(</span><span class="n">server_spec</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">server_name</span><span class="p">,</span>
+                                 <span class="n">relative_to</span><span class="o">=</span><span class="n">base</span><span class="p">,</span> <span class="n">global_conf</span><span class="o">=</span><span class="nb">vars</span><span class="p">)</span>
+<span class="n">app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadapp</span><span class="p">(</span><span class="n">app_spec</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">app_name</span><span class="p">,</span>
+                  <span class="n">relative_to</span><span class="o">=</span><span class="n">base</span><span class="p">,</span> <span class="n">global_conf</span><span class="o">=</span><span class="nb">vars</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">loadserver()</span></code> and <code class="docutils literal"><span class="pre">loadapp()</span></code> are defined in module
+<code class="docutils literal"><span class="pre">paste.deploy.loadwsgi</span></code>. The code here is complex, so we&#8217;ll just look at its
+general behavior. Both functions see the &#8220;config:&#8221; URI and read our config
+file. Since there is no server name or app name they both default to &#8220;main&#8221;.
+Therefore loadserver() looks for a &#8220;[server:main]&#8221; section in the config file,
+and loadapp()` looks for &#8220;[app:main]&#8221;. Here&#8217;s what they find in
+&#8220;development.ini&#8221;:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="p">[</span><span class="n">server</span><span class="p">:</span><span class="n">main</span><span class="p">]</span>
+<span class="n">use</span> <span class="o">=</span> <span class="n">egg</span><span class="p">:</span><span class="n">Paste</span><span class="c">#http</span>
+<span class="n">host</span> <span class="o">=</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span>
+<span class="n">port</span> <span class="o">=</span> <span class="mi">5000</span>
+
+<span class="p">[</span><span class="n">app</span><span class="p">:</span><span class="n">main</span><span class="p">]</span>
+<span class="n">use</span> <span class="o">=</span> <span class="n">egg</span><span class="p">:</span><span class="n">Analysis</span>
+<span class="n">full_stack</span> <span class="o">=</span> <span class="n">true</span>
+<span class="n">static_files</span> <span class="o">=</span> <span class="n">true</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>The &#8220;use =&#8221; line in each section tells which object to load. The other lines
+are configuration parameters for that object, or for plugins that object is
+expected to load.  We can also put custom parameters in [app:main] for our
+application to read directly.</p>
+<div class="section" id="server-loading">
+<h4>Server loading<a class="headerlink" href="#server-loading" title="Permalink to this headline">¶</a></h4>
+<ol class="arabic">
+<li><p class="first"><code class="docutils literal"><span class="pre">loadserver()</span></code>&#8216;s args are <code class="docutils literal"><span class="pre">uri=&quot;config:development.ini&quot;,</span> <span class="pre">name=None,</span>
+<span class="pre">relative_to=&quot;$APP&quot;</span></code>.</p>
+</li>
+<li><p class="first">A &#8220;config:&#8221; URI means to read a config file.</p>
+</li>
+<li><p class="first">A server name was not specified so it defaults to &#8220;main&#8221;. So loadserver()
+looks for a section &#8220;[server:main]&#8221;. The &#8220;server&#8221; part comes from the
+loadwsgi._Server.config_prefixes class attribute in
+$SP/paste/deploy/loadwsgi.py).</p>
+</li>
+<li><p class="first">&#8220;use = egg:Paste#http&#8221; says to load an egg called &#8220;Paste&#8221;.</p>
+</li>
+<li><p class="first">loadwsgi._Server.egg_protocols lists two protocols it supports:
+&#8220;server_factory&#8221; and &#8220;server_runner&#8221;.</p>
+</li>
+<li><p class="first">&#8220;paste.server_runner&#8221; is an entry point group in the &#8220;Paste&#8221; egg, and it has
+an entry point &#8220;http&#8221;. The relevant lines in
+$SP/Paste*.egg_info/entry_points.txt are:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="p">[</span><span class="n">paste</span><span class="o">.</span><span class="n">server_runner</span><span class="p">]</span>
+<span class="n">http</span> <span class="o">=</span> <span class="n">paste</span><span class="o">.</span><span class="n">httpserver</span><span class="p">:</span><span class="n">server_runner</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">There&#8217;s a server_runner() function in the paste.httpserver module
+($SP/paste/httpserver.py).</p>
+</li>
+</ol>
+<p>We&#8217;ll stop here for a moment and look at how the application is loaded.</p>
+</div>
+<div class="section" id="application-loading">
+<h4>Application loading<a class="headerlink" href="#application-loading" title="Permalink to this headline">¶</a></h4>
+<ol class="arabic">
+<li><p class="first">loadapp() looks for a section &#8220;[app:main]&#8221; in the config file. The &#8220;app&#8221;
+part comes from the loadwsgi._App.config_prefixes class attribute (in
+$SP/paste/deploy/loadwsgi.py).</p>
+</li>
+<li><p class="first">&#8220;use = egg:Analysis&#8221; says to find an egg called &#8220;Analysis&#8221;.</p>
+</li>
+<li><p class="first">loadwsgi._App.egg_protocols lists &#8220;paste.app_factory&#8221; as one of the
+protocols it supports.</p>
+</li>
+<li><p class="first">&#8220;paste.app_factory&#8221; is also an entry point group in the egg, as seen in
+$APP/Analysis.egg-info/entry_points.txt:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="p">[</span><span class="n">paste</span><span class="o">.</span><span class="n">app_factory</span><span class="p">]</span>
+<span class="n">main</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">middleware</span><span class="p">:</span><span class="n">make_app</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The line &#8220;main = analysis.config.middleware:make_app&#8221; means to
+look for a <code class="docutils literal"><span class="pre">make_app()</span></code> object in the <code class="docutils literal"><span class="pre">analysis</span></code> package.
+This is a function imported from <code class="docutils literal"><span class="pre">analysis.config.middleware</span></code>
+($APP/analysis/config/middleware.py).</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="instantiating-the-application-analysis">
+<h3>Instantiating the application (Analysis)<a class="headerlink" href="#instantiating-the-application-analysis" title="Permalink to this headline">¶</a></h3>
+<p>Here&#8217;s a closer look at our application&#8217;s <code class="docutils literal"><span class="pre">make_app</span></code> function:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># In $APP/analysis/config/middleware.py</span>
+<span class="k">def</span> <span class="nf">make_app</span><span class="p">(</span><span class="n">global_conf</span><span class="p">,</span> <span class="n">full_stack</span><span class="o">=</span><span class="k">True</span><span class="p">,</span> <span class="n">static_files</span><span class="o">=</span><span class="k">True</span><span class="p">,</span> <span class="o">**</span><span class="n">app_conf</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">load_environment</span><span class="p">(</span><span class="n">global_conf</span><span class="p">,</span> <span class="n">app_conf</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">PylonsApp</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">SomeMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>   <span class="c"># Repeated for several middlewares.</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+    <span class="k">return</span> <span class="n">app</span>
+</pre></div>
+</div>
+<p>This sets up the Pylons environment (next subsection), creates the application
+object (following subsection), wraps it in several layers of middleware (listed
+in &#8220;Anatomy of a Request&#8221; below), and returns the complete application object.</p>
+<p>The [DEFAULT] section of the config file is passed as dict <code class="docutils literal"><span class="pre">global_conf</span></code>.
+The [app:main] section is passed as keyword arguments into dict <code class="docutils literal"><span class="pre">app_conf</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">full_stack</span></code> defaults to True because we&#8217;re running the application
+standalone.  If we were embedding this application as a WSGI component of some
+larger application, we&#8217;d set <code class="docutils literal"><span class="pre">full_stack</span></code> to False to disable some of the
+middleware.</p>
+<p><code class="docutils literal"><span class="pre">static_files=True</span></code> means to serve static files from our public
+directory ($APP/analysis/public). Advanced users can arrange for Apache to
+serve the static files itself, and put &#8220;static_files = false&#8221;
+in their configuration file to gain a bit of efficiency.</p>
+<div class="section" id="load-environment-pylons-config">
+<h4>load_environment &amp; pylons.config<a class="headerlink" href="#load-environment-pylons-config" title="Permalink to this headline">¶</a></h4>
+<p>Before we begin, remember that <code class="docutils literal"><span class="pre">pylons.config</span></code>, <code class="docutils literal"><span class="pre">pylons.app_globals</span></code>,
+<code class="docutils literal"><span class="pre">pylons.request</span></code>, <code class="docutils literal"><span class="pre">pylons.response</span></code>, <code class="docutils literal"><span class="pre">pylons.session</span></code>, <code class="docutils literal"><span class="pre">pylons.url</span></code>,
+and <code class="docutils literal"><span class="pre">pylons.cache</span></code> are special globals that change value depending on the
+current request. The objects are proxies which maintain a thread-local stack of
+real values.  Pylons pushes the actual values onto them at the beginning of a
+request, and pops them off at the end. (Some of them it also pushes at other
+times so they can be used outside of requests.) The proxies delegate attribute
+access and key access to the topmost actual object on the stack. (You can also
+call <code class="docutils literal"><span class="pre">myproxy._current_obj()</span></code> to get the actual object itself.)  The proxy
+code is in <code class="docutils literal"><span class="pre">paste.registry.StackedObjectProxy</span></code>, so these are called
+&#8220;StackedObjectProxies&#8221;, or &#8220;SOPs&#8221; for short.</p>
+<p>The first thing <code class="docutils literal"><span class="pre">analysis.config.middleware.make_app()</span></code> does is call
+<code class="docutils literal"><span class="pre">analysis.config.environment.load_environment()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="k">def</span> <span class="nf">load_environment</span><span class="p">(</span><span class="n">global_conf</span><span class="p">,</span> <span class="n">app_conf</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">PylonsConfig</span><span class="p">()</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">__file__</span><span class="p">)))</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
+                 <span class="n">controllers</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;controllers&#39;</span><span class="p">),</span>
+                 <span class="n">static_files</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;public&#39;</span><span class="p">),</span>
+                 <span class="n">templates</span><span class="o">=</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;templates&#39;</span><span class="p">)])</span>
+
+    <span class="c"># Initialize config with the basic options</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">global_conf</span><span class="p">,</span> <span class="n">app_conf</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="s">&#39;analysis&#39;</span><span class="p">,</span>
+                    <span class="n">paths</span><span class="o">=</span><span class="n">paths</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s">&#39;routes.map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_map</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.app_globals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">app_globals</span><span class="o">.</span><span class="n">Globals</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">helpers</span>
+
+    <span class="c"># Setup cache object as early as possible</span>
+    <span class="kn">import</span> <span class="nn">pylons</span>
+    <span class="n">pylons</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">_push_object</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.app_globals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+
+    <span class="c"># Create the Mako TemplateLookup, with the default auto-escaping</span>
+    <span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.app_globals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mako_lookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span>
+        <span class="n">directories</span><span class="o">=</span><span class="n">paths</span><span class="p">[</span><span class="s">&#39;templates&#39;</span><span class="p">],</span>
+        <span class="n">error_handler</span><span class="o">=</span><span class="n">handle_mako_error</span><span class="p">,</span>
+        <span class="n">module_directory</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app_conf</span><span class="p">[</span><span class="s">&#39;cache_dir&#39;</span><span class="p">],</span> <span class="s">&#39;templates&#39;</span><span class="p">),</span>
+        <span class="n">input_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">default_filters</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;escape&#39;</span><span class="p">],</span>
+        <span class="n">imports</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;from webhelpers.html import escape&#39;</span><span class="p">])</span>
+
+    <span class="c"># CONFIGURATION OPTIONS HERE (note: all config options will override</span>
+    <span class="c"># any Pylons config options)</span>
+
+    <span class="k">return</span> <span class="n">config</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">config</span></code> is the Pylons configuration object, which will later be pushed onto
+<code class="docutils literal"><span class="pre">pylons.config</span></code>. It&#8217;s an instance of <code class="docutils literal"><span class="pre">pylons.configuration.PylonsConfig</span></code>, a
+dict subclass. <code class="docutils literal"><span class="pre">config.init_app()</span></code> initializes the dict&#8217;s keys.  It sets the
+keys to a merger of app_conf and global_conf (with app_conf overriding). It
+also adds &#8220;app_conf&#8221; and &#8220;global_conf&#8221; keys so you can access the original
+app_conf and global_conf if desired. It also adds several Pylons-specific keys.</p>
+<p><code class="docutils literal"><span class="pre">config[&quot;routes.map&quot;]</span></code> is the Routes map defined in
+<code class="docutils literal"><span class="pre">analysis.config.routing.make_map()</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">config[&quot;pylons.app_globals&quot;]</span></code> is the application&#8217;s globals object, which
+will later be pushed onto <code class="docutils literal"><span class="pre">pylons.app_globals</span></code>.  It&#8217;s an instance of
+<code class="docutils literal"><span class="pre">analysis.lib.app_globals.Globals</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">config[&quot;pylons.h&quot;]</span></code> is the helpers module, <code class="docutils literal"><span class="pre">analysis.lib.helpers</span></code>. Pylons
+will assign it to <code class="docutils literal"><span class="pre">h</span></code> in the templates&#8217; namespace.</p>
+<p>The &#8220;cache&#8221; lines push <code class="docutils literal"><span class="pre">pylons.app_globals.cache</span></code> onto <code class="docutils literal"><span class="pre">pylons.cache</span></code> for
+backward compatibility.  This gives a preview of how StackedObjectProxies work.</p>
+<p>The Mako stanza creates a TemplateLookup, which <code class="docutils literal"><span class="pre">render()</span></code> will use to find
+templates. The object is put on <code class="docutils literal"><span class="pre">app_globals</span></code>.</p>
+<p>If you&#8217;ve used older versions of Pylons, you&#8217;ll notice a couple differences in
+1.0.  The <code class="docutils literal"><span class="pre">config</span></code> object is created as a local variable and returned, and
+it&#8217;s passed explicitly to the route map factory and globals factory. Previous
+versions pushed it onto <code class="docutils literal"><span class="pre">pylons.config</span></code> immediately and used it from there.
+This was changed to make it easier to nest Pylons applications inside other
+Pylons applications.</p>
+<p>The other difference is that Buffet is gone, and along with it the
+<code class="docutils literal"><span class="pre">template_engine</span></code> argument and template config options. Pylons 1.0 gets out
+of the business of initializing template engines.  You use one of the standard
+render functions such as <code class="docutils literal"><span class="pre">render_mako</span></code> or write your own, and define any
+attributes in <code class="docutils literal"><span class="pre">app_globals</span></code> that your render function depends on.</p>
+</div>
+<div class="section" id="pylonsapp">
+<h4>PylonsApp<a class="headerlink" href="#pylonsapp" title="Permalink to this headline">¶</a></h4>
+<p>The second line of <code class="docutils literal"><span class="pre">make_app()</span></code> creates a Pylons application object
+based on your configuration.  Again the <code class="docutils literal"><span class="pre">config</span></code> object is passed around
+explicitly, unlike older versions of Pylons. A Pylons application is an
+instance of <code class="docutils literal"><span class="pre">pylons.wsgiapp.PylonsApp</span></code> instance. (Older versions of Pylons
+had a <code class="docutils literal"><span class="pre">PylonsBaseWSGIApp</span></code> superclass, but that has been merged into
+<code class="docutils literal"><span class="pre">PylonsApp</span></code>.)</p>
+</div>
+<div class="section" id="middleware">
+<h4>Middleware<a class="headerlink" href="#middleware" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">make_app()</span></code> then wraps the application (the <code class="docutils literal"><span class="pre">app</span></code> variable) in several
+layers of middleware. Each middleware provides an optional add-on service.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="36%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Middleware</th>
+<th class="head">Service</th>
+<th class="head">Effect if disabled</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>RoutesMiddleware</td>
+<td>Use Routes to manage URLs.</td>
+<td>Routes and <code class="docutils literal"><span class="pre">pylons.url</span></code> won&#8217;t
+work.</td>
+</tr>
+<tr class="row-odd"><td>SessionMiddleware</td>
+<td>HTTP sessions using Beaker,
+with flexible persistence
+backends (disk, memached,
+database).</td>
+<td><code class="docutils literal"><span class="pre">pylons.session</span></code> won&#8217;t work.</td>
+</tr>
+<tr class="row-even"><td>ErrorHandler</td>
+<td>Display interactive
+traceback if an exception
+occurs. In production mode,
+email the traceback to the
+site admin.</td>
+<td>Paste will catch exceptions and
+convert them to Internal Server
+Error.</td>
+</tr>
+<tr class="row-odd"><td>StatusCodeRedirect</td>
+<td>If an HTTP error occurs,
+make a subrequest to display
+a fancy styled HTML error
+page.</td>
+<td>If an HTTP error occurs,
+display a plain white HTML page
+with the error message.</td>
+</tr>
+<tr class="row-even"><td>RegistryManager</td>
+<td>Handles the special globals
+(<code class="docutils literal"><span class="pre">pylons.request</span></code>, etc).</td>
+<td>The special globals won&#8217;t work.
+There are other ways to access
+the objects without going
+through the special globals.</td>
+</tr>
+<tr class="row-odd"><td>StaticURLParser</td>
+<td>Serve the static files
+in the application&#8217;s
+public directory.</td>
+<td>The static files won&#8217;t be
+found. Presumably you&#8217;ve
+configured Apache to serve them
+directly.</td>
+</tr>
+<tr class="row-even"><td>Cascade</td>
+<td>Call several sub-middlewares
+in order, and use the first
+one that doesn&#8217;t return
+&#8220;404 Not Found&#8221;. Used in
+conjunction with
+StaticURLParser.</td>
+<td>No cascading through
+alternative apps.</td>
+</tr>
+</tbody>
+</table>
+<p>At the end of the function, <code class="docutils literal"><span class="pre">app.config</span></code> is set to the <code class="docutils literal"><span class="pre">config</span></code> object, so
+that any part of the application can access the config without going through
+the special global.</p>
+</div>
+</div>
+<div class="section" id="anatomy-of-a-request">
+<h3>Anatomy of a request<a class="headerlink" href="#anatomy-of-a-request" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s say you&#8217;re running the demo and click the &#8220;link&#8221; link on the home page.
+The browser sends a request for &#8220;<a class="reference external" href="http://localhost:5000/page2">http://localhost:5000/page2</a>&#8221;.  In my Firefox
+the HTTP request headers are:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">page2</span>
+<span class="n">Host</span><span class="p">:</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5000</span>
+<span class="n">User</span><span class="o">-</span><span class="n">Agent</span><span class="p">:</span> <span class="n">Mozilla</span><span class="o">/</span><span class="mf">5.0</span> <span class="o">...</span>
+<span class="n">Accept</span><span class="p">:</span> <span class="n">text</span><span class="o">/</span><span class="n">html</span><span class="p">,</span><span class="o">...</span>
+<span class="n">Accept</span><span class="o">-</span><span class="n">Language</span><span class="p">:</span> <span class="n">en</span><span class="o">-</span><span class="n">us</span><span class="p">,</span><span class="n">en</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="n">Accept</span><span class="o">-</span><span class="n">Encoding</span><span class="p">:</span> <span class="n">gzip</span><span class="p">,</span><span class="n">deflate</span>
+<span class="n">Accept</span><span class="o">-</span><span class="n">Charset</span><span class="p">:</span> <span class="n">ISO</span><span class="o">-</span><span class="mi">8859</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">utf</span><span class="o">-</span><span class="mi">8</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.7</span><span class="o">*</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.7</span>
+<span class="n">Keep</span><span class="o">-</span><span class="n">Alive</span><span class="p">:</span> <span class="mi">300</span>
+<span class="n">Connection</span><span class="p">:</span> <span class="n">keep</span><span class="o">-</span><span class="n">alive</span>
+<span class="n">Referer</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="o">/</span><span class="mi">5000</span><span class="o">/</span>
+<span class="n">Cache</span><span class="o">-</span><span class="n">Control</span>   <span class="nb">max</span><span class="o">-</span><span class="n">age</span><span class="o">=</span><span class="mi">0</span>
+</pre></div>
+</div>
+<p>The response is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">HTTP</span><span class="o">/</span><span class="mf">1.</span><span class="n">x</span> <span class="mi">200</span> <span class="n">OK</span>
+<span class="n">Server</span><span class="p">:</span> <span class="n">PasteWSGIServer</span><span class="o">/</span><span class="mf">0.5</span> <span class="n">Python</span><span class="o">/</span><span class="mf">2.6</span><span class="o">.</span><span class="mi">4</span>
+<span class="n">Date</span><span class="p">:</span> <span class="n">Sun</span><span class="p">,</span> <span class="mi">06</span> <span class="n">Dec</span> <span class="mi">2009</span> <span class="mi">14</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">05</span> <span class="n">GMT</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">text</span><span class="o">/</span><span class="n">html</span><span class="p">;</span> <span class="n">charset</span><span class="o">=</span><span class="n">utf</span><span class="o">-</span><span class="mi">8</span>
+<span class="n">Pragma</span><span class="p">:</span>  <span class="n">no</span><span class="o">-</span><span class="n">cache</span>
+<span class="n">Cache</span><span class="o">-</span><span class="n">Control</span><span class="p">:</span>   <span class="n">no</span><span class="o">-</span><span class="n">cache</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Length</span><span class="p">:</span>  <span class="mi">59</span>
+
+<span class="n">Thank</span> <span class="n">you</span> <span class="k">for</span> <span class="n">using</span> <span class="n">the</span> <span class="n">Analysis</span> <span class="n">Demo</span><span class="o">.</span>  <span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;/&quot;</span><span class="o">&gt;</span><span class="n">Home</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Here&#8217;s the processing sequence:</p>
+<ol class="arabic">
+<li><p class="first"><code class="docutils literal"><span class="pre">server(app)</span></code> is still running, called by <code class="docutils literal"><span class="pre">ServeCommand.command()</span></code> in
+$SP/paste/script/serve.py.</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">server</span></code> is actually <code class="docutils literal"><span class="pre">paste.httpserver.server_runner()</span></code> in
+$SP/paste/httpserver. The only keyword args are &#8216;host&#8217; and
+&#8216;port&#8217; extracted from the config file.  <code class="docutils literal"><span class="pre">server_runner</span></code> de-stringifies
+the arguments and calls <code class="docutils literal"><span class="pre">serve(wsgi_app,</span> <span class="pre">**kwargs)</span></code> (same module).</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">serve()</span></code>&#8216;s &#8216;use_threadpool&#8217; arg defaults to True, so it creates a
+<code class="docutils literal"><span class="pre">WSGIThreadPoolServer</span></code> instance called (<code class="docutils literal"><span class="pre">server</span></code>) with the following
+inheritance:</p>
+<div class="highlight-default"><div class="highlight"><pre>    <span class="n">SocketServer</span><span class="o">.</span><span class="n">BaseServer</span>     <span class="c"># In SocketServer.py in Python stdlib.</span>
+    <span class="n">BaseHTTPServer</span><span class="o">.</span><span class="n">HTTPServer</span>  <span class="c"># In BaseHTTPServer.py in Python stdlib.</span>
+    <span class="n">paste</span><span class="o">.</span><span class="n">httpserver</span><span class="o">.</span><span class="n">SecureHTTPServer</span>  <span class="c"># Adds SSL (HTTPS).</span>
+    <span class="n">paste</span><span class="o">.</span><span class="n">httpserver</span><span class="o">.</span><span class="n">WSGIServerBase</span>    <span class="c"># Adds WSGI.</span>
+    <span class="n">paste</span><span class="o">.</span><span class="n">httpserver</span><span class="o">.</span><span class="n">WSGIThreadPoolServer</span>
+        <span class="n">multiple</span> <span class="n">inheritance</span><span class="p">:</span> <span class="n">ThreadPoolMixIn</span> <span class="o">&lt;=</span> <span class="n">ThreadPool</span>
+
+<span class="n">Note</span> <span class="n">that</span> <span class="n">SecureHTTPServer</span> <span class="n">overrides</span> <span class="n">the</span> <span class="n">implementation</span> <span class="n">of</span> <span class="n">Python</span><span class="s">&#39;s</span>
+<span class="n">SocketServer</span><span class="o">.</span><span class="n">TCPServer</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">It calls <code class="docutils literal"><span class="pre">server.serve_forever()</span></code>, implemented by the <code class="docutils literal"><span class="pre">ThreadPoolMixIn</span></code>
+superclass.  This calls <code class="docutils literal"><span class="pre">self.handle_request()</span></code> in a loop until
+<code class="docutils literal"><span class="pre">self.running</span></code> becomes false.  That initiates this call stack:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># In paste.httpserver.serve(), calling &#39;server.serve_forever()&#39;</span>
+<span class="n">ThreadPoolMixIn</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>  <span class="c"># Defined in paste.httpserver.</span>
+<span class="o">-&gt;</span> <span class="n">TCPServer</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>    <span class="c"># Called for every request.</span>
+<span class="o">-&gt;</span> <span class="n">WSGIServerBase</span><span class="o">.</span><span class="n">get_request</span><span class="p">()</span>
+<span class="o">-&gt;</span> <span class="n">SecureHTTPServer</span><span class="o">.</span><span class="n">get_request</span><span class="p">()</span>
+<span class="o">-&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>          <span class="c"># Defined in stdlib socket module.</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">self.socket.accept()</span></code> blocks, waiting for the next request.</p>
+</li>
+<li><p class="first">The request arrives and <code class="docutils literal"><span class="pre">self.socket.accept()</span></code> returns a new socket for
+the connection. <code class="docutils literal"><span class="pre">TCPServer.handle_request()</span></code> continues. It calls
+<code class="docutils literal"><span class="pre">ThreadPoolMixIn.process_request()</span></code>, which puts the request in a thread
+queue:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">thread_pooladd</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span>
+    <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_request_in_thread</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">client_address</span><span class="p">))</span>
+    <span class="c"># &#39;request&#39; is the connection socket.</span>
+</pre></div>
+</div>
+<p>The thread pool is defined in the <code class="docutils literal"><span class="pre">ThreadPool</span></code> class. It spawns a number
+of threads which each wait on the queue for a callable to run. In this case
+the callable will be a complete Web transaction including sending the HTML
+page to the client. Each thread will repeatedly process transactions from
+the queue until they receive a sentinel value ordering them to die.</p>
+<p>The main thread goes back to listening for other requests, so we&#8217;re no
+longer interested in it.</p>
+</li>
+<li><p class="first"><strong>Thread #2</strong> pulls the lambda out of the queue and calls it:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="k">lambda</span>
+<span class="o">-&gt;</span> <span class="n">ThreadPoolMixIn</span><span class="o">.</span><span class="n">process_request_in_thread</span><span class="p">()</span>
+<span class="o">-&gt;</span> <span class="n">BaseServer</span><span class="o">.</span><span class="n">finish_request</span><span class="p">()</span>
+<span class="o">-&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">RequestHandlerClass</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">client_address</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>  <span class="c"># Instantiates this.</span>
+   <span class="n">The</span> <span class="k">class</span> <span class="nc">instantiated</span> <span class="ow">is</span> <span class="n">paste</span><span class="o">.</span><span class="n">httpserver</span><span class="o">.</span><span class="n">WSGIHandler</span><span class="p">;</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="p">,</span> <span class="n">the</span> <span class="s">&#39;handler&#39;</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">serve</span><span class="p">()</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The newly-created request handler takes over:</p>
+<div class="highlight-default"><div class="highlight"><pre>SocketServer.BaseRequestHandler.__init__(request, client_address, server)
+-&gt; WSGIHandler.handle()
+-&gt; BaseHTTPRequestHandler.handle()  # In stdlib BaseHTTPServer.py
+   Handles requests in a loop until self.close_connection is true.  (For HTTP keepalive?)
+-&gt; WSGIHandler.handle_one_request()
+   Reads the command from the socket.  The command is
+   &quot;GET /page2 HTTP/1.1&quot; plus the HTTP headers above.
+   BaseHTTPRequestHandler.parse_request() parses this into attributes
+   .command, .path, .request_version, and .headers.
+-&gt; WSGIHandlerMixin.wsgi_execute().
+-&gt; WSGIHandlerMixin.wsgi_setup()
+   Creates the .wsgi_environ dict.
+</pre></div>
+</div>
+<p>The WSGI environment dict is described in PEP 333, the WSGI specification.
+It contains various keys specifying the URL to fetch, query parameters,
+server info, etc. All keys required by the CGI specification are present,
+as are other keys specific to WSGI or to paricular middleware. The
+application will calculate a response based on the dict. The application is
+wrapped in layers of middleware &#8211; nested function calls &#8211; which modify
+the dict on the way in and modify the response on the way out.</p>
+</li>
+<li><p class="first">The request handler, still in <code class="docutils literal"><span class="pre">WSGIHandlerMixin.wsgi_execute()</span></code>, calls the
+application thus:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">wsgi_application</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wsgi_environ</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">wsgi_start_response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">wsgi_start_response</span></code> is a callable mandated by the WSGI spec. The
+application will call it to specify the HTTP headers. The return value is
+an iteration of strings, which when concatenated form the HTML document to
+send to the browser. Other MIME types are handled analagously.</p>
+</li>
+<li><p class="first">The application, as we remember, was returned by
+<code class="docutils literal"><span class="pre">analysis.config.middleware.make_app()</span></code>. It&#8217;s wrapped in several layers
+of middleware, so calling it will execute the middleware in reverse order
+of how they&#8217;re listed in $APP/analysis/config/middleware.py and
+$SP/pylons/wsgiapp.py:</p>
+<blockquote>
+<div><blockquote>
+<div><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">Cascade</span></code> (defined in $SP/paste/cascade.py) lists a
+series of applications which will be tried in order (Skipped if static_files is set to False):</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><code class="docutils literal"><span class="pre">StaticURLParser</span></code> (defined in
+$SP/paste/urlparser) looks for a file URL
+under $APP/analysis/public that matches the URL.  The demo
+has no static files.</li>
+<li>If that fails the cascader tries your application.
+But first there are other middleware to go through...</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">RegistryManager</span></code> (defined in $SP/paste/registry.py)
+makes Pylons special globals both thread-local and middleware-local.
+This includes <strong>app_globals</strong>, <strong>cache</strong>, <strong>request</strong>, <strong>response</strong>,
+<strong>session</strong>, <strong>tmpl_context</strong>, <strong>url</strong>, and any other
+<code class="docutils literal"><span class="pre">StackedObjectProxy</span></code> listed in $SP/pylons/__init__.py.  (<strong>h</strong> is
+a module so it doesn&#8217;t need a proxy.)</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">StatusCodeRedirect</span></code> (defined in $SP/pylons/middleware.py)
+intercepts any HTTP error status returned by the application (e.g.,
+&#8220;Page Not Found&#8221;, &#8220;Internal Server Error&#8221;) and sends another request
+to the application to get the appropriate error page to display
+instead. (Skipped if <code class="docutils literal"><span class="pre">full_stack</span></code> argument was false.)</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">ErrorHandler</span></code> (defined in $SP/pylons/middleware.py)
+sends an interactive traceback to the browser if the app raises an
+exception, if &#8220;debug&#8221; is true in the config file.  Otherwise it
+attempts to email the traceback to the site administrator, and
+substitutes a generic Internal Server Error for the response.
+(Skipped if <code class="docutils literal"><span class="pre">full_stack</span></code> argument was false.</p>
+</li>
+<li><p class="first">User-defined middleware goes here.</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">SessionMiddleware</span></code> (wsgiapp.py) adds <a class="reference external" href="http://beaker.groovie.org/">Beaker</a>
+session support (the <code class="docutils literal"><span class="pre">pylons.session</span></code> object).  (Skipped if the
+WSGI environment has a key &#8216;session&#8217; &#8211; it doesn&#8217;t in this demo.)</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">RoutesMiddleware</span></code> (wsgiapp.py) compares the request URI against the
+routing rules in $APP/analysis/config/routing.py and sets
+&#8216;wsgi.routing_args&#8217; to the routing match dict (useful) and
+&#8216;routes.route&#8217; to the Route (probably not useful).  Pylons 1.0 apps
+have a <code class="docutils literal"><span class="pre">singleton=False</span></code> argument that suppresses initializing the
+deprecated <code class="docutils literal"><span class="pre">url_for()</span></code> function. Routes now puts a URL
+generator in the WSGI environment, which Pylons aliases to
+<code class="docutils literal"><span class="pre">pylons.url</span></code>.</p>
+</li>
+<li><p class="first">The innermost middleware calls the PylonsApp instance it was
+initialized with.</p>
+</li>
+</ul>
+</div></blockquote>
+<p>Note: CacheMiddleware is no longer used in Pylons 1.0. Instead,
+<code class="docutils literal"><span class="pre">app_globals</span></code> creates the cache as an attribute, and a line in
+environment.py aliases <code class="docutils literal"><span class="pre">pylons.cache</span></code> to it.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Surprise! PylonsApp is itself middleware. Its .__call__() method does:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">setup_app_env</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+<span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">.setup_app_env()</span></code> registers all those special globals.</p>
+<p><code class="docutils literal"><span class="pre">.resolve()</span></code> calculates the controller class based on the route chosen by
+the RoutesMiddleware, and returns the controller class.</p>
+<p><code class="docutils literal"><span class="pre">.dispatch</span></code> instantiates the controller class and calls in the WSGI
+manner.  If the controller does not exist (<code class="docutils literal"><span class="pre">.resolve()</span></code> returned None),
+raise an Exception that tells you what controller did not have any
+content.</p>
+<p>This method also handles the special URL &#8220;/_test_vars&#8221;, which is enabled
+if the application is running under a Nose test. This URL initializes
+Pylons&#8217; special globals, for tests that have to access them before making
+a regular request.</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">analysis.controllers.main.MainController</span></code> does not have a
+<code class="docutils literal"><span class="pre">.\_\_call\_\_()</span></code> method, so control falls to its parent,
+<code class="docutils literal"><span class="pre">analysis.lib.base.BaseController</span></code>.  This trivially calls the
+grandparent, <code class="docutils literal"><span class="pre">pylons.controllers.WSGIController</span></code>. It calls the action
+method <code class="docutils literal"><span class="pre">MainController.page2()</span></code>. The action method may have any number of
+positional arguments as long as they correspond to variables in the routing
+match dict.  (GET/POST variables are in the <strong>request.params</strong> dict.)  If
+the method has a <code class="docutils literal"><span class="pre">\*\*kwargs</span></code> argument, all other match variables are put
+there.  Any variables passed to the action method are also put on the
+<strong>tmpl_context</strong> object as attributes. If an action method name
+starts with &#8220;_&#8221;, it&#8217;s private and HTTPNotFound is raised.</p>
+</li>
+<li><p class="first">If the controller has .__before__() and/or .__after__() methods,
+they are called before and after the action, respectively. These can
+perform authorization, lock OS resources, etc. These methods can have
+arguments in the same manner as the action method.  However, if the code is
+used by all controllers, most Pylons programmers prefer to it in the base
+controller&#8217;s <code class="docutils literal"><span class="pre">.\_\_call\_\_</span></code> method instead.</p>
+</li>
+<li><p class="first">The action method returns a string, unicode, Response object, or is a
+generator of strings. In this trivial case it returns a string. A typical
+Pylons action would set some <em>tmpl_context</em> attributes and &#8216;return
+render(&#8216;/some/template.html&#8221;)&#8217; . In either case the global <em>response</em>
+object&#8217;s body would be set to the string.</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">WSGIController.\_\_call\_\_()</span></code> continues, converting the Response object
+to an appropriate WSGI return value. (First it calls the start_response
+callback to specify the HTTP headers, then it returns an iteration of
+strings.  The Response object converts unicode to utf-8 encoded strings, or
+whatever encoding you&#8217;ve specified in the config file.)</p>
+</li>
+<li><p class="first">The stack of middleware calls unwinds, each modifying the return value and
+headers if it desires.</p>
+</li>
+<li><p class="first">The server receives the final return value. (We&#8217;re way back in
+<code class="docutils literal"><span class="pre">paste.httpserver.WSGIHandlerMixin.wsgi_execute()</span></code> now.) The outermost
+middleware has called back to <code class="docutils literal"><span class="pre">server.start_response()</span></code>, which has saved
+the status and HTTP headers in <code class="docutils literal"><span class="pre">.wsgi_curr_headers</span></code>. <code class="docutils literal"><span class="pre">.wsgi_execute()</span></code>
+then iterates the application&#8217;s return value, calling
+<code class="docutils literal"><span class="pre">.wsgi_write_chunk(chunk)</span></code> for each encoded string yielded.
+<code class="docutils literal"><span class="pre">.wsgi_write_chunk('')</span></code> formats the status and HTTP headers and sends them
+on the socket if they haven&#8217;t been sent yet, then sends the chunk. The
+convoluted header behavior here is mandated by the WSGI spec.</p>
+</li>
+<li><p class="first">Control returns to <code class="docutils literal"><span class="pre">BaseHTTPRequestHandler.handle()</span></code>.
+<code class="docutils literal"><span class="pre">.close_connection</span></code> is true so this method returns. The call stack
+continues unwinding all the way to
+<code class="docutils literal"><span class="pre">paste.httpserver.ThreadPoolMixIn.process_request_in_thread()</span></code>. This
+tries to finish the request first and then close it unless it finds errors in it to end raising an Exception.</p>
+</li>
+<li><p class="first">The request lambda finishes and control returns to
+<code class="docutils literal"><span class="pre">ThreadPool.worker_thread_callback()</span></code>. It waits for another request in
+the thread queue. If the next item in the queue is the shutdown sentinel
+value, thread #2 dies.</p>
+</li>
+</ol>
+<p>Thus endeth our request&#8217;s long journey, and this analysis is finished too.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pylons Execution Analysis</a><ul>
+<li><a class="reference internal" href="#the-sample-application">The sample application</a></li>
+<li><a class="reference internal" href="#pylons-dependencies">Pylons&#8217; dependencies</a></li>
+<li><a class="reference internal" href="#the-analysis">The analysis</a><ul>
+<li><a class="reference internal" href="#startup-pastescript">Startup (PasteScript)</a></li>
+<li><a class="reference internal" href="#loading-the-server-and-the-application-pastedeploy">Loading the server and the application (PasteDeploy)</a><ul>
+<li><a class="reference internal" href="#server-loading">Server loading</a></li>
+<li><a class="reference internal" href="#application-loading">Application loading</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#instantiating-the-application-analysis">Instantiating the application (Analysis)</a><ul>
+<li><a class="reference internal" href="#load-environment-pylons-config">load_environment &amp; pylons.config</a></li>
+<li><a class="reference internal" href="#pylonsapp">PylonsApp</a></li>
+<li><a class="reference internal" href="#middleware">Middleware</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#anatomy-of-a-request">Anatomy of a request</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="advanced_pylons/entry_points_and_plugins.html"
+                        title="previous chapter">Using Entry Points to Write Plugins</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="modules/index.html"
+                        title="next chapter">Pylons Modules</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules/index.html" title="Pylons Modules"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="advanced_pylons/entry_points_and_plugins.html" title="Using Entry Points to Write Plugins"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

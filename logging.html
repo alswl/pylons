@@ -1,0 +1,581 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Logging &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Helpers" href="helpers.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="Helpers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="configuration.html" title="Configuration"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="logging">
+<span id="id1"></span><h1>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="logging-messages">
+<h2>Logging messages<a class="headerlink" href="#logging-messages" title="Permalink to this headline">¶</a></h2>
+<p>As of Pylons 0.9.6, Pylons controllers (created via <code class="docutils literal"><span class="pre">paster</span>
+<span class="pre">controller/restcontroller</span></code>) and <code class="docutils literal"><span class="pre">websetup.py</span></code> create their own Logger objects
+via <a class="reference external" href="http://docs.python.org/lib/module-logging.html">Python&#8217;s logging module</a>.</p>
+<p>For example, in the helloworld project&#8217;s hello controller
+(<code class="docutils literal"><span class="pre">helloworld/controllers/hello.py</span></code>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="kn">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">tmpl_context</span> <span class="k">as</span> <span class="n">c</span><span class="p">,</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">pylons.controllers.util</span> <span class="kn">import</span> <span class="n">abort</span><span class="p">,</span> <span class="n">redirect</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>Python&#8217;s special <code class="docutils literal"><span class="pre">__name__</span></code> variable refers to the current module&#8217;s fully
+qualified name; in this case, <code class="docutils literal"><span class="pre">helloworld.controllers.hello</span></code>.</p>
+<p>To log messages, simply use methods available on that Logger object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="kn">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">tmpl_context</span> <span class="k">as</span> <span class="n">c</span><span class="p">,</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">pylons.controllers.util</span> <span class="kn">import</span> <span class="n">abort</span><span class="p">,</span> <span class="n">redirect</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="s">&#39;text/plain&#39;</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="s">&#39;Hello World!&#39;</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Returning: </span><span class="si">%s</span><span class="s"> (content-type: </span><span class="si">%s</span><span class="s">)&#39;</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">content_type</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="n">content_type</span>
+        <span class="k">return</span> <span class="n">content</span>
+</pre></div>
+</div>
+<p>Which will result in the following printed to the console, on stderr:</p>
+<div class="highlight-text"><div class="highlight"><pre>16:20:20,440 DEBUG [helloworld.controllers.hello] Returning: Hello World!
+                   (content-type: text/plain)
+</pre></div>
+</div>
+</div>
+<div class="section" id="basic-logging-configuration">
+<h2>Basic Logging configuration<a class="headerlink" href="#basic-logging-configuration" title="Permalink to this headline">¶</a></h2>
+<p>As of Pylons 0.9.6, the default ini files include a basic configuration for the
+logging module. Paste ini files use the Python standard <a class="reference external" href="http://docs.python.org/lib/module-ConfigParser.html">ConfigParser format</a>; the same format used
+for the Python <a class="reference external" href="http://docs.python.org/lib/logging-config-fileformat.html">logging module&#8217;s Configuration file format</a>.</p>
+<p><code class="docutils literal"><span class="pre">paster</span></code>, when loading an application via the <code class="docutils literal"><span class="pre">paster</span></code> <code class="docutils literal"><span class="pre">serve</span></code>, <code class="docutils literal"><span class="pre">shell</span></code>
+or <code class="docutils literal"><span class="pre">setup-app</span></code> commands, calls the <a class="reference external" href="http://docs.python.org/lib/logging-config-api.html">logging.fileConfig function</a> on that specified ini
+file if it contains a &#8216;loggers&#8217; entry. <code class="docutils literal"><span class="pre">logging.fileConfig</span></code> reads the logging
+configuration from a <code class="docutils literal"><span class="pre">ConfigParser</span></code> file.</p>
+<p>Logging configuration is provided in both the default <code class="docutils literal"><span class="pre">development.ini</span></code> and
+the production ini file (created via <code class="docutils literal"><span class="pre">paster</span> <span class="pre">make-config</span> <span class="pre">&lt;package_name&gt;</span>
+<span class="pre">&lt;ini_file&gt;</span></code>). The production ini&#8217;s logging setup is a little simpler than the
+<code class="docutils literal"><span class="pre">development.ini</span></code>&#8216;s, and is as follows:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># Logging configuration</span>
+<span class="k">[loggers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">root</span>
+
+<span class="k">[handlers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">console</span>
+
+<span class="k">[formatters]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">generic</span>
+
+<span class="k">[logger_root]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">console</span>
+
+<span class="k">[handler_console]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">StreamHandler</span>
+<span class="na">args</span> <span class="o">=</span> <span class="s">(sys.stderr,)</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">NOTSET</span>
+<span class="na">formatter</span> <span class="o">=</span> <span class="s">generic</span>
+
+<span class="k">[formatter_generic]</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">%(asctime)s %(levelname)-5.5s [%(name)s] [%(threadName)s] %(message)s</span>
+</pre></div>
+</div>
+<p>One root Logger is created that logs only messages at a level above or equal to
+the <code class="docutils literal"><span class="pre">INFO</span></code> level to stderr, with the following format:</p>
+<div class="highlight-text"><div class="highlight"><pre>2007-08-17 15:04:08,704 INFO [helloworld.controllers.hello] Loading resource, id: 86
+</pre></div>
+</div>
+<p>For those familiar with the <code class="docutils literal"><span class="pre">logging.basicConfig</span></code> function, this configuration
+is equivalent to the code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+<span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> </span><span class="si">%(levelname)-5.5s</span><span class="s"> [</span><span class="si">%(name)s</span><span class="s">] </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The default <code class="docutils literal"><span class="pre">development.ini</span></code>&#8216;s logging section has a couple of differences:
+it uses a less verbose timestamp, and defaults your application&#8217;s log messages
+to the <code class="docutils literal"><span class="pre">DEBUG</span></code> level (described in the next section).</p>
+<p>Pylons and many other libraries (such as Beaker, SQLAlchemy, Paste) log a number
+of messages for debugging purposes. Switching the root Logger level to <code class="docutils literal"><span class="pre">DEBUG</span></code>
+reveals them:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[logger_root]</span>
+<span class="c1">#level = INFO</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">DEBUG</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">console</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="filtering-log-messages">
+<h2>Filtering log messages<a class="headerlink" href="#filtering-log-messages" title="Permalink to this headline">¶</a></h2>
+<p>Often there&#8217;s too much log output to sift through, such as when switching
+the root Logger&#8217;s level to <code class="docutils literal"><span class="pre">DEBUG</span></code>.</p>
+<p>An example: you&#8217;re diagnosing database connection issues in your application and
+only want to see SQLAlchemy&#8217;s <code class="docutils literal"><span class="pre">DEBUG</span></code> messages in relation to database
+connection pooling. You can leave the root Logger&#8217;s level at the less verbose
+<code class="docutils literal"><span class="pre">INFO</span></code> level and set that particular SQLAlchemy Logger to <code class="docutils literal"><span class="pre">DEBUG</span></code> on its
+own, apart from the root Logger:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[logger_sqlalchemy.pool]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">DEBUG</span>
+<span class="na">handlers</span> <span class="o">=</span>
+<span class="na">qualname</span> <span class="o">=</span> <span class="s">sqlalchemy.pool</span>
+</pre></div>
+</div>
+<p>then add it to the list of Loggers:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[loggers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">root, sqlalchemy.pool</span>
+</pre></div>
+</div>
+<p>No Handlers need to be configured for this Logger as by default non root Loggers
+will propagate their log records up to their parent Logger&#8217;s Handlers. The root
+Logger is the top level parent of all Loggers.</p>
+<p>This technique is used in the default <code class="docutils literal"><span class="pre">development.ini</span></code>. The root Logger&#8217;s
+level is set to <code class="docutils literal"><span class="pre">INFO</span></code>, whereas the application&#8217;s log level is set to
+<code class="docutils literal"><span class="pre">DEBUG</span></code>:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># Logging configuration</span>
+<span class="k">[loggers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">root, helloworld</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[logger_helloworld]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">DEBUG</span>
+<span class="na">handlers</span> <span class="o">=</span>
+<span class="na">qualname</span> <span class="o">=</span> <span class="s">helloworld</span>
+</pre></div>
+</div>
+<p>All of the child Loggers of the helloworld Logger will inherit the <code class="docutils literal"><span class="pre">DEBUG</span></code>
+level unless they&#8217;re explicitly set differently. Meaning the
+<code class="docutils literal"><span class="pre">helloworld.controllers.hello</span></code>, <code class="docutils literal"><span class="pre">helloworld.websetup</span></code> (and all your app&#8217;s
+modules&#8217;) Loggers by default have an effective level of <code class="docutils literal"><span class="pre">DEBUG</span></code> too.</p>
+<p>For more advanced filtering, the logging module provides a <a class="reference external" href="http://docs.python.org/lib/node423.html">Filter</a> object; however it cannot be used
+directly from the configuration file.</p>
+</div>
+<div class="section" id="advanced-configuration">
+<h2>Advanced Configuration<a class="headerlink" href="#advanced-configuration" title="Permalink to this headline">¶</a></h2>
+<p>To capture log output to a separate file, use a <a class="reference external" href="http://docs.python.org/lib/node412.html">FileHandler</a> (or a <a class="reference external" href="http://docs.python.org/lib/node413.html">RotatingFileHandler</a>):</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[handler_accesslog]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">FileHandler</span>
+<span class="na">args</span> <span class="o">=</span> <span class="s">(&#39;access.log&#39;,&#39;a&#39;)</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">formatter</span> <span class="o">=</span> <span class="s">generic</span>
+</pre></div>
+</div>
+<p>Before it&#8217;s recognized, it needs to be added to the list of Handlers:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[handlers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">console, accesslog</span>
+</pre></div>
+</div>
+<p>and finally utilized by a Logger.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[logger_root]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">console, accesslog</span>
+</pre></div>
+</div>
+<p>These final 3 lines of configuration directs all of the root Logger&#8217;s output to
+the access.log as well as the console; we&#8217;ll want to disable this for the next
+section.</p>
+</div>
+<div class="section" id="request-logging-with-paste-s-translogger">
+<h2>Request logging with Paste&#8217;s TransLogger<a class="headerlink" href="#request-logging-with-paste-s-translogger" title="Permalink to this headline">¶</a></h2>
+<p>Paste provides the <a class="reference external" href="http://pythonpaste.org/module-paste.translogger.html">TransLogger</a> middleware for logging
+requests using the <a class="reference external" href="http://httpd.apache.org/docs/2.2/logs.html#combined">Apache Combined Log Format</a>. TransLogger combined
+with a FileHandler can be used to create an <code class="docutils literal"><span class="pre">access.log</span></code> file similar to
+Apache&#8217;s.</p>
+<p>Like any standard middleware with a Paste entry point, TransLogger can be
+configured to wrap your application in the <code class="docutils literal"><span class="pre">[app:main]</span></code> section of the ini
+file:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">filter-with</span> <span class="o">=</span> <span class="s">translogger</span>
+
+<span class="k">[filter:translogger]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#translogger</span>
+<span class="na">setup_console_handler</span> <span class="o">=</span> <span class="s">False</span>
+</pre></div>
+</div>
+<p>This is equivalent to wrapping your app in a TransLogger instance via the bottom
+of your project&#8217;s <code class="docutils literal"><span class="pre">config/middleware.py</span></code> file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paste.translogger</span> <span class="kn">import</span> <span class="n">TransLogger</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">TransLogger</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">setup_console_handler</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">app</span>
+</pre></div>
+</div>
+<p>TransLogger will automatically setup a logging Handler to the console when
+called with no arguments, so it &#8216;just works&#8217; in environments that don&#8217;t
+configure logging. Since we&#8217;ve configured our own logging Handlers, we need to
+disable that option via <code class="docutils literal"><span class="pre">setup_console_handler</span> <span class="pre">=</span> <span class="pre">False</span></code>.</p>
+<p>With the filter in place, TransLogger&#8217;s Logger (named the &#8216;wsgi&#8217; Logger) will
+propagate its log messages to the parent Logger (the root Logger), sending its
+output to the console when we request a page:</p>
+<div class="highlight-text"><div class="highlight"><pre>00:50:53,694 INFO [helloworld.controllers.hello] Returning: Hello World!
+                  (content-type: text/plain)
+00:50:53,695 INFO [wsgi] 192.168.1.111 - - [11/Aug/2007:20:09:33 -0700] &quot;GET /hello
+HTTP/1.1&quot; 404 - &quot;-&quot;
+&quot;Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725
+Firefox/2.0.0.6&quot;
+</pre></div>
+</div>
+<p>To direct TransLogger to the <code class="docutils literal"><span class="pre">access.log</span></code> FileHandler defined above, we need
+to add that FileHandler to the wsgi Logger&#8217;s list of Handlers:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># Logging configuration</span>
+<span class="k">[loggers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">root, wsgi</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[logger_wsgi]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">handler_accesslog</span>
+<span class="na">qualname</span> <span class="o">=</span> <span class="s">wsgi</span>
+<span class="na">propagate</span> <span class="o">=</span> <span class="s">0</span>
+</pre></div>
+</div>
+<p>As mentioned above, non-root Loggers by default propagate their log Records to
+the root Logger&#8217;s Handlers (currently the console Handler). Setting
+<code class="docutils literal"><span class="pre">propagate</span></code> to 0 (false) here disables this; so the <code class="docutils literal"><span class="pre">wsgi</span></code> Logger directs
+its records only to the <code class="docutils literal"><span class="pre">accesslog</span></code> Handler.</p>
+<p>Finally, there&#8217;s no need to use the <code class="docutils literal"><span class="pre">generic</span></code> Formatter with TransLogger as
+TransLogger itself provides all the information we need. We&#8217;ll use a Formatter
+that passes-through the log messages as is:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[formatters]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">generic, accesslog</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[formatter_accesslog]</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">%(message)s</span>
+</pre></div>
+</div>
+<p>Then wire this new <code class="docutils literal"><span class="pre">accesslog</span></code> Formatter into the FileHandler:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[handler_accesslog]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">FileHandler</span>
+<span class="na">args</span> <span class="o">=</span> <span class="s">(&#39;access.log&#39;,&#39;a&#39;)</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">formatter</span> <span class="o">=</span> <span class="s">accesslog</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="logging-to-wsgi-errors">
+<h2>Logging to wsgi.errors<a class="headerlink" href="#logging-to-wsgi-errors" title="Permalink to this headline">¶</a></h2>
+<p>Pylons provides a custom logging Handler class, <a class="reference external" href="http://pylonshq.com/docs/class-pylons.log.WSGIErrorsHandler.html">pylons.log.WSGIErrorsHandler</a>, for
+logging output to <code class="docutils literal"><span class="pre">environ['wsgi.errors']</span></code>: the WSGI server&#8217;s error stream
+(see the <a class="reference external" href="http://www.python.org/dev/peps/pep-0333/">WSGI Spefification, PEP 333</a> for more
+information). <code class="docutils literal"><span class="pre">wsgi.errors</span></code> can be useful to log to in certain situations,
+such as when deployed under Apache mod_wsgi/mod_python, where the
+<code class="docutils literal"><span class="pre">wsgi.errors</span></code> stream is the Apache error log.</p>
+<p>To configure logging of only <code class="docutils literal"><span class="pre">ERROR</span></code> (and <code class="docutils literal"><span class="pre">CRITICAL</span></code>) messages to
+<code class="docutils literal"><span class="pre">wsgi.errors</span></code>, add the following to the ini file:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[handlers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">console, wsgierrors</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[handler_wsgierrors]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">pylons.log.WSGIErrorsHandler</span>
+<span class="na">args</span> <span class="o">=</span> <span class="s">()</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">ERROR</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">generic</span>
+</pre></div>
+</div>
+<p>then add the new Handler name to the list of Handlers used by the root Logger:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[logger_root]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">console, wsgierrors</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><code class="docutils literal"><span class="pre">WSGIErrorsHandler</span></code> does not receive log messages created during
+application startup. This is due to the <code class="docutils literal"><span class="pre">wsgi.errors</span></code> stream only being
+available through the <code class="docutils literal"><span class="pre">environ</span></code> dictionary; which isn&#8217;t available until a
+request is made.</p>
+</div>
+<div class="section" id="lumberjacking-with-log4j-s-chainsaw">
+<h3>Lumberjacking with log4j&#8217;s Chainsaw<a class="headerlink" href="#lumberjacking-with-log4j-s-chainsaw" title="Permalink to this headline">¶</a></h3>
+<p>Java&#8217;s <code class="docutils literal"><span class="pre">log4j</span></code> project provides the Java GUI application <a class="reference external" href="http://logging.apache.org/log4j/docs/chainsaw.html">Chainsaw</a> for viewing and managing
+log messages. Among its features are the ability to filter log messages on the
+fly, and customizable color highlighting of log messages.</p>
+<p>We can configure Python&#8217;s logging module to output to a format parsable by
+Chainsaw, <code class="docutils literal"><span class="pre">log4j</span></code>&#8216;s <a class="reference external" href="http://logging.apache.org/log4j/docs/api/org/apache/log4j/xml/XMLLayout.html">XMLLayout</a>
+format.</p>
+<p>To do so, we first need to install the <a class="reference external" href="http://pypi.python.org/pypi/XMLLayout">Python XMLLayout package</a>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install XMLLayout
+</pre></div>
+</div>
+<p>It provides a log Formatter that generates <code class="docutils literal"><span class="pre">XMLLayout</span></code> XML. It also provides
+<code class="docutils literal"><span class="pre">RawSocketHandler</span></code>; like the logging module&#8217;s <code class="docutils literal"><span class="pre">SocketHandler</span></code>, it sends log
+messages across the network, but does not pickle them.</p>
+<p>The following is an example configuration for sending <code class="docutils literal"><span class="pre">XMLLayout</span></code> log messages
+across the network to Chainsaw, if it were listening on <cite>localhost</cite> port <cite>4448</cite>:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[handlers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">console, chainsaw</span>
+
+<span class="k">[formatters]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">generic, xmllayout</span>
+
+<span class="k">[logger_root]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">console, chainsaw</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[handler_chainsaw]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">xmllayout.RawSocketHandler</span>
+<span class="na">args</span> <span class="o">=</span> <span class="s">(&#39;localhost&#39;, 4448)</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">NOTSET</span>
+<span class="na">formatter</span> <span class="o">=</span> <span class="s">xmllayout</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[formatter_xmllayout]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">xmllayout.XMLLayout</span>
+</pre></div>
+</div>
+<p>This configures any log messages handled by the root Logger to also be sent to
+Chainsaw. The default <code class="docutils literal"><span class="pre">development.ini</span></code> configures the root Logger to the
+<code class="docutils literal"><span class="pre">INFO</span></code> level, however in the case of using Chainsaw, it is preferable to
+configure the root Logger to <code class="docutils literal"><span class="pre">NOTSET</span></code> so <em>all</em> log messages are sent to
+Chainsaw. Instead, we can restrict the console handler to the <code class="docutils literal"><span class="pre">INFO</span></code> level:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[logger_root]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">NOTSET</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">console</span>
+
+<span class="k">[handler_console]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">StreamHandler</span>
+<span class="na">args</span> <span class="o">=</span> <span class="s">(sys.stderr,)</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">formatter</span> <span class="o">=</span> <span class="s">generic</span>
+</pre></div>
+</div>
+<p>Chainsaw can be downloaded from its <a class="reference external" href="http://logging.apache.org/log4j/docs/chainsaw.html">home page</a>, but can also be launched
+directly from a Java-enabled browser via the link: <a class="reference external" href="http://logging.apache.org/log4j/docs/webstart/chainsaw/chainsawWebStart.jnlp">Chainsaw web start</a>.</p>
+<p>It can be configured from the GUI, but it also supports reading its
+configuration from a <code class="docutils literal"><span class="pre">log4j.xml</span></code> file.</p>
+<p>The following <code class="docutils literal"><span class="pre">log4j.xml</span></code> file configures Chainsaw to listen on port <cite>4448</cite>
+for <code class="docutils literal"><span class="pre">XMLLayout</span></code> style log messages. It also hides Chainsaw&#8217;s own logging
+messages under the <code class="docutils literal"><span class="pre">WARN</span></code> level, so only your app&#8217;s log messages are
+displayed:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
+<span class="cp">&lt;!DOCTYPE configuration&gt;</span>
+<span class="nt">&lt;configuration</span> <span class="na">xmlns=</span><span class="s">&quot;http://logging.apache.org/&quot;</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;plugin</span> <span class="na">name=</span><span class="s">&quot;XMLSocketReceiver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.apache.log4j.net.XMLSocketReceiver&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;decoder&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.log4j.xml.XMLDecoder&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;port&quot;</span> <span class="na">value=</span><span class="s">&quot;4448&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+
+<span class="nt">&lt;logger</span> <span class="na">name=</span><span class="s">&quot;org.apache.log4j&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;level</span> <span class="na">value=</span><span class="s">&quot;warn&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/logger&gt;</span>
+
+<span class="nt">&lt;root&gt;</span>
+    <span class="nt">&lt;level</span> <span class="na">value=</span><span class="s">&quot;debug&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/root&gt;</span>
+
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+</div>
+<p>Chainsaw will prompt for a configuration file upon startup. The configuration
+can also be loaded later by clicking <cite>File</cite>/<cite>Load Log4J File...</cite>. You should see
+an XMLSocketReceiver instance loaded in Chainsaw&#8217;s Receiver list, configured at
+port <cite>4448</cite>, ready to receive log messages.</p>
+<p>Here&#8217;s how the Pylons stack&#8217;s log messages can look with colors defined (using
+Chainsaw on OS X):</p>
+<a class="reference internal image-reference" href="_images/Pylons_Stack-Chainsaw-OSX.png"><img alt="_images/Pylons_Stack-Chainsaw-OSX.png" src="_images/Pylons_Stack-Chainsaw-OSX.png" style="width: 750px; height: 469px;" /></a>
+</div>
+<div class="section" id="alternate-logging-configuration-style">
+<h3>Alternate Logging Configuration style<a class="headerlink" href="#alternate-logging-configuration-style" title="Permalink to this headline">¶</a></h3>
+<p>Pylons&#8217; default ini files include a basic configuration for Python&#8217;s logging
+module. Its format matches the standard Python <code class="xref py py-mod docutils literal"><span class="pre">logging</span></code> module&#8217;s <a class="reference external" href="http://docs.python.org/lib/logging-config-fileformat.html">config file format</a> . If a
+more concise format is preferred, here is Max Ischenko&#8217;s demonstration of
+an alternative style to setup logging.</p>
+<p>The following function is called at the application start up (e.g. Global ctor):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">():</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;logfile&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">logfile</span> <span class="o">==</span> <span class="s">&#39;STDOUT&#39;</span><span class="p">:</span> <span class="c"># special value, used for unit testing</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+               <span class="c">#format=&#39;%(name)s %(levelname)s %(message)s&#39;,</span>
+               <span class="c">#format=&#39;%(asctime)s,%(msecs)d %(levelname)s %(message)s&#39;,</span>
+               <span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s">,</span><span class="si">%(msecs)d</span><span class="s"> </span><span class="si">%(name)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span>
+               <span class="n">datefmt</span><span class="o">=</span><span class="s">&#39;%H:%M:%S&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">logfile</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">logdir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logdir</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">logfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;at+&#39;</span><span class="p">,</span>
+             <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+             <span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s">,</span><span class="si">%(msecs)d</span><span class="s"> </span><span class="si">%(name)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span>
+             <span class="n">datefmt</span><span class="o">=</span><span class="s">&#39;%Y-%b-</span><span class="si">%d</span><span class="s"> %H:%M:%S&#39;</span><span class="p">)</span>
+    <span class="n">setup_thirdparty_logging</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The setup_thirdparty_logging function searches through the certain keys of the
+application <code class="docutils literal"><span class="pre">.ini</span></code> file which specify logging level for a particular logger
+(module).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">setup_thirdparty_logging</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;logging&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;.logging&#39;</span><span class="p">)</span>
+        <span class="n">loglevel</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Set </span><span class="si">%s</span><span class="s"> logging for </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">loglevel</span><span class="p">),</span> <span class="n">key</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">loglevel</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Relevant section of the .ini file (example):</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">sqlalchemy.logging</span> <span class="o">=</span> <span class="s">WARNING</span>
+<span class="na">sqlalchemy.orm.unitofwork.logging</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">sqlalchemy.engine.logging</span> <span class="o">=</span> <span class="s">DEBUG</span>
+<span class="na">sqlalchemy.orm.logging</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">routes.logging</span> <span class="o">=</span> <span class="s">WARNING</span>
+</pre></div>
+</div>
+<p>This means that routes logger (and all sub-loggers such as routes.mapper) only
+passes through messages of at least WARNING level; sqlalachemy defaults to
+WARNING level but some loggers are configured with more verbose level to aid
+debugging.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Logging</a><ul>
+<li><a class="reference internal" href="#logging-messages">Logging messages</a></li>
+<li><a class="reference internal" href="#basic-logging-configuration">Basic Logging configuration</a></li>
+<li><a class="reference internal" href="#filtering-log-messages">Filtering log messages</a></li>
+<li><a class="reference internal" href="#advanced-configuration">Advanced Configuration</a></li>
+<li><a class="reference internal" href="#request-logging-with-paste-s-translogger">Request logging with Paste&#8217;s TransLogger</a></li>
+<li><a class="reference internal" href="#logging-to-wsgi-errors">Logging to wsgi.errors</a><ul>
+<li><a class="reference internal" href="#lumberjacking-with-log4j-s-chainsaw">Lumberjacking with log4j&#8217;s Chainsaw</a></li>
+<li><a class="reference internal" href="#alternate-logging-configuration-style">Alternate Logging Configuration style</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="configuration.html"
+                        title="previous chapter">Configuration</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="helpers.html"
+                        title="next chapter">Helpers</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="Helpers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="configuration.html" title="Configuration"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

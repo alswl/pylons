@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Python 2.3 Installation Instructions &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Windows Notes" href="windowsnotes.html" />
+    <link rel="prev" title="Packaging and Deployment Overview" href="deployment.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="windowsnotes.html" title="Windows Notes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="deployment.html" title="Packaging and Deployment Overview"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="python-2-3-installation-instructions">
+<span id="python23-installation"></span><h1>Python 2.3 Installation Instructions<a class="headerlink" href="#python-2-3-installation-instructions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="advice-of-end-of-support-for-python-2-3">
+<h2>Advice of <strong>end of support for Python 2.3</strong><a class="headerlink" href="#advice-of-end-of-support-for-python-2-3" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><strong>END OF SUPPORT FOR PYTHON 2.3</strong> This is the <strong>LAST</strong> version to support Python 2.3 <strong>BEGIN UPGRADING OR DIE</strong></p>
+</div>
+</div>
+<div class="section" id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<p>First, please note that Python 2.3 users on Windows will need to install <a class="reference external" href="http://www.pylonshq.com/download/subprocess-0.1-20041012.win32-py2.3.exe">subprocess.exe</a> before beginning the installation (whereas Python 2.4 users on Windows do not). All windows users also should read the section <a class="reference internal" href="windowsnotes.html#windows-notes"><span class="std std-ref">Windows Notes</span></a> after installation. Users of Ubuntu/debian will also likely need to install the python-dev package.</p>
+</div>
+<div class="section" id="system-wide-install">
+<h2>System-wide Install<a class="headerlink" href="#system-wide-install" title="Permalink to this headline">¶</a></h2>
+<p>To install Pylons so it can be used by everyone (you&#8217;ll need root access).</p>
+<p>If you already have easy install:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install <span class="nv">Pylons</span><span class="o">==</span>0.9.7
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>On rare occasions, the python.org Cheeseshop goes down. It is still
+possible to install Pylons and its dependencies however by specifying our
+local package directory for installation with:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install -f http://pylonshq.com/download/ <span class="nv">Pylons</span><span class="o">==</span>0.9.7
+</pre></div>
+</div>
+<p>Which will use the packages necessary for the latest release. If you&#8217;re
+using an older version of Pylons, you can get the packages that went with
+it by specifying the version desired:</p>
+<div class="last highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install -f http://pylonshq.com/download/0.9.7/ <span class="nv">Pylons</span><span class="o">==</span>0.9.7
+</pre></div>
+</div>
+</div>
+<p>Otherwise:</p>
+<ol class="arabic simple">
+<li>Download the easy install setup file from <a class="reference external" href="http://peak.telecommunity.com/dist/ez_setup.py">http://peak.telecommunity.com/dist/ez_setup.py</a></li>
+<li>Run:</li>
+</ol>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python ez_setup.py <span class="nv">Pylons</span><span class="o">==</span>0.9.7
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><strong>END OF SUPPORT FOR PYTHON 2.3</strong> This is the <strong>LAST</strong> version to support Python 2.3 <strong>BEGIN UPGRADING OR DIE</strong></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Python 2.3 Installation Instructions</a><ul>
+<li><a class="reference internal" href="#advice-of-end-of-support-for-python-2-3">Advice of <strong>end of support for Python 2.3</strong></a></li>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#system-wide-install">System-wide Install</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="deployment.html"
+                        title="previous chapter">Packaging and Deployment Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="windowsnotes.html"
+                        title="next chapter">Windows Notes</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="windowsnotes.html" title="Windows Notes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="deployment.html" title="Packaging and Deployment Overview"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

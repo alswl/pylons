@@ -1,0 +1,463 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Forms &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Internationalization and Localization" href="i18n.html" />
+    <link rel="prev" title="Helpers" href="helpers.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="i18n.html" title="Internationalization and Localization"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="Helpers"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="forms">
+<span id="id1"></span><h1>Forms<a class="headerlink" href="#forms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-basics">
+<h2>The basics<a class="headerlink" href="#the-basics" title="Permalink to this headline">¶</a></h2>
+<p>When a user submits a form on a website the data is submitted to the URL specified in the <cite>action</cite> attribute of the <cite>&lt;form&gt;</cite> tag. The data can be submitted either via HTTP <cite>GET</cite> or <cite>POST</cite> as specified by the <cite>method</cite> attribute of the <cite>&lt;form&gt;</cite> tag. If your form doesn&#8217;t specify an <cite>action</cite>, then it&#8217;s submitted to the current URL, generally you&#8217;ll want to specify an <cite>action</cite>. When a file upload field such as <cite>&lt;input type=&#8221;file&#8221; name=&#8221;file&#8221; /&gt;</cite> is present, then the HTML <cite>&lt;form&gt;</cite> tag must also specify <cite>enctype=&#8221;multipart/form-data&#8221;</cite> and <cite>method</cite> must be <cite>POST</cite>.</p>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>Add two actions that looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># in the controller</span>
+
+<span class="k">def</span> <span class="nf">form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/form.mako&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&#39;Your email is: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Add a new template called <cite>form.mako</cite> in the <cite>templates</cite> directory that contains the following:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">name=</span><span class="s">&quot;test&quot;</span> <span class="na">method=</span><span class="s">&quot;GET&quot;</span> <span class="na">action=</span><span class="s">&quot;/hello/email&quot;</span><span class="nt">&gt;</span>
+Email Address: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;email&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</pre></div>
+</div>
+<p>If the server is still running (see the <a class="reference internal" href="gettingstarted.html#getting-started"><span class="std std-ref">Getting Started Guide</span></a>) you can visit <a class="reference external" href="http://localhost:5000/hello/form">http://localhost:5000/hello/form</a> and you will see the form. Try entering the email address <cite>test&#64;example.com</cite> and clicking Submit. The URL should change to <code class="docutils literal"><span class="pre">http://localhost:5000/hello/email?email=test%40example.com</span></code> and you should see the text <cite>Your email is test&#64;example.com</cite>.</p>
+<p>In Pylons all form variables can be accessed from the <code class="xref py py-data docutils literal"><span class="pre">request.params</span></code> object which behaves like a dictionary. The keys are the names of the fields in the form and the value is a string with all the characters entity decoded. For example note how the <cite>&#64;</cite> character was converted by the browser to <cite>%40</cite> in the URL and was converted back ready for use in <code class="xref py py-data docutils literal"><span class="pre">request.params</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><cite>request</cite> and <cite>response</cite> are objects from the <cite>WebOb</cite> library.  Full documentation on their attributes and methods is <a class="reference external" href="http://pythonpaste.org/webob/">here</a>.</p>
+</div>
+<p>If you have two fields with the same name in the form then using the dictionary interface will return the first string. You can get all the strings returned as a list by using the <cite>.getall()</cite> method. If you only expect one value and want to enforce this you should use <cite>.getone()</cite> which raises an error if more than one value with the same name is submitted.</p>
+<p>By default if a field is submitted without a value, the dictionary interface returns an empty string. This means that using <cite>.get(key, default)</cite> on <cite>request.params</cite> will only return a default if the value was not present in the form.</p>
+<div class="section" id="post-vs-get-and-the-re-submitted-data-problem">
+<h3>POST vs GET and the Re-Submitted Data Problem<a class="headerlink" href="#post-vs-get-and-the-re-submitted-data-problem" title="Permalink to this headline">¶</a></h3>
+<p>If you change the <cite>form.mako</cite> template so that the method is <cite>POST</cite> and you re-run the example you will see the same message is displayed as before. However, the URL displayed in the browser is simply <a class="reference external" href="http://localhost:5000/hello/email">http://localhost:5000/hello/email</a> without the query string. The data is sent in the body of the request instead of the URL, but Pylons makes it available in the same way as for GET requests through the use of <cite>request.params</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you are writing forms that contain password fields you should usually use POST to prevent the password being visible to anyone who might be looking at the user&#8217;s screen.</p>
+</div>
+<p>When writing form-based applications you will occasionally find users will press refresh immediately after submitting a form. This has the effect of repeating whatever actions were performed the first time the form was submitted but often the user will expect that the current page be shown again. If your form was submitted with a POST, most browsers will display a message to the user asking them if they wish to re-submit the data, this will not happen with a GET so POST is preferable to GET in those circumstances.</p>
+<p>Of course, the best way to solve this issue is to structure your code differently so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># in the controller</span>
+
+<span class="k">def</span> <span class="nf">form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/form.mako&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c"># Code to perform some action based on the form data</span>
+    <span class="c"># ...</span>
+    <span class="n">redirect</span><span class="p">(</span><span class="n">url</span><span class="p">(</span><span class="n">controller</span><span class="o">=</span><span class="s">&#39;home&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;result&#39;</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&#39;Your data was successfully submitted&#39;</span>
+</pre></div>
+</div>
+<p>In this case once the form is submitted the data is saved and an HTTP redirect occurs so that the browser redirects to <a class="reference external" href="http://localhost:5000/hello/result">http://localhost:5000/hello/result</a>. If the user then refreshes the page, it simply redisplays the message rather than re-performing the action.</p>
+</div>
+</div>
+<div class="section" id="using-the-helpers">
+<h2>Using the Helpers<a class="headerlink" href="#using-the-helpers" title="Permalink to this headline">¶</a></h2>
+<p>Creating forms can also be done using WebHelpers, which comes with Pylons. Here is the same form created in the previous section but this time using the helpers:</p>
+<div class="highlight-html+mako"><div class="highlight"><pre><span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s">&#39;email&#39;</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s">&#39;get&#39;</span><span class="p">)</span><span class="cp">}</span>
+Email Address: <span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;email&#39;</span><span class="p">)</span><span class="cp">}</span>
+<span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="s">&#39;Submit&#39;</span><span class="p">)</span><span class="cp">}</span>
+<span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">end_form</span><span class="p">()</span><span class="cp">}</span>
+</pre></div>
+</div>
+<p>Before doing this you&#8217;ll have to import the helpers you want to use into your
+project&#8217;s <cite>lib/helpers.py</cite> file; then they&#8217;ll be available under Pylons&#8217; <code class="docutils literal"><span class="pre">h</span></code>
+global.  Most projects will want to import at least these:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">webhelpers.html</span> <span class="kn">import</span> <span class="n">escape</span><span class="p">,</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">literal</span><span class="p">,</span> <span class="n">url_escape</span>
+<span class="kn">from</span> <span class="nn">webhelpers.html.tags</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>There are many other helpers for text formatting, container objects,
+statistics, and for dividing large query results into pages.  See the
+<code class="xref py py-mod docutils literal"><span class="pre">WebHelpers</span> <span class="pre">documentation</span></code> to choose the helpers you&#8217;ll need.</p>
+</div>
+<div class="section" id="file-uploads">
+<span id="id2"></span><h2>File Uploads<a class="headerlink" href="#file-uploads" title="Permalink to this headline">¶</a></h2>
+<p>File upload fields are created by using the <cite>file</cite> input field type. The <cite>file_field</cite> helper provides a shortcut for creating these form fields:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">file_field</span><span class="p">(</span><span class="s">&#39;myfile&#39;</span><span class="p">)</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>The HTML form must have its <cite>enctype</cite> attribute set to <cite>multipart/form-data</cite> to enable the browser to upload the file. The <cite>form</cite> helper&#8217;s <cite>multipart</cite> keyword argument provides a shortcut for setting the appropriate <cite>enctype</cite> value:</p>
+<div class="highlight-html+mako"><div class="highlight"><pre><span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s">&#39;upload&#39;</span><span class="p">),</span> <span class="n">multipart</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="cp">}</span>
+Upload file: <span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">file_field</span><span class="p">(</span><span class="s">&#39;myfile&#39;</span><span class="p">)</span><span class="cp">}</span> <span class="nt">&lt;br</span> <span class="nt">/&gt;</span>
+File description: <span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">text_field</span><span class="p">(</span><span class="s">&#39;description&#39;</span><span class="p">)</span><span class="cp">}</span> <span class="nt">&lt;br</span> <span class="nt">/&gt;</span>
+<span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="s">&#39;Submit&#39;</span><span class="p">)</span><span class="cp">}</span>
+<span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">end_form</span><span class="p">()</span><span class="cp">}</span>
+</pre></div>
+</div>
+<p>When a file upload has succeeded, the <cite>request.POST</cite> (or <cite>request.params</cite>) <cite>MultiDict</cite> will contain a <cite>cgi.FieldStorage</cite> object as the value of the field.</p>
+<p><cite>FieldStorage</cite> objects have three important attributes for file uploads:</p>
+<dl class="docutils">
+<dt><cite>filename</cite></dt>
+<dd>The name of file uploaded as it appeared on the uploader&#8217;s filesystem.</dd>
+<dt><cite>file</cite></dt>
+<dd>A file(-like) object from which the file&#8217;s data can be read: A python <cite>tempfile</cite> or a <cite>StringIO</cite> object.</dd>
+<dt><cite>value</cite></dt>
+<dd>The content of the uploaded file, eagerly read directly from the file object.</dd>
+</dl>
+<p>The easiest way to gain access to the file&#8217;s data is via the <cite>value</cite> attribute: it returns the entire contents of the file as a string:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">myfile</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s">&#39;Successfully uploaded: </span><span class="si">%s</span><span class="s">, size: </span><span class="si">%i</span><span class="s">, description: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> \
+        <span class="p">(</span><span class="n">myfile</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">myfile</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;description&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>However reading the entire contents of the file into memory is undesirable, especially for large file uploads. A common means of handling file uploads is to store the file somewhere on the filesystem. The <cite>FieldStorage</cite> typically reads the file onto filesystem, however to a non permanent location, via a python <cite>tempfile</cite> object (though for very small uploads it stores the file in a <cite>StringIO</cite> object instead).</p>
+<p>Python <cite>tempfiles</cite> are secure file objects that are automatically destroyed when they are closed (including an implicit close when the object is garbage collected). One of their security features is that their path cannot be determined: a simple <cite>os.rename</cite> from the <cite>tempfile&#8217;s</cite> path isn&#8217;t possible. Alternatively, <cite>shutil.copyfileobj</cite> can perform an efficient copy of the file&#8217;s data to a permanent location:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">permanent_store</span> <span class="o">=</span> <span class="s">&#39;/uploads/&#39;</span>
+
+<span class="k">class</span> <span class="nc">Uploader</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">myfile</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span>
+        <span class="n">permanent_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">permanent_store</span><span class="p">,</span>
+                                <span class="n">myfile</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)),</span>
+                                <span class="s">&#39;w&#39;</span><span class="p">)</span>
+
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">myfile</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">permanent_file</span><span class="p">)</span>
+    <span class="n">myfile</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">permanent_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="s">&#39;Successfully uploaded: </span><span class="si">%s</span><span class="s">, description: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> \
+        <span class="p">(</span><span class="n">myfile</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;description&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The previous basic example allows any file uploader to overwrite any file in
+the <cite>permanent_store</cite> directory that your web application has permissions
+to.</p>
+</div>
+<p>Also note the use of <cite>myfile.filename.lstrip(os.sep)</cite> here: without it, <cite>os.path.join</cite> is unsafe. <cite>os.path.join</cite> won&#8217;t join absolute paths (beginning with <cite>os.sep</cite>), i.e. <cite>os.path.join(&#8216;/uploads/&#8217;, &#8216;/uploaded_file.txt&#8217;)</cite> == <cite>&#8216;/uploaded_file.txt&#8217;</cite>. Always check user submitted data to be used with <cite>os.path.join</cite>.</p>
+</div>
+<div class="section" id="validating-user-input-with-formencode">
+<h2>Validating user input with FormEncode<a class="headerlink" href="#validating-user-input-with-formencode" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="validation-the-quick-way">
+<h3>Validation the Quick Way<a class="headerlink" href="#validation-the-quick-way" title="Permalink to this headline">¶</a></h3>
+<p>At the moment you could enter any value into the form and it would be displayed in the message, even if it wasn&#8217;t a valid email address. In most cases this isn&#8217;t acceptable since the user&#8217;s input needs validating. The recommended tool for validating forms in Pylons is <a class="reference external" href="http://www.formencode.org">FormEncode</a>.</p>
+<p>For each form you create you also create a validation schema. In our case this is fairly easy:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">formencode</span>
+
+<span class="k">class</span> <span class="nc">EmailForm</span><span class="p">(</span><span class="n">formencode</span><span class="o">.</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">allow_extra_fields</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">filter_extra_fields</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">formencode</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">Email</span><span class="p">(</span><span class="n">not_empty</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We usually recommend keeping form schemas together so that you have a single
+place you can go to update them. It&#8217;s also convenient for inheritance since
+you can make new form schemas that build on existing ones. If you put your
+forms in a <cite>models/form.py</cite> file, you can easily use them throughout your
+controllers as <cite>model.form.EmailForm</cite> in the case shown.</p>
+</div>
+<p>Our form actually has two fields, an email text field and a submit button. If extra fields are submitted FormEncode&#8217;s default behavior is to consider the form invalid so we specify <cite>allow_extra_fields = True</cite>. Since we don&#8217;t want to use the values of the extra fields we also specify <cite>filter_extra_fields = True</cite>. The final line specifies that the email field should be validated with an <cite>Email()</cite> validator. In creating the validator we also specify <cite>not_empty=True</cite> so that the email field will require input.</p>
+<p>Pylons comes with an easy to use <cite>validate</cite> decorator, if you wish to use it import it in your <cite>lib/base.py</cite> like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># other imports</span>
+
+<span class="kn">from</span> <span class="nn">pylons.decorators</span> <span class="kn">import</span> <span class="n">validate</span>
+</pre></div>
+</div>
+<p>Using it in your controller is pretty straight-forward:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># in the controller</span>
+
+<span class="k">def</span> <span class="nf">form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/form.mako&#39;</span><span class="p">)</span>
+
+<span class="nd">@validate</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="n">EmailForm</span><span class="p">(),</span> <span class="n">form</span><span class="o">=</span><span class="s">&#39;form&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&#39;Your email is: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">form_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;email&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Validation only occurs on POST requests so we need to alter our form definition so that the method is a POST:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s">&#39;email&#39;</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s">&#39;post&#39;</span><span class="p">)</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>If validation is successful, the valid result dict will be saved as
+<cite>self.form_result</cite> so it can be used in the action. Otherwise, the action will
+be re-run as if it was a GET request to the controller action specified in
+<cite>form</cite>, and the output will be filled by FormEncode&#8217;s htmlfill to fill in the
+form field errors. For simple cases this is really handy because it also avoids
+having to write code in your templates to display error messages if they are
+present.</p>
+<p>This does exactly the same thing as the example above but works with the
+original form definition and in fact will work with any HTML form regardless of
+how it is generated because the validate decorator uses <cite>formencode.htmlfill</cite>
+to find HTML fields and replace them with the values were originally submitted.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Python 2.3 doesn&#8217;t support decorators so rather than using the
+<cite>&#64;validate()</cite> syntax you need to put <cite>email =
+validate(schema=EmailForm(), form=&#8217;form&#8217;)(email)</cite> after the email
+function&#8217;s declaration.</p>
+</div>
+</div>
+<div class="section" id="validation-the-long-way">
+<h3>Validation the Long Way<a class="headerlink" href="#validation-the-long-way" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>validate</cite> decorator covers up a bit of work, and depending on your needs it&#8217;s possible you could need direct access to FormEncode abilities it smoothes over.</p>
+<p>Here&#8217;s the longer way to use the <cite>EmailForm</cite> schema:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># in the controller</span>
+
+<span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">EmailForm</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">form_result</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">formencode</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">Invalid</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;Invalid: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">error</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;Your email is: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">form_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;email&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the values entered are valid, the schema&#8217;s <cite>to_python()</cite> method returns a
+dictionary of the validated and coerced <cite>form_result</cite>. This means that you can
+guarantee that the <cite>form_result</cite> dictionary contains values that are valid and
+correct Python objects for the data types desired.</p>
+<p>In this case the email address is a string so <cite>request.params[&#8216;email&#8217;]</cite>
+happens to be the same as <cite>form_result[&#8216;email&#8217;]</cite>. If our form contained a
+field for age in years and we had used a <cite>formencode.validators.Int()</cite>
+validator, the value in <cite>form_result</cite> for the age would also be the correct
+type; in this case a Python integer.</p>
+<p>FormEncode comes with a useful set of validators but you can also easily
+create your own. If you do create your own validators you will find it very
+useful that all FormEncode schemas&#8217; <cite>.to_python()</cite> methods take a second
+argument named <cite>state</cite>. This means you can pass the Pylons <cite>c</cite> object
+into your validators so that you can set any variables that your validators
+need in order to validate a particular field as an attribute of the <cite>c</cite>
+object. It can then be passed as the <cite>c</cite> object to the schema as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="s">&#39;example.com&#39;</span>
+<span class="n">form_result</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The schema passes <cite>c</cite> to each validator in turn so that you can do things like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">SimpleEmail</span><span class="p">(</span><span class="n">formencode</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">Email</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">domain</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">formencode</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">Invalid</span><span class="p">(</span>
+                <span class="s">&#39;Email addresses must end in: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> \
+                    <span class="n">c</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">formencode</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">Email</span><span class="o">.</span><span class="n">_to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For this to work, make sure to change the <cite>EmailForm</cite> schema you&#8217;ve defined to use the new <cite>SimpleEmail</cite> validator. In other words,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">email</span> <span class="o">=</span> <span class="n">formencode</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">Email</span><span class="p">(</span><span class="n">not_empty</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c"># becomes:</span>
+<span class="n">email</span> <span class="o">=</span> <span class="n">SimpleEmail</span><span class="p">(</span><span class="n">not_empty</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In reality the invalid error message we get if we don&#8217;t enter a valid email address isn&#8217;t very useful. We really want to be able to redisplay the form with the value entered and the error message produced. Replace the line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">return</span> <span class="s">&#39;Invalid: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">error</span>
+</pre></div>
+</div>
+<p>with the lines:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span><span class="o">.</span><span class="n">form_result</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">value</span>
+<span class="n">c</span><span class="o">.</span><span class="n">form_errors</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">error_dict</span> <span class="ow">or</span> <span class="p">{}</span>
+<span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/form.mako&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we will need to make some tweaks to <cite>form.mako</cite>. Make it look like this:</p>
+<div class="highlight-html+mako"><div class="highlight"><pre><span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s">&#39;email&#39;</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s">&#39;get&#39;</span><span class="p">)</span><span class="cp">}</span>
+
+<span class="cp">%</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">form_errors</span><span class="p">:</span>
+<span class="nt">&lt;h2&gt;</span>Please correct the errors<span class="nt">&lt;/h2&gt;</span>
+<span class="cp">%</span> <span class="k">else</span><span class="p">:</span>
+<span class="nt">&lt;h2&gt;</span>Enter Email Address<span class="nt">&lt;/h2&gt;</span>
+<span class="cp">%</span><span class="k"> endif</span>
+
+<span class="cp">%</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">form_errors</span><span class="p">:</span>
+Email Address: <span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">text_field</span><span class="p">(</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">form_result</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="cp">}</span>
+<span class="nt">&lt;p&gt;</span><span class="cp">${</span><span class="n">c</span><span class="o">.</span><span class="n">form_errors</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">]</span><span class="cp">}</span><span class="nt">&lt;/p&gt;</span>
+<span class="cp">%</span> <span class="k">else</span><span class="p">:</span>
+Email Address: <span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">text_field</span><span class="p">(</span><span class="s">&#39;email&#39;</span><span class="p">)</span><span class="cp">}</span>
+<span class="cp">%</span><span class="k"> endif</span>
+
+<span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="s">&#39;Submit&#39;</span><span class="p">)</span><span class="cp">}</span>
+<span class="cp">${</span><span class="n">h</span><span class="o">.</span><span class="n">end_form</span><span class="p">()</span><span class="cp">}</span>
+</pre></div>
+</div>
+<p>Now when the form is invalid the <cite>form.mako</cite> template is re-rendered with the error messages.</p>
+</div>
+</div>
+<div class="section" id="other-form-tools">
+<h2>Other Form Tools<a class="headerlink" href="#other-form-tools" title="Permalink to this headline">¶</a></h2>
+<p>If you are going to be creating a lot of forms you may wish to consider using <a class="reference external" href="http://formbuild.org">FormBuild</a> to help create your forms. To use it you create a custom Form object and use that object to build all your forms. You can then use the API to modify all aspects of the generation and use of all forms built with your custom Form by modifying its definition without any need to change the form templates.</p>
+<p>Here is an one example of how you might use it in a controller to handle a form submission:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># in the controller</span>
+
+<span class="k">def</span> <span class="nf">form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">results</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">formbuild</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span>
+        <span class="n">schema</span><span class="o">=</span><span class="n">Schema</span><span class="p">(),</span> <span class="c"># Your FormEncode schema for the form</span>
+                         <span class="c"># to be validated</span>
+        <span class="n">template</span><span class="o">=</span><span class="s">&#39;form.mako&#39;</span><span class="p">,</span> <span class="c"># The template containg the code</span>
+                              <span class="c"># that builds your form</span>
+        <span class="n">form</span><span class="o">=</span><span class="n">Form</span> <span class="c"># The FormBuild Form definition you wish to use</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+        <span class="c"># The form validation failed so re-display</span>
+        <span class="c"># the form with the auto-generted response</span>
+        <span class="c"># containing submitted values and errors or</span>
+        <span class="c"># do something with the errors</span>
+        <span class="k">return</span> <span class="n">response</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># The form validated, do something useful with results.</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>Full documentation of all features is available in the <a class="reference external" href="http://formbuild.org/manual.html">FormBuild manual</a> which you should read before looking at <a class="reference external" href="http://formbuild.org/pylons.html">Using FormBuild in Pylons</a></p>
+<p>Looking forward it is likely Pylons will soon be able to use the TurboGears widgets system which will probably become the recommended way to build forms in Pylons.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Forms</a><ul>
+<li><a class="reference internal" href="#the-basics">The basics</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a><ul>
+<li><a class="reference internal" href="#post-vs-get-and-the-re-submitted-data-problem">POST vs GET and the Re-Submitted Data Problem</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-helpers">Using the Helpers</a></li>
+<li><a class="reference internal" href="#file-uploads">File Uploads</a></li>
+<li><a class="reference internal" href="#validating-user-input-with-formencode">Validating user input with FormEncode</a><ul>
+<li><a class="reference internal" href="#validation-the-quick-way">Validation the Quick Way</a></li>
+<li><a class="reference internal" href="#validation-the-long-way">Validation the Long Way</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-form-tools">Other Form Tools</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="helpers.html"
+                        title="previous chapter">Helpers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="i18n.html"
+                        title="next chapter">Internationalization and Localization</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="i18n.html" title="Internationalization and Localization"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="Helpers"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

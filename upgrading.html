@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Upgrading &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Packaging and Deployment Overview" href="deployment.html" />
+    <link rel="prev" title="Errors, Troubleshooting, and Debugging" href="debugging.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="deployment.html" title="Packaging and Deployment Overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="debugging.html" title="Errors, Troubleshooting, and Debugging"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="upgrading">
+<span id="id1"></span><h1>Upgrading<a class="headerlink" href="#upgrading" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id2">
+<h2>1.0 -&gt; 1.0.1<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>No changes are necessary, however to take advantage of MarkupSafe&#8217;s faster
+HTML escaping, the default filter in <code class="docutils literal"><span class="pre">environment.py</span></code> that Mako is
+configured with should be changed from:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">webhelpers.html</span> <span class="k">import</span> <span class="n">escape</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>To::</dt>
+<dd>from markupsafe import escape</dd>
+</dl>
+<p>MarkupSafe utilizes a C extension where available for faster escaping which
+can help on larger pages with substantial variable substitutions.</p>
+</div>
+<div class="section" id="id3">
+<h2>0.9.7 -&gt; 1.0<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>Upgrading your project is slightly different depending on which versions you&#8217;re upgrading from and to. It&#8217;s recommended that upgrades be done in minor revision steps, as deprecation warnings are added between revisions to help in the upgrade process.</p>
+<p>For any project prior to 0.9.7, you should first follow the applicable docs to upgrade to 0.9.7 before proceeding.</p>
+<p>To upgrade to 1.0, first upgrade your project to 0.10. This is a Pylons release that is fully backwards-compatible with 0.9.7. However under 0.10 a variety of warnings will be issued about the various things that need to be changed before upgrading to 1.0.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>Since Pylons 0.10 is only out as a beta at this point, upgrade using the
+actual URL, for example:</p>
+<div class="last highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install -U http://pylonshq.com/download/0.10/Pylons-0.10.tar.gz
+</pre></div>
+</div>
+</div>
+<p>Beyond the warnings issued, you should also read the following list and ensure these changes have been applied.</p>
+<p>Pylons changes from 0.9.7 to 1.0:</p>
+<ul>
+<li><p class="first">The config object created in <code class="docutils literal"><span class="pre">environment.py</span></code> is now passed around explicitly. There are also some other minor updates as follows.</p>
+<blockquote>
+<div><p>Update config/environment.py to initialize and return the config:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Add to the imports:</span>
+<span class="kn">from</span> <span class="nn">pylons.configuration</span> <span class="k">import</span> <span class="n">PylonsConfig</span>
+
+<span class="c"># Add under &#39;def load_environment&#39;:</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">PylonsConfig</span><span class="p">()</span>
+
+<span class="c"># Replace the make_map / app globals line with</span>
+<span class="n">config</span><span class="p">[</span><span class="s">&#39;routes.map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_map</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.app_globals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">app_globals</span><span class="o">.</span><span class="n">Globals</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c"># Optionally, if removing the CacheMiddleware and using the</span>
+<span class="c"># cache in the new 1.0 style, add under the previous lines:</span>
+<span class="kn">import</span> <span class="nn">pylons</span>
+<span class="n">pylons</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">_push_object</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.app_globals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+
+
+<span class="c"># Add at the end of the load_environment function:</span>
+<span class="k">return</span> <span class="n">config</span>
+</pre></div>
+</div>
+<p>Update config/middleware.py to use the returned <a class="reference internal" href="glossary.html#term-config"><span class="xref std std-term">config</span></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># modify the load_environment call:</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">load_environment</span><span class="p">(</span><span class="n">global_conf</span><span class="p">,</span> <span class="n">app_conf</span><span class="p">)</span>
+
+<span class="c"># update the middleware calls</span>
+
+<span class="c"># The Pylons WSGI app</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">PylonsApp</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c"># Routing/Session/Cache Middleware</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">RoutesMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;routes.map&#39;</span><span class="p">])</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">SessionMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+<span class="c"># CUSTOM MIDDLEWARE HERE (filtered by error handling middlewares)</span>
+
+<span class="c"># Add right before &#39;return app&#39;:</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The CacheMiddleware is no longer setup by default through
+middleware, its now setup under <a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a> inside its
+instantiation in <code class="file docutils literal"><span class="pre">lib/app_globals.py</span></code>.</p>
+</div>
+<p>Update config/routing.py to accept the <a class="reference internal" href="glossary.html#term-config"><span class="xref std std-term">config</span></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Replace the def line with</span>
+<span class="k">def</span> <span class="nf">make_map</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>Update lib/app_globals.py to accept the <a class="reference internal" href="glossary.html#term-config"><span class="xref std std-term">config</span></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Replace the __init__ line with</span>
+<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+
+<span class="c"># Optionally, if you decided to remove the CacheMiddleware</span>
+<span class="c"># Add these imports</span>
+<span class="kn">from</span> <span class="nn">beaker.cache</span> <span class="k">import</span> <span class="n">CacheManager</span>
+<span class="kn">from</span> <span class="nn">beaker.util</span> <span class="k">import</span> <span class="n">parse_cache_config_options</span>
+
+<span class="c"># and add this line in __init__:</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">CacheManager</span><span class="p">(</span><span class="o">**</span><span class="n">parse_cache_config_options</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Update tests/__init__.py as needed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">unittest</span> <span class="k">import</span> <span class="n">TestCase</span>
+
+<span class="kn">from</span> <span class="nn">paste.deploy</span> <span class="k">import</span> <span class="n">loadapp</span>
+<span class="kn">from</span> <span class="nn">paste.script.appinstall</span> <span class="k">import</span> <span class="n">SetupCommand</span>
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="k">import</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">routes.util</span> <span class="k">import</span> <span class="n">URLGenerator</span>
+<span class="kn">from</span> <span class="nn">webtest</span> <span class="k">import</span> <span class="n">TestApp</span>
+
+<span class="kn">import</span> <span class="nn">pylons.test</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;environ&#39;</span><span class="p">,</span> <span class="s">&#39;url&#39;</span><span class="p">,</span> <span class="s">&#39;TestController&#39;</span><span class="p">]</span>
+
+<span class="c"># Invoke websetup with the current config file</span>
+<span class="n">SetupCommand</span><span class="p">(</span><span class="s">&#39;setup-app&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">pylons</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">pylonsapp</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;__file__&#39;</span><span class="p">]])</span>
+
+<span class="n">environ</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">class</span> <span class="nc">TestController</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">wsgiapp</span> <span class="o">=</span> <span class="n">pylons</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">pylonsapp</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">wsgiapp</span><span class="o">.</span><span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">TestApp</span><span class="p">(</span><span class="n">wsgiapp</span><span class="p">)</span>
+        <span class="n">url</span><span class="o">.</span><span class="n">_push_object</span><span class="p">(</span><span class="n">URLGenerator</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;routes.map&#39;</span><span class="p">],</span> <span class="n">environ</span><span class="p">))</span>
+        <span class="n">TestCase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Change the use of <code class="docutils literal"><span class="pre">url_for</span></code> in your tests to use
+<code class="xref py py-class docutils literal"><span class="pre">url</span></code>, which is imported from
+<code class="file docutils literal"><span class="pre">tests/__init__.py</span></code> in your unit tests.</p>
+</div>
+<p>Finally, update websetup.py to avoid the duplicate app creation that
+previously could occur during the unit tests:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Add to the imports</span>
+<span class="kn">import</span> <span class="nn">pylons.test</span>
+
+<span class="c"># Add under the &#39;def setup_app&#39;:</span>
+
+<span class="c"># Don&#39;t reload the app if it was loaded under the testing environment</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">pylons</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">pylonsapp</span><span class="p">:</span>
+    <span class="n">load_environment</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">global_conf</span><span class="p">,</span> <span class="n">conf</span><span class="o">.</span><span class="n">local_conf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Change all instances of <code class="docutils literal"><span class="pre">redirect_to(...)</span></code> -&gt; <code class="docutils literal"><span class="pre">redirect(url(...))</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">redirect_to</span></code> processed arguments in a slightly &#8216;magical&#8217; manner in that
+some of them went to the <code class="docutils literal"><span class="pre">url_for</span></code> while sometimes... not. <code class="xref py py-func docutils literal"><span class="pre">redirect()</span></code>
+issues a redirect and nothing more, so to generate a url, the <code class="xref py py-class docutils literal"><span class="pre">url</span></code>
+instance should be used (import: <code class="docutils literal"><span class="pre">from</span> <span class="pre">pylons</span> <span class="pre">import</span> <span class="pre">url</span></code>).</p>
+</div></blockquote>
+</li>
+<li><p class="first">Ensure that all use of <code class="docutils literal"><span class="pre">g</span></code> is switched to using the new name, <a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a></p>
+</li>
+<li><p class="first">Change all instances of <code class="docutils literal"><span class="pre">url_for</span></code> to <code class="xref py py-class docutils literal"><span class="pre">url</span></code>.</p>
+<blockquote>
+<div><p>Note that <code class="docutils literal"><span class="pre">url</span></code> does not retain the current route memory like
+<code class="docutils literal"><span class="pre">url_for</span></code> did by default. To get a route generated using the
+current route, call
+<code class="xref py py-meth docutils literal"><span class="pre">url.current</span></code>.</p>
+<p>For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Rather than url_for() for the current route</span>
+<span class="n">url</span><span class="o">.</span><span class="n">current</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><code class="xref py py-class docutils literal"><span class="pre">url</span></code> can be imported from <code class="docutils literal"><span class="pre">pylons</span></code>.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Change <code class="docutils literal"><span class="pre">config</span></code> import statement if needed</p>
+<blockquote>
+<div><p>Previously, the config object could be imported as if it was a module:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pylons.config</span>
+</pre></div>
+</div>
+<p>The config object is now an object in <code class="file docutils literal"><span class="pre">pylons/__init__.py</span></code> so the
+import needs to be changed to:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pylons</span> <span class="k">import</span> <span class="n">config</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Routes is now explicit by default</p>
+<blockquote>
+<div><p>This won&#8217;t affect those already using <code class="xref py py-class docutils literal"><span class="pre">url</span></code> as it ignores route memory. This change does mean that some routes which relied on a default controller of &#8216;content&#8217; and a default action of &#8216;index&#8217; will not work.</p>
+<p>To restore the old behavior, in <code class="file docutils literal"><span class="pre">config/routing.py</span></code>, set the mapper
+to explicit:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">explicit</span> <span class="o">=</span> <span class="k">True</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">By default, the <a class="reference internal" href="glossary.html#term-tmpl-context"><span class="xref std std-term">tmpl_context</span></a> (a.k.a &#8216;c&#8217;), is no longer a <code class="xref py py-class docutils literal"><span class="pre">AttribSafeContextObj</span></code>. This means accessing attributes that don&#8217;t exist will raise an <code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code>.</p>
+<blockquote>
+<div><p>To use the attribute-safe <a class="reference internal" href="glossary.html#term-tmpl-context"><span class="xref std std-term">tmpl_context</span></a>, add this line to the
+<code class="file docutils literal"><span class="pre">config/environment.py</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.strict_tmpl_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">False</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Upgrading</a><ul>
+<li><a class="reference internal" href="#id2">1.0 -&gt; 1.0.1</a></li>
+<li><a class="reference internal" href="#id3">0.9.7 -&gt; 1.0</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="debugging.html"
+                        title="previous chapter">Errors, Troubleshooting, and Debugging</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="deployment.html"
+                        title="next chapter">Packaging and Deployment Overview</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="deployment.html" title="Packaging and Deployment Overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="debugging.html" title="Errors, Troubleshooting, and Debugging"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

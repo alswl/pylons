@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Glossary &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="prev" title="webob – Request/Response objects" href="thirdparty/webob.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="thirdparty/webob.html" title="webob – Request/Response objects"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="glossary">
+<span id="id1"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
+<dl class="glossary docutils">
+<dt id="term-action">action</dt>
+<dd>The class method in a Pylons applications&#8217; controller that handles
+a request.</dd>
+<dt id="term-api">API</dt>
+<dd>Application Programming Interface. The means of communication between
+a programmer and a software program or operating system.</dd>
+<dt id="term-app-globals">app_globals</dt>
+<dd><p class="first">The <code class="docutils literal"><span class="pre">app_globals</span></code> object is created on application instantiation by
+the <code class="xref py py-class docutils literal"><span class="pre">Globals</span></code> class in a projects <code class="file docutils literal"><span class="pre">lib/app_globals.py</span></code>
+module.</p>
+<p class="last">This object is created once when the application is loaded by the
+projects <code class="file docutils literal"><span class="pre">config/environment.py</span></code> module (See
+<a class="reference internal" href="configuration.html#environment-config"><span class="std std-ref">Environment</span></a>). It remains persistent
+during the lifecycle of the web application, and is <em>not</em> thread-safe
+which means that it is best used for global options that should be
+<em>read-only</em>, or as an object to attach db connections or other objects
+which ensure their own access is thread-safe.</p>
+</dd>
+<dt id="term-c">c</dt>
+<dd>Commonly used alias for <a class="reference internal" href="#term-tmpl-context"><span class="xref std std-term">tmpl_context</span></a> to save on the typing
+when using lots of controller populated variables in templates.</dd>
+<dt id="term-caching">caching</dt>
+<dd>The storage of the results of expensive or length computations for
+later re-use at a point more quickly accessed by the end user.</dd>
+<dt id="term-cdn">CDN</dt>
+<dd>Content Delivery Networks (CDN&#8217;s) are generally globally distributed
+content delivery networks optimized for low latency for static file
+distribution. They can significantly increase page-load times by
+ensuring that the static resources on a page are delivered by servers
+geographically close to the client in addition to lightening the load
+placed on the application server.</dd>
+<dt id="term-coldfusion-components">ColdFusion Components</dt>
+<dd>CFCs represent an attempt by Macromedia to bring ColdFusion closer
+to an Object Oriented Programming (OOP) language. ColdFusion is in
+no way an OOP language, but thanks in part to CFCs, it does boast
+some of the attributes that make OOP languages so popular.</dd>
+<dt id="term-config">config</dt>
+<dd>The <code class="xref py py-class docutils literal"><span class="pre">PylonsConfig</span></code> instance for a given
+application. This can be accessed as <code class="docutils literal"><span class="pre">pylons.config</span></code> after an
+Pylons application has been loaded.</dd>
+<dt id="term-controller">controller</dt>
+<dd>The &#8216;C&#8217; in MVC. The controller is given a request, does the necessary
+logic to prepare data for display, then renders a template with
+the data and returns it to the user. See <a class="reference internal" href="controllers.html#controllers"><span class="std std-ref">控制器</span></a>.</dd>
+<dt id="term-easy-install">easy_install</dt>
+<dd><p class="first">A tool that lets you download, build, install and manage Python packages
+and their dependencies. <a class="reference external" href="http://peak.telecommunity.com/DevCenter/EasyInstall">easy_install</a> is the end-user facing component
+of <a class="reference internal" href="#term-setuptools"><span class="xref std std-term">setuptools</span></a>.</p>
+<p>Pylons can be installed with <code class="docutils literal"><span class="pre">easy_install</span></code>, and applications built
+with Pylons can easily be deployed this way as well.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Pylons <a class="reference internal" href="deployment.html#deployment"><span class="std std-ref">Packaging and Deployment Overview</span></a></p>
+</div>
+</dd>
+<dt id="term-dotted-name-string">dotted name string</dt>
+<dd>A reference to a Python module by name using a string to identify it,
+e.g. <code class="docutils literal"><span class="pre">pylons.controllers.util</span></code>. These strings are evaluated to
+import the module being referenced without having to import it in
+the code used. This is generally used to avoid import-time
+side-effects.</dd>
+<dt id="term-egg">egg</dt>
+<dd><p class="first">Python egg&#8217;s are bundled Python packages, generally installed by
+a package called <a class="reference internal" href="#term-setuptools"><span class="xref std std-term">setuptools</span></a>. Unlike normal Python package
+installs, egg&#8217;s allow a few additional features, such as package
+dependencies, and dynamic discovery.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://peak.telecommunity.com/DevCenter/PythonEggs">The Quick Guide to Python Eggs</a></p>
+</div>
+</dd>
+<dt id="term-ejbs">EJBs</dt>
+<dd>Enterprise JavaBeans (EJB) technology is the server-side component
+architecture for Java Platform, Enterprise Edition (Java EE). EJB
+technology enables rapid and simplified development of distributed,
+transactional, secure and portable applications based on Java
+technology.</dd>
+<dt id="term-environ">environ</dt>
+<dd>environ is a dictionary passed into all <a class="reference internal" href="#term-wsgi"><span class="xref std std-term">WSGI</span></a> application. It
+generally contains unparsed header information, CGI style variables
+and other objects inserted by <a class="reference internal" href="#term-wsgi-middleware"><span class="xref std std-term">WSGI Middleware</span></a>.</dd>
+<dt id="term-etag">ETag</dt>
+<dd>An ETag (entity tag) is an HTTP response header returned by an
+HTTP/1.1 compliant web server used to determine change in content
+at a given URL. See <a class="reference external" href="http://wikipedia.org/wiki/HTTP_ETag">http://wikipedia.org/wiki/HTTP_ETag</a></dd>
+<dt id="term-g">g</dt>
+<dd>Alias used in prior versions of Pylons for <a class="reference internal" href="#term-app-globals"><span class="xref std std-term">app_globals</span></a>.</dd>
+<dt id="term-google-app-engine">Google App Engine</dt>
+<dd><p class="first">A cloud computing platform for hosting web applications implemented in
+Python. Building Pylons applications for App Engine is facilitated by
+Ian Bicking&#8217;s <a class="reference external" href="http://code.google.com/p/appengine-monkey/">appengine-monkey project</a>.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://code.google.com/appengine/docs/whatisgoogleappengine.html">What is Google App Engine? - Official Doc</a></p>
+</div>
+</dd>
+<dt id="term-h">h</dt>
+<dd>The helpers reference, <code class="docutils literal"><span class="pre">h</span></code>, is made available for use inside
+templates to assist with common rendering tasks. <code class="docutils literal"><span class="pre">h</span></code> is just a
+reference to the <code class="file docutils literal"><span class="pre">lib/helpers.py</span></code> module and can be used in the
+same manner as any other module import.</dd>
+<dt id="term-model-view-controller">Model-View-Controller</dt>
+<dd><p class="first">An architectural pattern used in software engineering. In Pylons, the
+MVC paradigm is extended slightly with a pipeline that may transform
+and extend the data available to a controller, as well as the Pylons
+<a class="reference internal" href="#term-wsgi"><span class="xref std std-term">WSGI</span></a> app itself that determines the appropriate Controller
+to call.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://wikipedia.org/wiki/Model-View-Controller">MVC at Wikipedia</a></p>
+</div>
+</dd>
+<dt id="term-mvc">MVC</dt>
+<dd>See <a class="reference internal" href="#term-model-view-controller"><span class="xref std std-term">Model-View-Controller</span></a></dd>
+<dt id="term-orm">ORM</dt>
+<dd>(Object-Relational Mapper) Maps relational databases such as
+MySQL, Postgres, Oracle to objects providing a cleaner API.
+Most ORM&#8217;s also make it easier to prevent SQL Injection attacks
+by binding variables, and can handle generating sometimes
+extensive SQL.</dd>
+<dt id="term-pylons">Pylons</dt>
+<dd>A Python-based WSGI oriented web framework.</dd>
+<dt id="term-rails">Rails</dt>
+<dd>Abbreviated as RoR, Ruby on Rails (also referred to as just
+Rails) is an open source Web application framework, written in Ruby</dd>
+<dt id="term-request">request</dt>
+<dd>Refers to the current request being processed. Available to import
+from <code class="xref py py-mod docutils literal"><span class="pre">pylons</span></code> and is available for use in templates by the
+same name. See <code class="xref py py-class docutils literal"><span class="pre">Request</span></code>.</dd>
+<dt id="term-response">response</dt>
+<dd>Refers to the response to the current request. Available to import
+from <code class="xref py py-mod docutils literal"><span class="pre">pylons</span></code> and is available for use in template by the same
+name. See <code class="xref py py-class docutils literal"><span class="pre">Response</span></code>.</dd>
+<dt id="term-route">route</dt>
+<dd>Routes determine how the URL&#8217;s are mapped to the controllers and which
+URL is generated. See <a class="reference internal" href="configuration.html#url-config"><span class="std std-ref">URL Configuration</span></a></dd>
+<dt id="term-setuptools">setuptools</dt>
+<dd><p class="first">An extension to the basic distutils, setuptools allows packages to
+specify package dependencies and have dynamic discovery of other
+installed Python packages.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://peak.telecommunity.com/DevCenter/setuptools">Building and Distributing Packages with setuptools</a></p>
+</div>
+</dd>
+<dt id="term-sqlalchemy">SQLAlchemy</dt>
+<dd>One of the most popular Python database object-relational mappers
+(<a class="reference internal" href="#term-orm"><span class="xref std std-term">ORM</span></a>). <a class="reference external" href="http://www.sqlalchemy.org/">SQLAlchemy</a> is the default
+ORM recommended in Pylons. SQLAlchemy at the ORM level can look similar
+to Rails ActiveRecord, but uses the <a class="reference external" href="http://www.martinfowler.com/eaaCatalog/dataMapper.html">DataMapper</a>
+pattern for additional flexibility with the ability to map simple to
+extremely complex databases.</dd>
+<dt id="term-tmpl-context">tmpl_context</dt>
+<dd>The <code class="docutils literal"><span class="pre">tmpl_context</span></code> is available in the <code class="xref py py-mod docutils literal"><span class="pre">pylons</span></code> module, and
+refers to the template context. Objects attached to it are available
+in the template namespace as either <code class="docutils literal"><span class="pre">tmpl_context</span></code> or <code class="docutils literal"><span class="pre">c</span></code> for
+convenience.</dd>
+<dt id="term-ui">UI</dt>
+<dd>User interface. The means of communication between a person
+and a software program or operating system.</dd>
+<dt id="term-virtualenv">virtualenv</dt>
+<dd><p class="first">A tool to create isolated Python environments, designed to supersede the
+<code class="docutils literal"><span class="pre">workingenv</span></code> package and <a class="reference external" href="http://peak.telecommunity.com/DevCenter/EasyInstall#creating-a-virtual-python">virtual python</a> configurations. In addition
+to isolating packages from possible system conflicts, <a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>
+makes it easy to install Python libraries using <a class="reference internal" href="#term-easy-install"><span class="xref std std-term">easy_install</span></a>
+without dumping lots of packages into the system-wide Python.</p>
+<p>The other great benefit is that no root access is required since all
+modules are kept under the desired directory. This makes it easy
+to setup a working Pylons install on shared hosting providers and other
+systems where system-wide access is unavailable.</p>
+<p class="last"><code class="docutils literal"><span class="pre">virtualenv</span></code> is employed automatically by the <code class="docutils literal"><span class="pre">go-pylons.py</span></code> script
+described in <a class="reference internal" href="gettingstarted.html#getting-started"><span class="std std-ref">快速入门</span></a>. The Pylons wiki has more
+information on <a class="reference external" href="http://wiki.pylonshq.com/display/pylonscookbook/Using+a+Virtualenv+Sandbox">working with virtualenv</a>.</p>
+</dd>
+<dt id="term-web-server-gateway-interface">web server gateway interface</dt>
+<dd>A specification for web servers and application servers to
+communicate with web applications. Also referred to by its
+initials, as <a class="reference internal" href="#term-wsgi"><span class="xref std std-term">WSGI</span></a>.</dd>
+<dt id="term-wsgi">WSGI</dt>
+<dd>The <a class="reference external" href="http://www.python.org/dev/peps/pep-0333/">WSGI Specification</a>,
+also commonly referred to as PEP 333 and described by <span class="target" id="index-0"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0333"><strong>PEP 333</strong></a>.</dd>
+<dt id="term-wsgi-middleware">WSGI Middleware</dt>
+<dd><p class="first"><a class="reference internal" href="#term-wsgi"><span class="xref std std-term">WSGI</span></a> Middleware refers to the ability of WSGI applications
+to modify the environ, and/or the content of other WSGI applications
+by being placed in between the request and the other WSGI application.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="concepts.html#wsgi-middleware"><span class="std std-ref">WSGI Middleware in Concepts of Pylons</span></a>
+<a class="reference internal" href="configuration.html#middleware-config"><span class="std std-ref">WSGI Middleware Configuration</span></a></p>
+</div>
+</dd>
+</dl>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="thirdparty/webob.html"
+                        title="previous chapter"><code class="docutils literal"><span class="pre">webob</span></code> &#8211; Request/Response objects</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="thirdparty/webob.html" title="webob – Request/Response objects"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Entry Points to Write Plugins &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Advanced Pylons" href="index.html" />
+    <link rel="next" title="Pylons Execution Analysis" href="../execution.html" />
+    <link rel="prev" title="Creating Paste templates" href="creating_paste_templates.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="../_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="../index.html">
+      		<img class="logo" src="../_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../execution.html" title="Pylons Execution Analysis"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="creating_paste_templates.html" title="Creating Paste templates"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Advanced Pylons</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-entry-points-to-write-plugins">
+<span id="entry-points-and-plugins"></span><h1>Using Entry Points to Write Plugins<a class="headerlink" href="#using-entry-points-to-write-plugins" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>An entry point is a Python object in a project&#8217;s code that is identified by a string in the project&#8217;s <code class="docutils literal"><span class="pre">setup.py</span></code> file. The entry point is referenced by a group and a name so that the object may be discoverabe. This means that another application can search for all the installed software that has an entry point with a particular group name, and then access the Python object associated with that name.</p>
+<p>This is extremely useful because it means it is possible to write plugins for an appropriately-designed application that can be loaded at run time. This document describes just such an application.</p>
+<p>It is important to understand that entry points are a feature of the new Python eggs package format and are <em>not</em> a standard feature of Python. To learn about eggs, their benefits, how to install them and how to set them up, see:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://peak.telecommunity.com/DevCenter/PythonEggs">Python Eggs</a></li>
+<li><a class="reference external" href="http://peak.telecommunity.com/DevCenter/EasyInstall">Easy Install</a></li>
+<li><a class="reference external" href="http://peak.telecommunity.com/DevCenter/setuptools">Setuptools</a></li>
+</ul>
+<p>If reading the above documentation is inconvenient, suffice it to say that eggs are created via a similar <code class="docutils literal"><span class="pre">setup.py</span></code> file to the one used by Python&#8217;s own <a class="reference external" href="http://docs.python.org/lib/module-distutils.html">distutils</a> module &#8212; except that eggs have some powerful extra features such as entry points and the ability to specify module dependencies and have them automatically installed by <code class="docutils literal"><span class="pre">easy_install</span></code> when the application itself is installed.</p>
+<p>For those developers unfamiliar with <code class="docutils literal"><span class="pre">distutils</span></code>: it is the standard mechanism by which Python packages should be distributed. To use it, add a <code class="docutils literal"><span class="pre">setup.py</span></code> file to the desired project, insert the required metadata and specify the important files. The <code class="docutils literal"><span class="pre">setup.py</span></code> file can be used to issue various commands which create distributions of the pacakge in various formats for users to install.</p>
+</div>
+<div class="section" id="creating-plugins">
+<h2>Creating Plugins<a class="headerlink" href="#creating-plugins" title="Permalink to this headline">¶</a></h2>
+<p>This document describes how to use entry points to create a plugin mechansim which allows new types of content to be added to a content management system but we are going to start by looking at the plugin.</p>
+<p>Say the standard way the CMS creates a plugin is with the <code class="docutils literal"><span class="pre">make_plugin()</span></code> function. In order for a plugin to be a plugin it must therefore have the function which takes the same arguments as the <code class="xref py py-func docutils literal"><span class="pre">make_plugin()</span></code> function and returns a plugin. We are going to add some image plugins to the CMS so we setup a project with the following directory structure:</p>
+<div class="highlight-text"><div class="highlight"><pre>+ image_plugins
+  + __init__.py
++ setup.py
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">image_plugins/__init__.py</span></code> file looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">make_jpeg_image_plugin</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">&quot;This would return the JPEG image plugin&quot;</span>
+
+<span class="k">def</span> <span class="nf">make_png_image_plugin</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">&quot;This would return the PNG image plugin&quot;</span>
+</pre></div>
+</div>
+<p>We have now defined our plugins so we need to define our entry points. First lets write a basic <code class="docutils literal"><span class="pre">setup.py</span></code> for the project:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">find_packages</span>
+
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">&#39;ImagePlugins&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s">&quot;1.0&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s">&quot;Image plugins for the imaginary CMS 1.0 project&quot;</span><span class="p">,</span>
+    <span class="n">author</span><span class="o">=</span><span class="s">&quot;James Gardner&quot;</span><span class="p">,</span>
+    <span class="n">packages</span><span class="o">=</span><span class="n">find_packages</span><span class="p">(),</span>
+    <span class="n">include_package_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>When using <code class="docutils literal"><span class="pre">setuptools</span></code> we can specify the <code class="docutils literal"><span class="pre">find_packages()</span></code> function and <code class="docutils literal"><span class="pre">include_package_data=True</span></code> rather than having to manually list all the modules and package data like we had to do in the old <code class="docutils literal"><span class="pre">distutils</span></code> <code class="docutils literal"><span class="pre">setup.py</span></code>.</p>
+<p>Because the plugin is designed to work with the (imaginary) CMS 1.0 package, we need to specify that the plugin requires the CMS to be installed too and so we add this line to the <code class="docutils literal"><span class="pre">setup()</span></code> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">install_requires</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;CMS&gt;=1.0&quot;</span><span class="p">],</span>
+</pre></div>
+</div>
+<p>Now when the plugins are installed, CMS 1.0 or above will be installed automatically if it is not already present.</p>
+<p>There are lots of other arguments such as <code class="docutils literal"><span class="pre">author_email</span></code> or <code class="docutils literal"><span class="pre">url</span></code> which you can add to the <code class="docutils literal"><span class="pre">setup.py</span></code> function too.</p>
+<p>We are interested in adding the entry points. We need to decide on a group name for the entry points. It is traditional to use the name of the package using the entry point, separated by a <code class="docutils literal"><span class="pre">.</span></code> character and then use a name that describes what the entry point does. For our example <code class="docutils literal"><span class="pre">cms.plugin</span></code> might be an appropriate name for the entry point. Since the <code class="docutils literal"><span class="pre">image_plugin</span></code> module contains two plugins we will need two entries. Add the following to the <code class="docutils literal"><span class="pre">setup.py</span></code> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">entry_points</span><span class="o">=</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">    [cms.plugin]</span>
+<span class="s">    jpg_image=image_plugin:make_jpeg_image_plugin</span>
+<span class="s">    png_image=image_plugin:make_jpeg_image_plugin</span>
+<span class="s">&quot;&quot;&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Group names are specified in square brackets, plugin names are specified in the format <code class="docutils literal"><span class="pre">name=module.import.path:object_within_the_module</span></code>. The object doesn&#8217;t have to be a function and can have any valid Python name. The module import path doesn&#8217;t have to be a top level component as it is in this example and the name of the entry point doesn&#8217;t have to be the same as the name of the object it is pointing to.</p>
+<p>The developer can add as many entries as desired in each group as long as the names are different and the same holds for adding groups. It is also possible to specify the entry points as a Python dictionary rather than a string if that approach is preferred.</p>
+<p>There are two more things we need to do to complete the plugin. The first is to include an <code class="docutils literal"><span class="pre">ez_setup</span></code> module so that if the user installing the plugin doesn&#8217;t have <code class="docutils literal"><span class="pre">setuptools</span></code> installed, it will be installed for them. We do this by adding the follwoing to the very top of the <code class="docutils literal"><span class="pre">setup.py</span></code> file before the import:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ez_setup</span> <span class="kn">import</span> <span class="n">use_setuptools</span>
+<span class="n">use_setuptools</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We also need to download the <code class="docutils literal"><span class="pre">ez_setup.py</span></code> file into our project directory at the same level as <code class="docutils literal"><span class="pre">setup.py</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you keep your project in SVN there is a <a class="reference external" href="http://peak.telecommunity.com/DevCenter/setuptools#managing-multiple-projects">trick you can use with the `SVN:externals</a> to keep the <code class="docutils literal"><span class="pre">ez_setup.py</span></code> file up to date.</p>
+</div>
+<p>Finally in order for the CMS to find the plugins we need to install them. We can do this with:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py install
+</pre></div>
+</div>
+<p>as usual or, since we might go on to develop the plugins further we can install them using a special development mode which sets up the paths to run the plugins from the source rather than installing them to Python&#8217;s <code class="docutils literal"><span class="pre">site-packages</span></code> directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py develop
+</pre></div>
+</div>
+<p>Both commands will download and install <code class="docutils literal"><span class="pre">setuptools</span></code> if you don&#8217;t already have it installed.</p>
+</div>
+<div class="section" id="using-plugins">
+<h2>Using Plugins<a class="headerlink" href="#using-plugins" title="Permalink to this headline">¶</a></h2>
+<p>Now that the plugin is written we need to write the code in the CMS package to load it. Luckily this is even easier.</p>
+<p>There are actually lots of ways of discovering plugins. For example: by distribution name and version requirement (such as <code class="docutils literal"><span class="pre">ImagePlugins&gt;=1.0</span></code>) or by the entry point group and name (eg <code class="docutils literal"><span class="pre">jpg_image</span></code>). For this example we are choosing the latter, here is a simple script for loading the plugins:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">iter_entry_points</span>
+<span class="k">for</span> <span class="nb">object</span> <span class="ow">in</span> <span class="n">iter_entry_points</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s">&#39;cms.plugin&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">print</span> <span class="nb">object</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">iter_entry_points</span>
+<span class="n">available_methods</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">method_handler</span> <span class="ow">in</span> <span class="n">iter_entry_points</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s">&#39;authkit.method&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">available_methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">method_handler</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Executing this short script, will result in the following output:</p>
+<div class="highlight-text"><div class="highlight"><pre>This would return the JPEG image plugin
+This would return the PNG image plugin
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">iter_entry_points()</span></code> function has looped though all the objects in the <code class="docutils literal"><span class="pre">cms.plugin</span></code> group and returned the function they were associated with. The application then called the function that the enrty point was pointing to.</p>
+<p>We hope that we have demonstrated the power of entry points for building extensible code and developers are encouraged to read the <a class="reference external" href="http://peak.telecommunity.com/DevCenter/PkgResources">pkg_resources</a> module documentation to learn about some more features of the eggs format.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using Entry Points to Write Plugins</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#creating-plugins">Creating Plugins</a></li>
+<li><a class="reference internal" href="#using-plugins">Using Plugins</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="creating_paste_templates.html"
+                        title="previous chapter">Creating Paste templates</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../execution.html"
+                        title="next chapter">Pylons Execution Analysis</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../execution.html" title="Pylons Execution Analysis"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="creating_paste_templates.html" title="Creating Paste templates"
+             >previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Advanced Pylons</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

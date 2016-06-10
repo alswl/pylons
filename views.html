@@ -1,0 +1,468 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Views &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="模型" href="models.html" />
+    <link rel="prev" title="控制器" href="controllers.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="模型"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="controllers.html" title="控制器"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="views">
+<span id="id1"></span><h1>Views<a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h1>
+<p>译者：<a class="reference external" href="http://log4d.com/">alswl</a></p>
+<a class="reference internal image-reference" href="_images/pylon4.jpg"><img alt="" class="align-left" src="_images/pylon4.jpg" style="width: 368px; height: 434px;" /></a>
+<p>In the MVC paradigm the <em>view</em> manages the presentation of the model.</p>
+<p>在 MVC 模型中， <em>视图</em> 用来管理模型的表现形式。</p>
+<p>用户看到并与之交互的是视图。对于 web 应用来说，一般是 HTML 界面。
+目前 Web 应用界面绝大部分还是 HTML，但也有一些变得常见的其他形式。</p>
+<p>这些界面技术包括 Macromedia Flash，JSON 和另外一些标记型语言比如 XHTML、XML/XSL、
+WML 和 Web services。另外在界面层提供 REST API 形式的 web 应用也越来越多，
+它们提供实效的方法从数据模型读写数据。</p>
+<p>还有一些其他稍微复杂的数据展示方法，比如通过 SOAP 服务。</p>
+<p>The growing adoption of RDF, the graph-based representation scheme that underpins the Semantic Web, brings a perspective that is strongly weighted towards machine-readability.</p>
+<p>如何把这些应用界面都处理好是一种大挑战。
+MVC 的一大优势就是可以轻松在这一堆方法中创建多种视图。</p>
+<p>通常情况下，无论是在线商店或雇员列表应用，
+视图不会对数据进行重大操作，它仅仅提供展现数据并向用户提供操作。</p>
+<div class="section" id="templates">
+<span id="id2"></span><h2>模板<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h2>
+<p>模板渲染引擎经常被用来处理视图展现。</p>
+<p>控制器会调用模板引擎来渲染并返回:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">helloworld.lib.base</span> <span class="k">import</span> <span class="n">BaseController</span><span class="p">,</span> <span class="n">render</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/sample.mako&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>使用 Mako 引擎的话，Mako 会主动查找 <code class="file docutils literal"><span class="pre">helloworld/templates</span></code> 目录
+（假设项目的名字叫做 &#8216;helloworld&#8217;）下面叫做 file:<cite>sample.mako</cite> 的文件。</p>
+<p><code class="xref py py-func docutils literal"><span class="pre">render()</span></code> 方法是在项目中 <cite>base.py</cite> 中定义的，是
+<code class="xref py py-func docutils literal"><span class="pre">render_mako()</span></code> 的别名。</p>
+<div class="section" id="id3">
+<h3>内建支持的模板引擎<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Pylons 内建支持的模板渲染引擎有 <a class="reference external" href="http://www.makotemplates.org/">Mako</a>, <a class="reference external" href="http://genshi.edgewall.org/">Genshi</a> 和 <a class="reference external" href="http://jinja.pocoo.org/">Jinja2</a> 。
+它们会在新项目创建时自动配置好，也可以随时手动添加并配置。</p>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>向模板引擎传递变量<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p>Pylons 在控制器中使用 <a class="reference internal" href="glossary.html#term-tmpl-context"><span class="xref std std-term">tmpl_context</span></a> 来传递变量到模板
+（默认情况是使用 <cite>c</cite> 作为别名）:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="k">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">tmpl_context</span> <span class="k">as</span> <span class="n">c</span><span class="p">,</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">pylons.controllers.util</span> <span class="k">import</span> <span class="n">abort</span><span class="p">,</span> <span class="n">redirect</span>
+
+<span class="kn">from</span> <span class="nn">helloworld.lib.base</span> <span class="k">import</span> <span class="n">BaseController</span><span class="p">,</span> <span class="n">render</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;Fred Smith&quot;</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/sample.mako&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>在模板中使用变量：</p>
+<div class="highlight-html+mako"><div class="highlight"><pre>Hi there <span class="cp">${</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span>!
+</pre></div>
+</div>
+<div class="section" id="tmpl-context">
+<h3>tmpl_context 模板上下文对象的严格模式和非严格模式<a class="headerlink" href="#tmpl-context" title="Permalink to this headline">¶</a></h3>
+<p><cite>tmpl_context</cite> 对象是在每次请求时候被创建的。它是
+<code class="xref py py-class docutils literal"><span class="pre">AttribSafeContextObj</span></code> 的子类，也是属性读取安全的。
+这意味着当尝试获取一个 <strong>不</strong> 存在的属性时，它不会抛出异常
+<a href="#id8"><span class="problematic" id="id9">:exec:`AttribSafeContextObj`</span></a> ，而是返回一个空字符串。</p>
+<p>这种默认设置，可以为开发者带来很多方便：</p>
+<div class="highlight-html+mako"><div class="highlight"><pre>Hi there <span class="cp">${</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span>
+</pre></div>
+</div>
+<p>当 <cite>c.name</cite> 不存在时候，上述代码依然可以工作，这种写法比使用
+严格的上下文内容对象 <code class="xref py py-class docutils literal"><span class="pre">ContextObj</span></code> 代码要精简很多。</p>
+<p>如果想切换到严格版本的 <a class="reference internal" href="glossary.html#term-tmpl-context"><span class="xref std std-term">tmpl_context</span></a> ，在 <code class="file docutils literal"><span class="pre">config/environment.py</span></code>
+中（在 config.init_app）中加入:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.strict_c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">True</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="template-globals">
+<span id="id10"></span><h2>默认模板参数<a class="headerlink" href="#template-globals" title="Permalink to this headline">¶</a></h2>
+<p>默认状态下，所有的模板页都自带一些通用对象来帮助开发。完整的变量列表如下：</p>
+<ul class="simple">
+<li><a class="reference internal" href="glossary.html#term-c"><span class="xref std std-term">c</span></a> &#8211; 模板页上下文对象 (是 <a class="reference internal" href="glossary.html#term-tmpl-context"><span class="xref std std-term">tmpl_context</span></a> 的别名)</li>
+<li><a class="reference internal" href="glossary.html#term-tmpl-context"><span class="xref std std-term">tmpl_context</span></a> &#8211; 模板页上下文对象</li>
+<li><code class="xref py py-data docutils literal"><span class="pre">config</span></code> &#8211; Pylons <code class="xref py py-class docutils literal"><span class="pre">PylonsConfig</span></code>
+对象 (字典结构)</li>
+<li><a class="reference internal" href="glossary.html#term-g"><span class="xref std std-term">g</span></a> &#8211; 项目全局对象 (<a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a> 的别名)</li>
+<li><a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a> &#8211; 项目全局对象</li>
+<li><a class="reference internal" href="glossary.html#term-h"><span class="xref std std-term">h</span></a> &#8211; 项目助手模块</li>
+<li><code class="xref py py-data docutils literal"><span class="pre">request</span></code> &#8211; Pylons <code class="xref py py-class docutils literal"><span class="pre">Request</span></code>
+当前请求对象</li>
+<li><code class="xref py py-data docutils literal"><span class="pre">response</span></code> &#8211; Pylons <code class="xref py py-class docutils literal"><span class="pre">Response</span></code>
+当前响应对象</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">session</span></code> &#8211; Pylons session 对象 (除非 Session 被禁用了)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">translator</span></code> &#8211; 从配置文件获取当前 i18 对象</li>
+<li><code class="xref py py-func docutils literal"><span class="pre">ungettext()</span></code> &#8211; gettext 的 ngettext Unicode 版本 (用来处理多语言的复数)</li>
+<li><code class="xref py py-func docutils literal"><span class="pre">_()</span></code> &#8211; Unicode 版本的获取多语言函数</li>
+<li><code class="xref py py-func docutils literal"><span class="pre">N_()</span></code> &#8211; gettext no-op function to mark a string for
+translation, but doesn&#8217;t actually translate</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">url</span></code> &#8211; <code class="xref py py-class docutils literal"><span class="pre">routes.util.URLGenerator</span></code>
+的实例</li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h2>配置模板引擎<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<p>新的 Pylons 项目在项目文件 <code class="file docutils literal"><span class="pre">config/environment.py</span></code> 中配置模板引擎。
+在这里面会创建 Mako 模板查找器，并将其载入 <a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a> 对象，
+这样就可以使用模板的渲染方法了。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># these imports are at the top</span>
+<span class="kn">from</span> <span class="nn">mako.lookup</span> <span class="kn">import</span> <span class="n">TemplateLookup</span>
+<span class="kn">from</span> <span class="nn">pylons.error</span> <span class="kn">import</span> <span class="n">handle_mako_error</span>
+
+<span class="c"># this section is inside the load_environment function</span>
+<span class="c"># Create the Mako TemplateLookup, with the default auto-escaping</span>
+<span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.app_globals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mako_lookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span>
+    <span class="n">directories</span><span class="o">=</span><span class="n">paths</span><span class="p">[</span><span class="s">&#39;templates&#39;</span><span class="p">],</span>
+    <span class="n">error_handler</span><span class="o">=</span><span class="n">handle_mako_error</span><span class="p">,</span>
+    <span class="n">module_directory</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app_conf</span><span class="p">[</span><span class="s">&#39;cache_dir&#39;</span><span class="p">],</span> <span class="s">&#39;templates&#39;</span><span class="p">),</span>
+    <span class="n">input_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">default_filters</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;escape&#39;</span><span class="p">],</span>
+    <span class="n">imports</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;from webhelpers.html import escape&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="section" id="id12">
+<h3>使用多个模板引擎<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>Since template engines are configured in the <code class="file docutils literal"><span class="pre">config/environment.py</span></code> section, then used by render functions, it&#8217;s trivial to setup additional template engines, or even differently configured versions of a single template engine. However, custom render functions will frequently be needed to utilize the additional template engine objects.</p>
+<p>Example of additional Mako template loader for a different templates directory for admins, which falls back to the normal templates directory:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Add the additional path for the admin template</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
+             <span class="n">controllers</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;controllers&#39;</span><span class="p">),</span>
+             <span class="n">static_files</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;public&#39;</span><span class="p">),</span>
+             <span class="n">templates</span><span class="o">=</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;templates&#39;</span><span class="p">)],</span>
+             <span class="n">admintemplates</span><span class="o">=</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;admintemplates&#39;</span><span class="p">),</span>
+                             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;templates&#39;</span><span class="p">)])</span>
+
+<span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.app_globals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mako_admin_lookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span>
+    <span class="n">directories</span><span class="o">=</span><span class="n">paths</span><span class="p">[</span><span class="s">&#39;admin_templates&#39;</span><span class="p">],</span>
+    <span class="n">error_handler</span><span class="o">=</span><span class="n">handle_mako_error</span><span class="p">,</span>
+    <span class="n">module_directory</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app_conf</span><span class="p">[</span><span class="s">&#39;cache_dir&#39;</span><span class="p">],</span> <span class="s">&#39;admintemplates&#39;</span><span class="p">),</span>
+    <span class="n">input_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">default_filters</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;escape&#39;</span><span class="p">],</span>
+    <span class="n">imports</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;from webhelpers.html import escape&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>That adds the additional template lookup instance, next a <a class="reference internal" href="#custom-render"><span class="std std-ref">custom render function</span></a> is needed that utilizes it:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pylons.templating</span> <span class="k">import</span> <span class="n">cached_template</span><span class="p">,</span> <span class="n">pylons_globals</span>
+
+<span class="k">def</span> <span class="nf">render_mako_admin</span><span class="p">(</span><span class="n">template_name</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">cache_key</span><span class="o">=</span><span class="k">None</span><span class="p">,</span>
+                      <span class="n">cache_type</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">cache_expire</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
+    <span class="c"># Create a render callable for the cache function</span>
+    <span class="k">def</span> <span class="nf">render_template</span><span class="p">():</span>
+        <span class="c"># Pull in extra vars if needed</span>
+        <span class="n">globs</span> <span class="o">=</span> <span class="n">extra_vars</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="c"># Second, get the globals</span>
+        <span class="n">globs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pylons_globals</span><span class="p">())</span>
+
+        <span class="c"># Grab a template reference</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">globs</span><span class="p">[</span><span class="s">&#39;app_globals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mako_admin_lookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">globs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cached_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">cache_key</span><span class="o">=</span><span class="n">cache_key</span><span class="p">,</span>
+                           <span class="n">cache_type</span><span class="o">=</span><span class="n">cache_type</span><span class="p">,</span> <span class="n">cache_expire</span><span class="o">=</span><span class="n">cache_expire</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The only change from the <code class="xref py py-func docutils literal"><span class="pre">render_mako()</span></code> function that comes with Pylons is to use the <cite>mako_admin_lookup</cite> rather than the <cite>mako_lookup</cite> that is used by default.</p>
+</div>
+</div>
+<div class="section" id="render">
+<span id="custom-render"></span><h2>自定义 <code class="xref py py-func docutils literal"><span class="pre">render()</span></code> 函数<a class="headerlink" href="#render" title="Permalink to this headline">¶</a></h2>
+<p>Writing custom render functions can be used to access specific features in a template engine, such as Genshi, that go beyond the default <code class="xref py py-func docutils literal"><span class="pre">render_genshi()</span></code> functionality or to add support for additional template engines.</p>
+<p>Two helper functions for use with the render function are provided to make it easier to include the common Pylons globals that are useful in a template in addition to enabling easy use of cache capabilities. The <code class="xref py py-func docutils literal"><span class="pre">pylons_globals()</span></code> and <code class="xref py py-func docutils literal"><span class="pre">cached_template()</span></code> functions can be used if desired.</p>
+<p>Generally, the custom render function should reside in the project&#8217;s
+<code class="docutils literal"><span class="pre">lib/</span></code> directory, probably in <code class="file docutils literal"><span class="pre">base.py</span></code>.</p>
+<p>Here&#8217;s a sample Genshi render function as it would look in a project&#8217;s
+<code class="docutils literal"><span class="pre">lib/base.py</span></code> that doesn&#8217;t fully render the result to a string, and
+rather than use <code class="xref py py-data docutils literal"><span class="pre">c</span></code> assumes that a dict is passed in to be used
+in the templates global namespace. It also returns a Genshi stream
+instead the rendered string.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pylons.templating</span> <span class="kn">import</span> <span class="n">pylons_globals</span>
+
+<span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">template_name</span><span class="p">,</span> <span class="n">tmpl_vars</span><span class="p">):</span>
+    <span class="c"># First, get the globals</span>
+    <span class="n">globs</span> <span class="o">=</span> <span class="n">pylons_globals</span><span class="p">()</span>
+
+    <span class="c"># Update the passed in vars with the globals</span>
+    <span class="n">tmpl_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">globs</span><span class="p">)</span>
+
+    <span class="c"># Grab a template reference</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">globs</span><span class="p">[</span><span class="s">&#39;app_globals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">genshi_loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
+
+    <span class="c"># Render the template</span>
+    <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">tmpl_vars</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using the <code class="xref py py-func docutils literal"><span class="pre">pylons_globals()</span></code> function also makes it easy to get to the <a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a> object which is where the template engine was attached in <code class="file docutils literal"><span class="pre">config/environment.py</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 0.9.7: </span>Prior to 0.9.7, all templating was handled through a layer called &#8216;Buffet&#8217;. This layer frequently made customization of the template engine difficult as any customization required additional plugin modules being installed. Pylons 0.9.7 now deprecates use of the Buffet plug-in layer.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-mod docutils literal"><span class="pre">pylons.templating</span></code> - Pylons templating API</p>
+</div>
+</div>
+<div class="section" id="mako">
+<h2>使用 Mako 模板引擎<a class="headerlink" href="#mako" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id13">
+<h3>介绍<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>这个模板库是用来处理 <em>视图</em> 的，他会生成 (X)HTML、CSS 和 Javascript 代码。
+<em>（在这节案例中，项目根目录是 ``myapp`` 。）</em></p>
+<div class="section" id="id14">
+<h4>静态还是动态？<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<p>需要动态生成的模板保存在 <cite>myapp/templates</cite> 里，
+静态文件存放在 <cite>myapp/public</cite> 里。</p>
+<p>服务器运行后，他们都是相对于根目录的， <strong>如果名称冲突，静态文件会优被使用</strong> 。</p>
+</div>
+</div>
+<div class="section" id="id15">
+<h3>使用结构化的模板<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h4>创建公共基础模板<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<p>在 <cite>myapp/templates</cite> 下创建名为 <cite>base.mako</cite> 的文件并按如下编辑：</p>
+<div class="highlight-html+mako"><div class="highlight"><pre><span class="cp">&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;</span>
+<span class="cp">&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+  <span class="nt">&lt;head&gt;</span>
+    <span class="cp">${</span><span class="bp">self</span><span class="o">.</span><span class="n">head_tags</span><span class="p">()</span><span class="cp">}</span>
+  <span class="nt">&lt;/head&gt;</span>
+  <span class="nt">&lt;body&gt;</span>
+    <span class="cp">${</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">()</span><span class="cp">}</span>
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+</div>
+<p>一个公共基础模板会被所有页面是使用，这样可以给应用提供一个统一的界面。</p>
+<ul class="simple">
+<li><cite>${...}</cite> 中的表达式将被执行并返回文本结果</li>
+<li><cite>${</cite> 和 <cite>}</cite> may span several lines but the closing brace should not be on a line by itself (or Mako throws an error)</li>
+<li><cite>self</cite> 下面的方法是在 Mako 模板中定义的方法</li>
+</ul>
+</div>
+<div class="section" id="id17">
+<h4>创建子模板<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h4>
+<p>在 <cite>myapp/templates</cite> 里创建一个名为 <cite>my_action.mako</cite> 的文件，并编辑：</p>
+<div class="highlight-html+mako"><div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">inherit</span> <span class="na">file=</span><span class="s">&quot;/base.mako&quot;</span> <span class="cp">/&gt;</span>
+
+<span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;head_tags()&quot;</span><span class="cp">&gt;</span>
+  <span class="c">&lt;!-- add some head tags here --&gt;</span>
+<span class="cp">&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span>
+
+<span class="nt">&lt;h1&gt;</span>My Controller<span class="nt">&lt;/h1&gt;</span>
+
+<span class="nt">&lt;p&gt;</span>Lorem ipsum dolor ...<span class="nt">&lt;/p&gt;</span>
+</pre></div>
+</div>
+<p>这个文件中定义了一个教 <cite>base.mako</cite> 的方法。</p>
+<ul class="simple">
+<li><cite>inherit</cite> 指明继承的模板</li>
+<li>Mako 用 <cite>&lt;%def name=&#8221;function_name()&#8221;&gt;...&lt;/%def&gt;</cite> 定义方法，
+返回的结果将显示出来</li>
+<li>Mako 标签之外的所有内容将被自动输出到 <cite>body()</cite> 方法。</li>
+</ul>
+<p>如果所有的页面都继承自同一个文件，那么很容易形成统一的风格。
+（在这里这个文件是 <cite>base.mako</cite> ）</p>
+</div>
+<div class="section" id="id18">
+<h4>检查是否正常工作<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<p>在控制器的 action 里面，使用 <cite>return</cite> 来返回模板数据。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/my_action.mako&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>现在我们来运行这个 action，通常是访问类似
+<code class="docutils literal"><span class="pre">http://localhost:5000/my_controller/my_action</span></code> 的网页。
+在浏览器点击「查看源码」应该会看到下面这样的输出：</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="cp">&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;</span>
+<span class="cp">&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+  <span class="nt">&lt;head&gt;</span>
+  <span class="c">&lt;!-- add some head tags here --&gt;</span>
+  <span class="nt">&lt;/head&gt;</span>
+  <span class="nt">&lt;body&gt;</span>
+
+<span class="nt">&lt;h1&gt;</span>My Controller<span class="nt">&lt;/h1&gt;</span>
+
+<span class="nt">&lt;p&gt;</span>Lorem ipsum dolor ...<span class="nt">&lt;/p&gt;</span>
+
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt>The <a class="reference external" href="http://www.makotemplates.org/docs/">Mako documentation</a></dt>
+<dd>Reasonably straightforward to follow</dd>
+<dt>See the <a class="reference internal" href="i18n.html#i18n"><span class="std std-ref">Internationalization and Localization</span></a></dt>
+<dd>Provides more help on making your application more worldly.</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Views</a><ul>
+<li><a class="reference internal" href="#templates">模板</a><ul>
+<li><a class="reference internal" href="#id3">内建支持的模板引擎</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">向模板引擎传递变量</a><ul>
+<li><a class="reference internal" href="#tmpl-context">tmpl_context 模板上下文对象的严格模式和非严格模式</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#template-globals">默认模板参数</a></li>
+<li><a class="reference internal" href="#id11">配置模板引擎</a><ul>
+<li><a class="reference internal" href="#id12">使用多个模板引擎</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#render">自定义 <code class="docutils literal"><span class="pre">render()</span></code> 函数</a></li>
+<li><a class="reference internal" href="#mako">使用 Mako 模板引擎</a><ul>
+<li><a class="reference internal" href="#id13">介绍</a><ul>
+<li><a class="reference internal" href="#id14">静态还是动态？</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id15">使用结构化的模板</a><ul>
+<li><a class="reference internal" href="#id16">创建公共基础模板</a></li>
+<li><a class="reference internal" href="#id17">创建子模板</a></li>
+<li><a class="reference internal" href="#id18">检查是否正常工作</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="controllers.html"
+                        title="previous chapter">控制器</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="models.html"
+                        title="next chapter">模型</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="模型"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="controllers.html" title="控制器"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

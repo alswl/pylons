@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>WSGI, CLI scripts &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Advanced Pylons" href="index.html" />
+    <link rel="next" title="Adding commands to Paster" href="paster_commands.html" />
+    <link rel="prev" title="Advanced Pylons" href="index.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="../_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="../index.html">
+      		<img class="logo" src="../_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="paster_commands.html" title="Adding commands to Paster"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Advanced Pylons"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Advanced Pylons</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="wsgi-cli-scripts">
+<span id="paster"></span><h1>WSGI, CLI scripts<a class="headerlink" href="#wsgi-cli-scripts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="working-with-wsgiwrappers-wsgirequest">
+<h2>Working with <code class="xref py py-class docutils literal"><span class="pre">wsgiwrappers.WSGIRequest</span></code><a class="headerlink" href="#working-with-wsgiwrappers-wsgirequest" title="Permalink to this headline">¶</a></h2>
+<p>Pylons uses a specialised <em>WSGIRequest</em> class that is accessible via the
+<code class="docutils literal"><span class="pre">paste.wsgiwrappers</span></code> module.</p>
+<p>The <code class="docutils literal"><span class="pre">wsgiwrappers.WSGIRequest</span></code> object represents a WSGI request that has
+a more programmer-friendly interface. This interface does not expose every
+detail of the WSGI environment <em>(why?)</em> and does not attempt to express
+anything beyond what is available in the environment dictionary.</p>
+<p>The only state maintained in this object is the desired <code class="docutils literal"><span class="pre">charset</span></code>, an
+associated errors handler and a <code class="docutils literal"><span class="pre">decode_param_names</span></code> option.</p>
+<blockquote id="note">
+<div><p><em>Unicode notes</em></p>
+<p>When <code class="docutils literal"><span class="pre">charset</span></code> is set, the incoming parameter values will be
+automatically coerced to unicode objects of the charset encoding.</p>
+<p>When unicode is expected, <code class="docutils literal"><span class="pre">charset</span></code> will be overridden by the the value
+of the charset parameter set in the Content-Type header, if one was
+specified by the client.</p>
+<p>The incoming parameter names are not decoded to unicode unless the
+decode_param_names option is enabled.</p>
+</div></blockquote>
+<p>The class variable <code class="docutils literal"><span class="pre">defaults</span></code> specifies default values for charset, errors,
+and language. These default values can be overridden for the current request
+via the registry <em>(what&#8217;s a registry?)</em>.</p>
+<p>The language default value is considered the fallback during i18n
+translations to ensure in odd cases that mixed languages don&#8217;t occur should
+the language file contain the string but not another language in the accepted
+languages list. The language value only applies when getting a list of
+accepted languages from the HTTP Accept header.</p>
+<p>This behavior is duplicated from Aquarium, and may seem strange but is very
+useful. Normally, everything in the code is in &#8220;en-us&#8221;. However, the &#8220;en-us&#8221;
+translation catalog is usually empty. If the user requests [&#8220;en-us&#8221;, &#8220;zh-cn&#8221;]
+and a translation isn&#8217;t found for a string in &#8220;en-us&#8221;, you don&#8217;t want gettext
+to fallback to &#8220;zh-cn&#8221;. You want it to just use the string itself. Hence, if
+a string isn&#8217;t found in the language catalog, the string in the source code
+will be used.</p>
+<p>All other state is kept in the environment dictionary; this is essential for
+interoperability.</p>
+<p>You are free to subclass this object.</p>
+</div>
+<div class="section" id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="get">
+<h3>GET<a class="headerlink" href="#get" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary-like object representing the QUERY_STRING parameters. Always present, possibly empty.</p>
+<p>If the same key is present in the query string multiple times, a list of its
+values can be retrieved from the <code class="xref py py-class docutils literal"><span class="pre">MultiDict</span></code> via the :meth:<code class="docutils literal"><span class="pre">getall</span></code>
+method.</p>
+<p>Returns a <code class="xref py py-class docutils literal"><span class="pre">MultiDict</span></code> container or, when charset is set, a <code class="xref py py-class docutils literal"><span class="pre">UnicodeMultiDict</span></code>.</p>
+</div>
+<div class="section" id="post">
+<h3>POST<a class="headerlink" href="#post" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary-like object representing the <code class="docutils literal"><span class="pre">POST</span></code> body.</p>
+<p>Most values are encoded strings, or unicode strings when charset is set.
+There may also be FieldStorage objects representing file uploads. If this is
+not a POST request, or the body is not encoded fields (e.g., an XMLRPC
+request) then this will be empty.</p>
+<p>This will consume wsgi.input when first accessed if applicable, but the raw
+version will be put in environ[&#8216;paste.parsed_formvars&#8217;].</p>
+<p>Returns a MultiDict container or a UnicodeMultiDict when charset is set.</p>
+</div>
+<div class="section" id="cookies">
+<h3>cookies<a class="headerlink" href="#cookies" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary of cookies, keyed by cookie name.</p>
+<p>Just a plain dictionary, may be empty but not None.</p>
+</div>
+<div class="section" id="defaults">
+<h3>defaults<a class="headerlink" href="#defaults" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&#39;errors&#39;</span><span class="p">:</span> <span class="s">&#39;replace&#39;</span><span class="p">,</span>
+ <span class="s">&#39;decode_param_names&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+ <span class="s">&#39;charset&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+ <span class="s">&#39;language&#39;</span><span class="p">:</span> <span class="s">&#39;en-us&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="host">
+<h3>host<a class="headerlink" href="#host" title="Permalink to this headline">¶</a></h3>
+<p>The host name, as provided in <code class="docutils literal"><span class="pre">HTTP_HOST</span></code> with a fall-back to <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal"><span class="pre">SERVER_NAME</span></code></p>
+</div>
+<div class="section" id="is-xhr">
+<h3>is_xhr<a class="headerlink" href="#is-xhr" title="Permalink to this headline">¶</a></h3>
+<p>Returns a boolean if <code class="docutils literal"><span class="pre">X-Requested-With</span></code> is present and is a <code class="docutils literal"><span class="pre">XMLHttpRequest</span></code></p>
+</div>
+<div class="section" id="languages">
+<h3>languages<a class="headerlink" href="#languages" title="Permalink to this headline">¶</a></h3>
+<p>Returns a (possibly empty) list of preferred languages, most preferred first.</p>
+</div>
+<div class="section" id="params">
+<h3>params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary-like object of keys from <code class="docutils literal"><span class="pre">POST</span></code>, <code class="docutils literal"><span class="pre">GET</span></code>, <code class="docutils literal"><span class="pre">URL</span></code> dicts</p>
+<p>Return a key value from the parameters, they are checked in the following order: POST, GET, URL</p>
+</div>
+</div>
+<div class="section" id="additional-methods-supported">
+<h2>Additional methods supported:<a class="headerlink" href="#additional-methods-supported" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getlist-key">
+<h3>getlist(key)<a class="headerlink" href="#getlist-key" title="Permalink to this headline">¶</a></h3>
+<p>Returns a list of all the values by that key, collected from POST, GET, URL dicts</p>
+<p>Returns a <code class="xref py py-class docutils literal"><span class="pre">MultiDict</span></code> container or a <code class="xref py py-class docutils literal"><span class="pre">UnicodeMultiDict</span></code> when <code class="xref py py-data docutils literal"><span class="pre">charset</span></code> is set.</p>
+</div>
+<div class="section" id="urlvars">
+<h3>urlvars<a class="headerlink" href="#urlvars" title="Permalink to this headline">¶</a></h3>
+<p>Return any variables matched in the URL (e.g. wsgiorg.routing_args).</p>
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="init-self-environ">
+<h3>__init__(self, environ)<a class="headerlink" href="#init-self-environ" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="determine-browser-charset-self">
+<h3>determine_browser_charset(self)<a class="headerlink" href="#determine-browser-charset-self" title="Permalink to this headline">¶</a></h3>
+<p>Determine the encoding as specified by the browser via the Content-Type&#8217;s <code class="docutils literal"><span class="pre">charset</span> <span class="pre">parameter</span></code>, if one is set</p>
+</div>
+<div class="section" id="match-accept-self-mimetypes">
+<h3>match_accept(self, mimetypes)<a class="headerlink" href="#match-accept-self-mimetypes" title="Permalink to this headline">¶</a></h3>
+<p>Return a list of specified mime-types that the browser&#8217;s HTTP Accept header allows in the order provided.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">WSGI, CLI scripts</a><ul>
+<li><a class="reference internal" href="#working-with-wsgiwrappers-wsgirequest">Working with <code class="docutils literal"><span class="pre">wsgiwrappers.WSGIRequest</span></code></a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#get">GET</a></li>
+<li><a class="reference internal" href="#post">POST</a></li>
+<li><a class="reference internal" href="#cookies">cookies</a></li>
+<li><a class="reference internal" href="#defaults">defaults</a></li>
+<li><a class="reference internal" href="#host">host</a></li>
+<li><a class="reference internal" href="#is-xhr">is_xhr</a></li>
+<li><a class="reference internal" href="#languages">languages</a></li>
+<li><a class="reference internal" href="#params">params</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#additional-methods-supported">Additional methods supported:</a><ul>
+<li><a class="reference internal" href="#getlist-key">getlist(key)</a></li>
+<li><a class="reference internal" href="#urlvars">urlvars</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#methods">Methods</a><ul>
+<li><a class="reference internal" href="#init-self-environ">__init__(self, environ)</a></li>
+<li><a class="reference internal" href="#determine-browser-charset-self">determine_browser_charset(self)</a></li>
+<li><a class="reference internal" href="#match-accept-self-mimetypes">match_accept(self, mimetypes)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Advanced Pylons</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="paster_commands.html"
+                        title="next chapter">Adding commands to Paster</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="paster_commands.html" title="Adding commands to Paster"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Advanced Pylons"
+             >previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Advanced Pylons</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

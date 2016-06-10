@@ -1,0 +1,396 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unit and functional testing &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Errors, Troubleshooting, and Debugging" href="debugging.html" />
+    <link rel="prev" title="Caching" href="caching.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="debugging.html" title="Errors, Troubleshooting, and Debugging"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="caching.html" title="Caching"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="unit-and-functional-testing">
+<span id="testing"></span><h1>Unit and functional testing<a class="headerlink" href="#unit-and-functional-testing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unit-testing-with-webtest">
+<h2>Unit Testing with <code class="xref py py-mod docutils literal"><span class="pre">webtest</span></code><a class="headerlink" href="#unit-testing-with-webtest" title="Permalink to this headline">¶</a></h2>
+<p>Pylons provides powerful unit testing capabilities for your web application
+utilizing <a class="reference external" href="http://pythonpaste.org/webtest/">webtest</a>
+to emulate requests to your web application. You can then ensure that the
+response was handled appropriately and that the controller set things up
+properly.</p>
+<p>To run the test suite for your web application, Pylons utilizes the <a class="reference external" href="http://somethingaboutorange.com/mrl/projects/nose/">nose</a> test runner/discovery
+package. Running <code class="docutils literal"><span class="pre">nosetests</span></code> in your project directory will run all the
+tests you create in the tests directory. If you don&#8217;t have nose installed on
+your system, it can be installed via setuptools with:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install -U nose
+</pre></div>
+</div>
+<p>To avoid conflicts with your development setup, the tests use the <cite>test.ini</cite> configuration file when run. This means <strong>you must configure any databases, etc. in your test.ini file or your tests will not be able to find the database configuration</strong>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Nose can trigger errors during its attempt to search for doc tests since it will try and import all your modules one at a time <em>before</em> your app was loaded. This will cause files under models/ that rely on your app to be running, to fail.</p>
+</div>
+<p>Pylons 0.9.6.1 and later includes a plugin for nose that loads the app before
+the doctests scan your modules, allowing models to be doctested. You can use
+this option from the command line with nose:</p>
+<div class="highlight-bash"><div class="highlight"><pre>nosetests --with-pylons<span class="o">=</span>test.ini
+</pre></div>
+</div>
+<p>Or by setting up a <cite>[nosetests]</cite> block in your setup.cfg:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[nosetests]</span>
+<span class="na">verbose</span><span class="o">=</span><span class="s">True</span>
+<span class="na">verbosity</span><span class="o">=</span><span class="s">2</span>
+<span class="na">with-pylons</span><span class="o">=</span><span class="s">test.ini</span>
+<span class="na">detailed-errors</span><span class="o">=</span><span class="s">1</span>
+<span class="na">with-doctest</span><span class="o">=</span><span class="s">True</span>
+</pre></div>
+</div>
+<p>Then just run:</p>
+<div class="highlight-bash"><div class="highlight"><pre>python setup.py nosetests
+</pre></div>
+</div>
+<p>to run the tests.</p>
+</div>
+<div class="section" id="example-testing-a-controller">
+<h2>Example: Testing a Controller<a class="headerlink" href="#example-testing-a-controller" title="Permalink to this headline">¶</a></h2>
+<p>First let&#8217;s create a new project and controller for this example:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster create -t pylons TestExample
+<span class="nv">$ </span><span class="nb">cd </span>TestExample
+<span class="nv">$ </span>paster controller comments
+</pre></div>
+</div>
+<p>You&#8217;ll see that it creates two files when you create a controller. The stub controller, and a test for it under <code class="docutils literal"><span class="pre">testexample/tests/functional/</span></code>.</p>
+<p>Modify the <code class="docutils literal"><span class="pre">testexample/controllers/comments.py</span></code> file so it looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">testexample.lib.base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">CommentsController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;Basic output&#39;</span>
+
+    <span class="k">def</span> <span class="nf">sess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">session</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Joe Smith&#39;</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s">&#39;Saved a session&#39;</span>
+</pre></div>
+</div>
+<p>Then write a basic set of tests to ensure that the controller actions are functioning properly, modify <code class="docutils literal"><span class="pre">testexample/tests/functional/test_comments.py</span></code> to match the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">testexample.tests</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">TestCommentsController</span><span class="p">(</span><span class="n">TestController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">test_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">(</span><span class="n">controller</span><span class="o">=</span><span class="s">&#39;/comments&#39;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="s">&#39;Basic output&#39;</span> <span class="ow">in</span> <span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">test_sess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">(</span><span class="n">controller</span><span class="o">=</span><span class="s">&#39;/comments&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;sess&#39;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;Joe Smith&#39;</span>
+        <span class="k">assert</span> <span class="s">&#39;Saved a session&#39;</span> <span class="ow">in</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p>Run <code class="docutils literal"><span class="pre">nosetests</span></code> in your main project directory and you should see them all pass:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="go">..</span>
+<span class="go">----------------------------------------------------------------------</span>
+<span class="go">Ran 2 tests in 2.999s</span>
+
+<span class="go">OK</span>
+</pre></div>
+</div>
+<p>Unfortunately, a plain assert does not provide detailed information about the results of an assertion should it fail, unless you specify it a second argument. For example, add the following test to the <code class="docutils literal"><span class="pre">test_sess</span></code> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;address&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>When you run <code class="docutils literal"><span class="pre">nosetests</span></code> you will get the following, not-very-helpful result:</p>
+<div class="highlight-pycon"><div class="highlight"><pre>.F
+======================================================================
+FAIL: test_sess (testexample.tests.functional.test_comments.TestCommentsController)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+File &quot;~/TestExample/testexample/tests/functional/test_comments.py&quot;, line 12, in test_sess
+assert response.session.has_key(&#39;address&#39;) == True
+AssertionError:
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.417s
+
+FAILED (failures=1)
+</pre></div>
+</div>
+<p>You can augment this result by doing the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;address&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="bp">True</span><span class="p">,</span> <span class="s">&quot;address not found in session&quot;</span>
+</pre></div>
+</div>
+<p>Which results in:</p>
+<div class="highlight-pycon"><div class="highlight"><pre>.F
+======================================================================
+FAIL: test_sess (testexample.tests.functional.test_comments.TestCommentsController)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+File &quot;~/TestExample/testexample/tests/functional/test_comments.py&quot;, line 12, in test_sess
+assert response.session.has_key(&#39;address&#39;) == True
+AssertionError: address not found in session
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.417s
+
+FAILED (failures=1)
+</pre></div>
+</div>
+<p>But detailing every assert statement could be time consuming. Our TestController subclasses the standard Python <code class="docutils literal"><span class="pre">unittest.TestCase</span></code> class, so we can use utilize its helper methods, such as <code class="docutils literal"><span class="pre">assertEqual</span></code>, that can automatically provide a more detailed AssertionError. The new test line looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;address&#39;</span><span class="p">),</span> <span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Which provides the more useful failure message:</p>
+<div class="highlight-pycon"><div class="highlight"><pre>.F
+======================================================================
+FAIL: test_sess (testexample.tests.functional.test_comments.TestCommentsController)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+File &quot;~/TestExample/testexample/tests/functional/test_comments.py&quot;, line 12, in test_sess
+self.assertEqual(response.session.has_key(&#39;address&#39;), True)
+AssertionError: False != True
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-pylons-objects">
+<h2>Testing Pylons Objects<a class="headerlink" href="#testing-pylons-objects" title="Permalink to this headline">¶</a></h2>
+<p>Pylons will provide several additional attributes for the <code class="xref py py-mod docutils literal"><span class="pre">webtest</span></code> <code class="xref py py-class docutils literal"><span class="pre">webtest.TestResponse</span></code> object that let you access various objects that were created during the web request:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">config</span></code></dt>
+<dd>The configured Pylons applications.</dd>
+<dt><code class="docutils literal"><span class="pre">session</span></code></dt>
+<dd>Session object</dd>
+<dt><code class="docutils literal"><span class="pre">req</span></code></dt>
+<dd>Request object</dd>
+<dt><code class="docutils literal"><span class="pre">tmpl_context</span></code></dt>
+<dd>Object containing variables passed to templates</dd>
+<dt><code class="docutils literal"><span class="pre">app_globals</span></code></dt>
+<dd>Globals object</dd>
+</dl>
+<p>To use them, merely access the attributes of the response <em>after</em> you&#8217;ve used
+a get/post command:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">response</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/some/url&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;var&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+<span class="k">assert</span> <span class="s">&#39;REQUEST_METHOD&#39;</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">req</span><span class="o">.</span><span class="n">environ</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="xref py py-class docutils literal"><span class="pre">response</span></code> object already has a
+TestRequest object assigned to it, therefore Pylons assigns its
+<code class="docutils literal"><span class="pre">request</span></code> object to the response as <code class="docutils literal"><span class="pre">req</span></code>.</p>
+</div>
+<div class="section" id="accessing-special-globals">
+<h3>Accessing Special Globals<a class="headerlink" href="#accessing-special-globals" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes, you might wish to modify or check a global Pylons variable such as <a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a> before running the rest of your unit tests. The non-request specific variables are available from a special URL that will respond only in unit testing situations.</p>
+<p>For example, to get the <a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a> object without sending a request to your actual applications:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">response</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/_test_vars&#39;</span><span class="p">)</span>
+<span class="n">app_globals</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">app_globals</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="testing-your-own-objects">
+<h2>Testing Your Own Objects<a class="headerlink" href="#testing-your-own-objects" title="Permalink to this headline">¶</a></h2>
+<p>WebTest&#8217;s fixture testing allows you to designate your own objects that you&#8217;d
+like to access in your tests. This powerful functionality makes it easy to
+test the value of objects that are normally only retained for the duration of
+a single request.</p>
+<p>Before making objects available for testing, its useful to know when your
+application is being tested. WebTest will provide an environ variable called
+<code class="docutils literal"><span class="pre">paste.testing</span></code> that you can test for the presence and truth of so that your
+application only populates the testing objects when it has to.</p>
+<p>Populating the <code class="xref py py-mod docutils literal"><span class="pre">webtest</span></code> response object with your objects is done by
+adding them to the environ dict under the key <code class="docutils literal"><span class="pre">paste.testing_variables</span></code>.
+Pylons creates this dict before calling your application, so testing for its
+existence and adding new values to it is recommended. All variables assigned
+to the <code class="docutils literal"><span class="pre">paste.testing_variables</span></code> dict will be available on the response
+object with the key being the attribute name.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">WebTest is an extracted stand-alone version of a Paste component called
+paste.fixture. For backwards compatibility, WebTest continues to honor
+the <code class="docutils literal"><span class="pre">paste.testing_variables</span></code> key in the environ.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># testexample/lib/base.py</span>
+
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">pylons.controllers</span> <span class="kn">import</span> <span class="n">WSGIController</span>
+<span class="kn">from</span> <span class="nn">pylons.templating</span> <span class="kn">import</span> <span class="n">render_mako</span> <span class="k">as</span> <span class="n">render</span>
+
+<span class="k">class</span> <span class="nc">BaseController</span><span class="p">(</span><span class="n">WSGIController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+        <span class="c"># Create a custom email object</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">MyCustomEmailObj</span><span class="p">()</span>
+        <span class="n">email</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;Fred Smith&#39;</span>
+        <span class="k">if</span> <span class="s">&#39;paste.testing_variables&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;paste.testing_variables&#39;</span><span class="p">][</span><span class="s">&#39;email&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">email</span>
+        <span class="k">return</span> <span class="n">WSGIController</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+
+
+<span class="c"># testexample/tests/functional/test_controller.py</span>
+<span class="kn">from</span> <span class="nn">testexample.tests</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">TestCommentsController</span><span class="p">(</span><span class="n">TestController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">test_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">(</span><span class="n">controller</span><span class="o">=</span><span class="s">&#39;/&#39;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;Fred Smith&#39;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://pythonpaste.org/webtest/">WebTest Documentation</a></dt>
+<dd>Documentation covering webtest and its usage</dd>
+<dt><code class="xref py py-mod docutils literal"><span class="pre">WebTest</span> <span class="pre">Module</span> <span class="pre">docs</span></code></dt>
+<dd>Module API reference for methods available for use when testing
+the application</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="unit-testing">
+<span id="id1"></span><h2>Unit Testing<a class="headerlink" href="#unit-testing" title="Permalink to this headline">¶</a></h2>
+<p>XXX: Describe unit testing an applications models, libraries</p>
+</div>
+<div class="section" id="functional-testing">
+<span id="id2"></span><h2>Functional Testing<a class="headerlink" href="#functional-testing" title="Permalink to this headline">¶</a></h2>
+<p>XXX: Describe functional/integrated testing, WebTest</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Unit and functional testing</a><ul>
+<li><a class="reference internal" href="#unit-testing-with-webtest">Unit Testing with <code class="docutils literal"><span class="pre">webtest</span></code></a></li>
+<li><a class="reference internal" href="#example-testing-a-controller">Example: Testing a Controller</a></li>
+<li><a class="reference internal" href="#testing-pylons-objects">Testing Pylons Objects</a><ul>
+<li><a class="reference internal" href="#accessing-special-globals">Accessing Special Globals</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing-your-own-objects">Testing Your Own Objects</a></li>
+<li><a class="reference internal" href="#unit-testing">Unit Testing</a></li>
+<li><a class="reference internal" href="#functional-testing">Functional Testing</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="caching.html"
+                        title="previous chapter">Caching</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="debugging.html"
+                        title="next chapter">Errors, Troubleshooting, and Debugging</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="debugging.html" title="Errors, Troubleshooting, and Debugging"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="caching.html" title="Caching"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pylons 参考手册 &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="#" />
+    <link rel="next" title="快速入门" href="gettingstarted.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="#">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gettingstarted.html" title="快速入门"
+             accesskey="N">next</a> |</li>
+    	<li><a href="#">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pylons">
+<h1>Pylons 参考手册<a class="headerlink" href="#pylons" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/pylon1.jpg"><img alt="The First Pylon of the Ramesseum, Thebes is approximately 69m long and 22m high, and marks the entrance to the Main Temple and the First Courtyard." class="align-center" src="_images/pylon1.jpg" style="width: 780px; height: 255px;" /></a>
+<p>译者：<a class="reference external" href="http://log4d.com/">alswl</a></p>
+<div class="section" id="id1">
+<h2>Pylons 入门<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">快速入门</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#id2">安装需求</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#installing-pylons">安装</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#id4">创建 Pylons 项目</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#id5">启动应用</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#hello-world">Hello World</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Pylons 理念</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#id1">Pylons 溯源</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#wsgi">WSGI 应用</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#wsgi-middleware">WSGI 中间件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#controller">Controller 调度</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#paster">Paster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#id4">载入应用</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="mvc">
+<h2>MVC 参考<a class="headerlink" href="#mvc" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="controllers.html">控制器</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#id2">标准控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#using-the-wsgi-controller-to-provide-a-wsgi-service">Using the WSGI Controller to provide a WSGI service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#using-the-rest-controller-with-a-restful-api">Using the REST Controller with a RESTful API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#using-the-xml-rpc-controller-for-xml-rpc-requests">Using the XML-RPC Controller for XML-RPC requests</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="views.html">Views</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="views.html#templates">模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="views.html#id7">向模板引擎传递变量</a></li>
+<li class="toctree-l2"><a class="reference internal" href="views.html#template-globals">默认模板参数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="views.html#id11">配置模板引擎</a></li>
+<li class="toctree-l2"><a class="reference internal" href="views.html#render">自定义 <code class="docutils literal"><span class="pre">render()</span></code> 函数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="views.html#mako">使用 Mako 模板引擎</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">模型</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#id2">关于模型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#id3">模型基础应用</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#organizing">Organizing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#creating-a-model">Creating a Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#adding-a-relation">Adding a Relation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#creating-the-database">Creating the Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#a-brief-guide-to-using-model-objects-in-the-controller">A brief guide to using model objects in the Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#about-sqlalchemy">About SQLAlchemy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_models.html">Advanced Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced_models.html#advanced-sqlalchemy">Advanced SQLAlchemy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_models.html#non-sqlalchemy-libraries">Non-SQLAlchemy libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_models.html#object-databases">Object Databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_models.html#popular-no-sql-databases">Popular No-SQL Databases</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>项目配置和日志系统<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#runtime-configuration">Runtime Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#environment">Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#url-configuration">URL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#middleware">Middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#application-setup">Application Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#logging-messages">Logging messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#basic-logging-configuration">Basic Logging configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#filtering-log-messages">Filtering log messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#advanced-configuration">Advanced Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#request-logging-with-paste-s-translogger">Request logging with Paste&#8217;s TransLogger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#logging-to-wsgi-errors">Logging to wsgi.errors</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>表单，验证工具和工具库<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="helpers.html">Helpers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers.html#pagination">Pagination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.html#secure-form-tag-helpers">Secure Form Tag Helpers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="forms.html">Forms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="forms.html#the-basics">The basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forms.html#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forms.html#using-the-helpers">Using the Helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forms.html#file-uploads">File Uploads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forms.html#validating-user-input-with-formencode">Validating user input with FormEncode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forms.html#other-form-tools">Other Form Tools</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="sessions">
+<h2>国际化、Sessions 会话和缓存<a class="headerlink" href="#sessions" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="i18n.html">Internationalization and Localization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#using-babel">Using Babel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#back-to-work">Back To Work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#testing-the-application">Testing the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#fallback-languages">Fallback Languages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#translations-within-templates">Translations Within Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#lazy-translations">Lazy Translations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#producing-a-python-egg">Producing a Python Egg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#plural-forms">Plural Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#summary">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#further-reading">Further Reading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#module-babel.core"><code class="docutils literal"><span class="pre">babel.core</span></code> &#8211; Babel core classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#module-babel.localedata"><code class="docutils literal"><span class="pre">babel.localedata</span></code> &#8212; Babel locale data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#module-babel.dates"><code class="docutils literal"><span class="pre">babel.dates</span></code> &#8211; Babel date classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i18n.html#module-babel.numbers"><code class="docutils literal"><span class="pre">babel.numbers</span></code> &#8211; Babel number classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sessions.html">Sessions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#id2">Sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#the-session-object">The Session Object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#configuring-the-session">Configuring the Session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#storing-sqlalchemy-mapped-objects-in-beaker-sessions">Storing SQLAlchemy mapped objects in Beaker sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#custom-and-caching-middleware">Custom and caching middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#using-session-in-internationalization">Using <cite>Session</cite> in Internationalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#using-session-in-secure-forms">Using <cite>Session</cite> in Secure Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#hacking-the-session-for-no-cookies">Hacking the session for no cookies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sessions.html#using-middleware-beaker-with-a-composite-app">Using middleware (Beaker) with a composite app</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#types-of-caching">Types of Caching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#namespaces-and-keys">Namespaces and Keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#configuring">Configuring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#browser-side">Browser-Side</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#controller-actions">Controller Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#templates">Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#arbitrary-functions">Arbitrary Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#fragments">Fragments</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>测试、升级和部署<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Unit and functional testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#unit-testing-with-webtest">Unit Testing with <code class="docutils literal"><span class="pre">webtest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#example-testing-a-controller">Example: Testing a Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#testing-pylons-objects">Testing Pylons Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#testing-your-own-objects">Testing Your Own Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#unit-testing">Unit Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#functional-testing">Functional Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Errors, Troubleshooting, and Debugging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#error-middleware">Error Middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#interactive-debugging">Interactive Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#e-mailing-errors">E-mailing Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#programmatically-handling-errors">Programmatically Handling Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="upgrading.html#id2">1.0 -&gt; 1.0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upgrading.html#id3">0.9.7 -&gt; 1.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Packaging and Deployment Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#egg-files">Egg Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#installing-as-a-non-root-user">Installing as a Non-root User</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#understanding-the-setup-process">Understanding the Setup Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#deploying-the-application">Deploying the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#advanced-usage">Advanced Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html#running-pylons-apps-with-other-web-servers">Running Pylons Apps with Other Web Servers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#using-fast-cgi">Using Fast-CGI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#apache-configuration">Apache Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#prefixmiddleware">PrefixMiddleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#using-java-web-servers-with-jython">Using Java Web Servers with Jython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html#documenting-your-application">Documenting Your Application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#tutorial">Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#learning-restructuredtext">Learning ReStructuredText</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#using-docstrings">Using Docstrings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#using-doctest">Using doctest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html#distributing-your-application">Distributing Your Application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#running-your-application">Running Your Application</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="windows-python-2-3">
+<h2>在 Windows 上安装 Python 2.3<a class="headerlink" href="#windows-python-2-3" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python23_install.html">Python 2.3 Installation Instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python23_install.html#advice-of-end-of-support-for-python-2-3">Advice of <strong>end of support for Python 2.3</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python23_install.html#preparation">Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python23_install.html#system-wide-install">System-wide Install</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="windowsnotes.html">Windows Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="windowsnotes.html#for-win2k-or-winxp">For Win2K or WinXP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsnotes.html#for-windows-95-98-and-me">For Windows 95, 98 and ME</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsnotes.html#finally">Finally</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="jython-pylons">
+<h2>在 Jython 用 Pylons<a class="headerlink" href="#jython-pylons" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="jython.html">Pylons on Jython</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="jython.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jython.html#deploying-to-java-web-servers">Deploying to Java Web servers</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>高级 Pylons<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="security_policy_for_bugs.html">Security policy for bugs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="security_policy_for_bugs.html#receiving-security-updates">Receiving Security Updates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security_policy_for_bugs.html#reporting-security-issues">Reporting Security Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security_policy_for_bugs.html#minimising-risk">Minimising Risk</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wsgi_support.html">WSGI support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wsgi_support.html#paste-and-wsgi">Paste and WSGI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wsgi_support.html#using-a-wsgi-application-as-a-pylons-0-9-controller">Using a WSGI Application as a Pylons 0.9 Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wsgi_support.html#running-a-wsgi-application-from-within-a-controller">Running a WSGI Application From Within a Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wsgi_support.html#configuring-middleware-within-a-pylons-application">Configuring Middleware Within a Pylons Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wsgi_support.html#the-cascade">The Cascade</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wsgi_support.html#useful-resources">Useful Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_pylons/index.html">Advanced Pylons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced_pylons/paster.html">WSGI, CLI scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_pylons/paster_commands.html">Adding commands to Paster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_pylons/creating_paste_templates.html">Creating Paste templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_pylons/entry_points_and_plugins.html">Using Entry Points to Write Plugins</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="execution.html">Pylons Execution Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="execution.html#the-sample-application">The sample application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execution.html#pylons-dependencies">Pylons&#8217; dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execution.html#the-analysis">The analysis</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>模块列表<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules/index.html">Pylons Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/commands.html"><code class="docutils literal"><span class="pre">pylons.commands</span></code> &#8211; Command line functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/configuration.html"><code class="docutils literal"><span class="pre">pylons.configuration</span></code> &#8211; Configuration object and defaults setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/controllers.html"><code class="docutils literal"><span class="pre">pylons.controllers</span></code> &#8211; Controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/controllers_core.html"><code class="docutils literal"><span class="pre">pylons.controllers.core</span></code> &#8211; WSGIController Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/controllers_util.html"><code class="docutils literal"><span class="pre">pylons.controllers.util</span></code> &#8211; Controller Utility functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/controllers_xmlrpc.html"><code class="docutils literal"><span class="pre">pylons.controllers.xmlrpc</span></code> &#8211; XMLRPCController Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/decorators.html"><code class="docutils literal"><span class="pre">pylons.decorators</span></code> &#8211; Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/decorators_cache.html"><code class="docutils literal"><span class="pre">pylons.decorators.cache</span></code> &#8211; Cache Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/decorators_rest.html"><code class="docutils literal"><span class="pre">pylons.decorators.rest</span></code> &#8211; REST-ful Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/decorators_secure.html"><code class="docutils literal"><span class="pre">pylons.decorators.secure</span></code> &#8211; Secure Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/error.html"><code class="docutils literal"><span class="pre">pylons.error</span></code> &#8211; Error handling support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/i18n_translation.html"><code class="docutils literal"><span class="pre">pylons.i18n.translation</span></code> &#8211; Translation/Localization functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/log.html"><code class="docutils literal"><span class="pre">pylons.log</span></code> &#8211; Logging for WSGI errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/middleware.html"><code class="docutils literal"><span class="pre">pylons.middleware</span></code> &#8211; WSGI Middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/templating.html"><code class="docutils literal"><span class="pre">pylons.templating</span></code> &#8211; Render functions and helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/test.html"><code class="docutils literal"><span class="pre">pylons.test</span></code> &#8211; Test related functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/util.html"><code class="docutils literal"><span class="pre">pylons.util</span></code> &#8211; Paste Template and Pylons utility functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/wsgiapp.html"><code class="docutils literal"><span class="pre">pylons.wsgiapp</span></code> &#8211; PylonsWSGI App Creator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="thirdparty/index.html">Third-party components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="thirdparty/formencode_api.html">FormEncode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="thirdparty/weberror.html"><code class="docutils literal"><span class="pre">weberror</span></code> &#8211; Weberror</a></li>
+<li class="toctree-l2"><a class="reference internal" href="thirdparty/webtest.html"><code class="docutils literal"><span class="pre">webtest</span></code> &#8211; WebTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="thirdparty/webob.html"><code class="docutils literal"><span class="pre">webob</span></code> &#8211; Request/Response objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+</div>
+<p>索引页面能看到更多信息</p>
+</div>
+</div>
+<div class="section" id="id7">
+<h1>索引<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><a class="reference internal" href="glossary.html#glossary"><span class="std std-ref">Glossary</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pylons 参考手册</a><ul>
+<li><a class="reference internal" href="#id1">Pylons 入门</a></li>
+<li><a class="reference internal" href="#mvc">MVC 参考</a></li>
+<li><a class="reference internal" href="#id2">项目配置和日志系统</a></li>
+<li><a class="reference internal" href="#id3">表单，验证工具和工具库</a></li>
+<li><a class="reference internal" href="#sessions">国际化、Sessions 会话和缓存</a></li>
+<li><a class="reference internal" href="#id4">测试、升级和部署</a></li>
+<li><a class="reference internal" href="#windows-python-2-3">在 Windows 上安装 Python 2.3</a></li>
+<li><a class="reference internal" href="#jython-pylons">在 Jython 用 Pylons</a></li>
+<li><a class="reference internal" href="#id5">高级 Pylons</a></li>
+<li><a class="reference internal" href="#id6">模块列表</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">索引</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gettingstarted.html"
+                        title="next chapter">快速入门</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gettingstarted.html" title="快速入门"
+             >next</a> |</li>
+    	<li><a href="#">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

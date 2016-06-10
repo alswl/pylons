@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pylons Modules &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="../index.html" />
+    <link rel="next" title="pylons.commands – Command line functions" href="commands.html" />
+    <link rel="prev" title="Pylons Execution Analysis" href="../execution.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="../_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="../index.html">
+      		<img class="logo" src="../_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="commands.html" title="pylons.commands – Command line functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../execution.html" title="Pylons Execution Analysis"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pylons-modules">
+<span id="modules"></span><h1>Pylons Modules<a class="headerlink" href="#pylons-modules" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html"><code class="docutils literal"><span class="pre">pylons.commands</span></code> &#8211; Command line functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html"><code class="docutils literal"><span class="pre">pylons.configuration</span></code> &#8211; Configuration object and defaults setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="controllers.html"><code class="docutils literal"><span class="pre">pylons.controllers</span></code> &#8211; Controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="controllers_core.html"><code class="docutils literal"><span class="pre">pylons.controllers.core</span></code> &#8211; WSGIController Class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="controllers_core.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="controllers_util.html"><code class="docutils literal"><span class="pre">pylons.controllers.util</span></code> &#8211; Controller Utility functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="controllers_util.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="controllers_xmlrpc.html"><code class="docutils literal"><span class="pre">pylons.controllers.xmlrpc</span></code> &#8211; XMLRPCController Class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="controllers_xmlrpc.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="decorators.html"><code class="docutils literal"><span class="pre">pylons.decorators</span></code> &#8211; Decorators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="decorators.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="decorators_cache.html"><code class="docutils literal"><span class="pre">pylons.decorators.cache</span></code> &#8211; Cache Decorators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="decorators_cache.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="decorators_rest.html"><code class="docutils literal"><span class="pre">pylons.decorators.rest</span></code> &#8211; REST-ful Decorators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="decorators_rest.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="decorators_secure.html"><code class="docutils literal"><span class="pre">pylons.decorators.secure</span></code> &#8211; Secure Decorators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="decorators_secure.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="error.html"><code class="docutils literal"><span class="pre">pylons.error</span></code> &#8211; Error handling support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="i18n_translation.html"><code class="docutils literal"><span class="pre">pylons.i18n.translation</span></code> &#8211; Translation/Localization functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="i18n_translation.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="log.html"><code class="docutils literal"><span class="pre">pylons.log</span></code> &#8211; Logging for WSGI errors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="log.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="middleware.html"><code class="docutils literal"><span class="pre">pylons.middleware</span></code> &#8211; WSGI Middleware</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="middleware.html#module-contents">Module Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="middleware.html#referenced-classes">Referenced classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templating.html"><code class="docutils literal"><span class="pre">pylons.templating</span></code> &#8211; Render functions and helpers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templating.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="test.html"><code class="docutils literal"><span class="pre">pylons.test</span></code> &#8211; Test related functionality</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="test.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="util.html"><code class="docutils literal"><span class="pre">pylons.util</span></code> &#8211; Paste Template and Pylons utility functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="util.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wsgiapp.html"><code class="docutils literal"><span class="pre">pylons.wsgiapp</span></code> &#8211; PylonsWSGI App Creator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wsgiapp.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../execution.html"
+                        title="previous chapter">Pylons Execution Analysis</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="commands.html"
+                        title="next chapter"><code class="docutils literal"><span class="pre">pylons.commands</span></code> &#8211; Command line functions</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="commands.html" title="pylons.commands – Command line functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../execution.html" title="Pylons Execution Analysis"
+             >previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

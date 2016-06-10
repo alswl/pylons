@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Creating Paste templates &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Advanced Pylons" href="index.html" />
+    <link rel="next" title="Using Entry Points to Write Plugins" href="entry_points_and_plugins.html" />
+    <link rel="prev" title="Adding commands to Paster" href="paster_commands.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="../_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="../index.html">
+      		<img class="logo" src="../_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="entry_points_and_plugins.html" title="Using Entry Points to Write Plugins"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="paster_commands.html" title="Adding commands to Paster"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Advanced Pylons</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="creating-paste-templates">
+<span id="id1"></span><h1>Creating Paste templates<a class="headerlink" href="#creating-paste-templates" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://pythonpaste.org/">Python Paste</a> is an extremely powerful package that isn&#8217;t just about WSGI middleware. The related document <a class="reference internal" href="entry_points_and_plugins.html#entry-points-and-plugins"><span class="std std-ref">Using Entry Points to Write Plugins</span></a> demonstrates how to use entry_points to create simple plugins. This document describes how to write just such a plugin for use Paste&#8217;s project template creation facility and how to add a command to Paste&#8217;s <code class="docutils literal"><span class="pre">paster</span></code> script.</p>
+<p>The example task is to create a template for an imaginary content management system. The template is going to produce a project directory structure for a Python package, so we need to be able to specify a package name.</p>
+</div>
+<div class="section" id="creating-the-directory-structure-and-templates">
+<h2>Creating The Directory Structure and Templates<a class="headerlink" href="#creating-the-directory-structure-and-templates" title="Permalink to this headline">¶</a></h2>
+<p>The directory structure for the new project needs to look like this:</p>
+<div class="highlight-text"><div class="highlight"><pre>- default_project
+    - +package+
+        - __init__.py
+        - static
+            - layout
+            - region
+            - renderer
+        - service
+            - layout
+                - __init__.py
+            - region
+                - __init__.py
+            - renderer
+                - __init__.py
+    - setup.py_tmpl
+    - setup.cfg_tmpl
+    - development.ini_tmpl
+    - README.txt_tmpl
+    - ez_setup.py
+</pre></div>
+</div>
+<p>Of course, the actual project&#8217;s directory structure might look very different. In fact the <code class="docutils literal"><span class="pre">paster</span> <span class="pre">create</span></code> command can even be used to generate directory structures which <em>aren&#8217;t</em> project templates &#8212; although this wasn&#8217;t what it was designed for.</p>
+<p>When the <code class="docutils literal"><span class="pre">paster</span> <span class="pre">create</span></code> command is run, any directories with <code class="docutils literal"><span class="pre">+package+</span></code> in their name will have that portion of the name replaced by a simplified package name and likewise any directories with <code class="docutils literal"><span class="pre">+egg+</span></code> in their name will have that portion replaced by the name of the egg directory, although we don&#8217;t make use of that feature in this example.</p>
+<p>All of the files with <code class="docutils literal"><span class="pre">_tmpl</span></code> at the end of their filenames are treated as templates and will have the variables they contain replaced automatically. All other files will remain unchanged.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The small templating language used with <code class="docutils literal"><span class="pre">paster</span> <span class="pre">create</span></code> in files ending in <code class="docutils literal"><span class="pre">_tmpl</span></code> is described in detail in the <a class="reference external" href="http://pythonpaste.org/module-paste.util.template.html">Paste util module documentation</a></p>
+</div>
+<p>When specifying a package name it can include capitalisation and <code class="docutils literal"><span class="pre">_</span></code> characters but it should be borne in mind that the actual name of the package will be the <em>lowercase</em> package name with the <code class="docutils literal"><span class="pre">_</span></code> characters removed. If the package name contains an <code class="docutils literal"><span class="pre">_</span></code>, the egg name will contain a <code class="docutils literal"><span class="pre">_</span></code> character so occasionally the <code class="docutils literal"><span class="pre">+egg+</span></code> name is different to the <code class="docutils literal"><span class="pre">+package+</span></code> name.</p>
+<p>To avoid difficulty always recommend to users that they stick with package names that contain no <code class="docutils literal"><span class="pre">_</span></code> characters so that the names remain unique when made lowercase.</p>
+</div>
+<div class="section" id="implementing-the-code">
+<h2>Implementing the Code<a class="headerlink" href="#implementing-the-code" title="Permalink to this headline">¶</a></h2>
+<p>Now that the directory structure has been defined, the next step is to implement the commands that will convert this to a ready-to-run project. The template creation commands are implemented by a class derived from <code class="docutils literal"><span class="pre">paste.script.templates.Template</span></code>. This is how our example appears:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paste.script.templates</span> <span class="kn">import</span> <span class="n">Template</span><span class="p">,</span> <span class="n">var</span>
+
+<span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;version&#39;</span><span class="p">,</span> <span class="s">&#39;Version (like 0.1)&#39;</span><span class="p">),</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;description&#39;</span><span class="p">,</span> <span class="s">&#39;One-line description of the package&#39;</span><span class="p">),</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;long_description&#39;</span><span class="p">,</span> <span class="s">&#39;Multi-line description (in reST)&#39;</span><span class="p">),</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;keywords&#39;</span><span class="p">,</span> <span class="s">&#39;Space-separated keywords/tags&#39;</span><span class="p">),</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">,</span> <span class="s">&#39;Author name&#39;</span><span class="p">),</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;author_email&#39;</span><span class="p">,</span> <span class="s">&#39;Author email&#39;</span><span class="p">),</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;url&#39;</span><span class="p">,</span> <span class="s">&#39;URL of homepage&#39;</span><span class="p">),</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;license_name&#39;</span><span class="p">,</span> <span class="s">&#39;License name&#39;</span><span class="p">),</span>
+    <span class="n">var</span><span class="p">(</span><span class="s">&#39;zip_safe&#39;</span><span class="p">,</span> <span class="s">&#39;True/False: if the package can be distributed as a .zip file&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">ArtProjectTemplate</span><span class="p">(</span><span class="n">Template</span><span class="p">):</span>
+    <span class="n">_template_dir</span> <span class="o">=</span> <span class="s">&#39;templates/default_project&#39;</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="s">&#39;Art project template&#39;</span>
+    <span class="nb">vars</span> <span class="o">=</span> <span class="nb">vars</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">vars</span></code> arguments can all be set at run time and will be available to be used as (in this instance) Cheetah template variables in the files which end <code class="docutils literal"><span class="pre">_tmpl</span></code>. For example the <code class="docutils literal"><span class="pre">setup.py_tmpl</span></code> file for the <code class="docutils literal"><span class="pre">default_project</span></code> might look like this:</p>
+<div class="highlight-html+mako"><div class="highlight"><pre>from setuptools import setup, find_packages
+
+version = <span class="cp">${</span><span class="nb">repr</span><span class="p">(</span><span class="n">version</span><span class="p">)</span><span class="o">|</span><span class="s">&quot;0.0&quot;</span><span class="cp">}</span>
+
+setup(name=<span class="cp">${</span><span class="nb">repr</span><span class="p">(</span><span class="n">project</span><span class="p">)</span><span class="cp">}</span>,
+    version=version,
+    description=&quot;<span class="cp">${</span><span class="n">description</span><span class="o">|</span><span class="n">nothing</span><span class="cp">}</span>&quot;,
+    long_description=&quot;&quot;&quot;<span class="o">\</span>
+    <span class="cp">${</span><span class="n">long_description</span><span class="o">|</span><span class="n">nothing</span><span class="cp">}</span>&quot;&quot;&quot;,
+    classifiers=[],
+    keywords=<span class="cp">${</span><span class="nb">repr</span><span class="p">(</span><span class="n">keywords</span><span class="p">)</span><span class="o">|</span><span class="n">empty</span><span class="cp">}</span>,
+    author=<span class="cp">${</span><span class="nb">repr</span><span class="p">(</span><span class="n">author</span><span class="p">)</span><span class="o">|</span><span class="n">empty</span><span class="cp">}</span>,
+    author_email=<span class="cp">${</span><span class="nb">repr</span><span class="p">(</span><span class="n">author_email</span><span class="p">)</span><span class="o">|</span><span class="n">empty</span><span class="cp">}</span>,
+    url=<span class="cp">${</span><span class="nb">repr</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">|</span><span class="n">empty</span><span class="cp">}</span>,
+    license=<span class="cp">${</span><span class="nb">repr</span><span class="p">(</span><span class="n">license_name</span><span class="p">)</span><span class="o">|</span><span class="n">empty</span><span class="cp">}</span>,
+    packages=find_packages(exclude=[&#39;ez_setup&#39;]),
+    include_package_data=True,
+    zip_safe=<span class="cp">${</span><span class="nb">repr</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">zip_safe</span><span class="p">))</span><span class="o">|</span><span class="bp">False</span><span class="cp">}</span>,
+    install_requires=[
+      # Extra requirements go here #
+    ],
+    entry_points=&quot;&quot;&quot;
+        [paste.app_factory]
+        main=<span class="cp">${</span><span class="n">package</span><span class="cp">}</span>:make_app
+    &quot;&quot;&quot;,
+)
+</pre></div>
+</div>
+<p>Note how the variables specified in <code class="docutils literal"><span class="pre">vars</span></code> earlier are used to generate the actual <code class="docutils literal"><span class="pre">setup.py</span></code> file.</p>
+<p>In order to use the new templates they must be hooked up to the <code class="docutils literal"><span class="pre">paster</span> <span class="pre">create</span></code> command by means of an entry point. In the <code class="docutils literal"><span class="pre">setup.py</span></code> file of the project (in which created the project template is going to be stored) we need to add the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">entry_points</span><span class="o">=</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">    [paste.paster_create_template]</span>
+<span class="s">    art_project=art.entry.template:ArtProjectTemplate</span>
+<span class="s">&quot;&quot;&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>We also need to add <code class="docutils literal"><span class="pre">PasteScript&gt;=1.3</span></code> to the <code class="docutils literal"><span class="pre">install_requires</span></code> line.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">install_requires</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;PasteScript&gt;=1.3&quot;</span><span class="p">],</span>
+</pre></div>
+</div>
+<p>We just need to install the entry points now by running:</p>
+<div class="highlight-bash"><div class="highlight"><pre>python setup.py develop
+</pre></div>
+</div>
+<p>We should now be able to see a list of available templates with this command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster create --list-templates
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Windows users will need to add their Python scripts directory to their path or enter the full version of the command, similar to this:</p>
+<div class="last highlight-bash"><div class="highlight"><pre>C:<span class="se">\P</span>ython24<span class="se">\S</span>cripts<span class="se">\p</span>aster.exe create --list-templates
+</pre></div>
+</div>
+</div>
+<p>You should see the following:</p>
+<div class="highlight-text"><div class="highlight"><pre>Available templates:
+art_project:              Art project template
+basic_package:            A basic setuptools-enabled package
+</pre></div>
+</div>
+<p>There may be other projects too.</p>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<p>If the Art entries don&#8217;t show up, check whether it is possible to import the <code class="docutils literal"><span class="pre">template.py</span></code> file because any errors are simply ignored by the paster create command rather than output as a warning.</p>
+<p>If the code is correct, the issue might be that the entry points data hasn&#8217;t been updated. Examine the Python <code class="docutils literal"><span class="pre">site-packages</span></code> directory and delete the <code class="docutils literal"><span class="pre">Art.egg-link</span></code> files, any <code class="docutils literal"><span class="pre">Art*.egg</span></code> files or directories and remove any entries for art from <code class="docutils literal"><span class="pre">easy_install.pth</span></code> (replacing <code class="docutils literal"><span class="pre">Art</span></code> with the name chosen for the project of course). Then re-run <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code> to install the correct information.</p>
+<p>If problems are still evident, then running the following code will print out a list of all entry points. It might help track the problem down:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pkg_resources</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_group_name</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">print</span> <span class="n">x</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-the-template">
+<h2>Using the Template<a class="headerlink" href="#using-the-template" title="Permalink to this headline">¶</a></h2>
+<p>Now that the entry point is working, a new project can be created:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster create --template<span class="o">=</span>art TestProject
+</pre></div>
+</div>
+<p>Paster will ask lots of questions based on the variables set up in <code class="docutils literal"><span class="pre">vars</span></code> earlier. Pressing <code class="docutils literal"><span class="pre">return</span></code> will cause the default to be used. The final result is a nice project template ready for people to start coding with.</p>
+</div>
+<div class="section" id="implementing-pylons-templates">
+<h2>Implementing Pylons Templates<a class="headerlink" href="#implementing-pylons-templates" title="Permalink to this headline">¶</a></h2>
+<p>If the development context is subject to a frequent need to create lots of Pylons projects, each with a slightly different setup from the standard Pylons defaults then it is probably desirable to create a customised Pylons template to use when generating projects. This can be done in exactly the way described in this document.</p>
+<p>First, set up a new Python package, perhaps called something like <code class="docutils literal"><span class="pre">CustomPylons</span></code> (obviously, don&#8217;t use the Pylons name because Pylons itself is already using it). Then check out the Pylons source code and copy the <a class="reference external" href="http://pylonshq.com/project/pylonshq/browser/Pylons/trunk/pylons/templates/default_project">pylons/templates/default_project</a> directory into the new project as a starting point. The next stage is to add the custom <code class="docutils literal"><span class="pre">vars</span></code> and <code class="docutils literal"><span class="pre">Template</span></code> class and set up the entry points in the <code class="docutils literal"><span class="pre">CustomPylons</span></code> <code class="docutils literal"><span class="pre">setup.py</span></code> file.</p>
+<p>After those tasks have been completed, it is then possible to create customised templates (ultimately based on the Pylons one) by using the <code class="docutils literal"><span class="pre">CustomPylons</span></code> package.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Creating Paste templates</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#creating-the-directory-structure-and-templates">Creating The Directory Structure and Templates</a></li>
+<li><a class="reference internal" href="#implementing-the-code">Implementing the Code</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li><a class="reference internal" href="#using-the-template">Using the Template</a></li>
+<li><a class="reference internal" href="#implementing-pylons-templates">Implementing Pylons Templates</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="paster_commands.html"
+                        title="previous chapter">Adding commands to Paster</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="entry_points_and_plugins.html"
+                        title="next chapter">Using Entry Points to Write Plugins</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="entry_points_and_plugins.html" title="Using Entry Points to Write Plugins"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="paster_commands.html" title="Adding commands to Paster"
+             >previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Advanced Pylons</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pylons 理念 &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="控制器" href="controllers.html" />
+    <link rel="prev" title="快速入门" href="gettingstarted.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="controllers.html" title="控制器"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gettingstarted.html" title="快速入门"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pylons">
+<span id="concepts"></span><h1>Pylons 理念<a class="headerlink" href="#pylons" title="Permalink to this headline">¶</a></h1>
+<p>译者：<a class="reference external" href="http://log4d.com/">alswl</a></p>
+<p>我们需要了解一些 Pylons 的基本概念：请求和响应是怎么贯穿框架栈结构的，
+Pylons 是如何让定制变得简单，还有出于什么原因这么设计的。</p>
+<p>这一章将介绍 <a class="reference internal" href="glossary.html#term-wsgi"><span class="xref std std-term">WSGI</span></a> 应用的基本概念和 <a class="reference internal" href="glossary.html#term-wsgi-middleware"><span class="xref std std-term">WSGI Middleware</span></a> ，
+后者用来解释 Pylons 如何利用它们组合完成一个 web 框架。</p>
+<p>在开始阅读下面的内容之前，请先在 <a class="reference internal" href="gettingstarted.html#getting-started"><span class="std std-ref">快速入门</span></a> 的指引下创建一个工程。</p>
+<div class="section" id="id1">
+<h2>Pylons 溯源<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Pylons 项目和其他大多数 web 框架有点不一样。
+它没有和其他框架那样凭空创建一个新项目。而是在它运行的时候，
+从 Pylons 中载入模块，声明 WSGI 应用和应用栈，再返回结果。</p>
+<p>只要你愿意，新工程可以使用任意 WSGI 应用来替代 Pylons 的包引入。
+开发者可以按他们的想法自行打造一个自由可伸缩的 web 应用，。</p>
+<p>默认情况下，项目会将大部分开发者所需要的标准组件配置好，比如 sessions、
+模板引擎、缓存、请求/响应对象和 <a class="reference internal" href="glossary.html#term-orm"><span class="xref std std-term">ORM</span></a> 。开发者也可以自由定制自己所需要的，
+而不是让项目自身搞定（在框架内部代码里实现）。</p>
+<p>依据这种理念，Pylons 会设定一些它认为 <em>必须</em> 的组件，
+然后开发者可以根据项目需要自行设定。
+通过保留大量标准化的 <a class="reference internal" href="glossary.html#term-wsgi"><span class="xref std std-term">WSGI</span></a> 组件接口，Pylons 提供一种前所未有的可定制级别，</p>
+</div>
+<div class="section" id="wsgi">
+<h2>WSGI 应用<a class="headerlink" href="#wsgi" title="Permalink to this headline">¶</a></h2>
+<p>WSGI 描述了如何和 HTTP 服务器协同工作，在 <span class="target" id="index-0"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0333"><strong>PEP 333</strong></a> 被声明。
+它涉及到如何从请求中获取 HTTP 头和如何在 HTTP 头中返回内容。</p>
+<p>一个「Hello World」 WSGI 应用：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">simple_app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="n">start_response</span><span class="p">(</span><span class="s">&#39;200 OK&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="s">&#39;Content-type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s">&#39;&lt;html&gt;&lt;body&gt;Hello World&lt;/body&gt;&lt;/html&gt;&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>其实这个 WSGI 没做什么东西，仅仅设定了 200 返回状态码、HTTP &#8216;Content-type&#8217;
+头和一些 HTML。</p>
+<p>WSGI 标准规定了 <a class="reference external" href="http://www.python.org/dev/peps/pep-0333/#environ-variables">一组在环境变量中设定的键值集</a>.</p>
+<p>WSGI 接口其实就是调用一个方法（或者一个类），这个方法有两个参数，
+然后在和上面范例那样返回一个结果。这种思想贯穿了 Pylons：
+一个标准化的接口将控制权传递到下一个组件。</p>
+<p>在新创建的项目的 <code class="file docutils literal"><span class="pre">config/middleware.py</span></code> 文件中， <cite>make_app</cite>
+就是用来负责创建 WSGI 应用的。它被包裹在 WSGI 中间件（下文会解释）中，
+然后再被返回到上层来处理 HTTP 服务器的请求。</p>
+</div>
+<div class="section" id="wsgi-middleware">
+<span id="id3"></span><h2>WSGI 中间件<a class="headerlink" href="#wsgi-middleware" title="Permalink to this headline">¶</a></h2>
+<p>在 <code class="file docutils literal"><span class="pre">config/middleware.py</span></code> 中可以看到，一个 Pylons 应用是层层包裹的，
+每一层有自己的功能。通过中间件里包裹 Pylons 应用的过程看上去很像洋葱结构。</p>
+<img alt="Pylons middleware onion analogy" class="align-center" src="_images/pylons_as_onion.png" />
+<p>一旦中间件完成对 Pylons 应用的包裹，make_app 函数就会返回如下完整的结构
+（先列出最外层的）：</p>
+<div class="highlight-text"><div class="highlight"><pre>Registry Manager
+    Status Code Redirect
+        Error Handler
+            Cache Middleware
+                Session Middleware
+                    Routes Middleware
+                        Pylons App (WSGI Application)
+</pre></div>
+</div>
+<p>WSGI 中间层被广泛运用在 Pylons 中，它会给 基础 WSGI 应用添加各种功能。
+在 Pylons 中，基础 WSGI 应用是类 <code class="xref py py-class docutils literal"><span class="pre">PylonsApp</span></code> 。
+It&#8217;s responsible for looking in the
+<cite>environ</cite> dict that was passed in (from the Routes Middleware).</p>
+<p>要理解它如何运作，看下面这个中间层类范例：模拟处理 Google 跳转来的 <cite>HTTP_REFERER</cite> ：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">GoogleRefMiddleware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+        <span class="n">environ</span><span class="p">[</span><span class="s">&#39;google&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="s">&#39;HTTP_REFERER&#39;</span> <span class="ow">in</span> <span class="n">environ</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">environ</span><span class="p">[</span><span class="s">&#39;HTTP_REFERER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://google.com&#39;</span><span class="p">):</span>
+                <span class="n">environ</span><span class="p">[</span><span class="s">&#39;google&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>这个类行为和 WSGI 中间件很像，它添加了一些变量到环境上下文、初始化的 WSGI 参数。
+一个新的 Pylons 工程会按照这样来建造 <cite>WSGI 协议栈</cite> 。</p>
+<p>有些中间层只向 <cite>environ</cite> 、 HTTP 头（比如 Session 会添加 cookie 头信息）
+和返回项添加内容，比如 Session、Routes 和 Cache。而另外有一些则返回错误跳转，
+错误可以在整个流程被处理，然后改变输出内容。</p>
+</div>
+<div class="section" id="controller">
+<h2>Controller 调度<a class="headerlink" href="#controller" title="Permalink to this headline">¶</a></h2>
+<p>当一个请求通过中间件时候，请求 URL 会被 RoutesMiddleware 解析，
+如果它符合某个范式（参看 <a class="reference internal" href="configuration.html#url-config"><span class="std std-ref">URL Configuration</span></a> ），那么将要被调用的控制器会在
+<code class="xref py py-class docutils literal"><span class="pre">PylonsApp</span></code> 中被设定到 <cite>environ</cite> 。</p>
+<p>然后 <code class="xref py py-class docutils literal"><span class="pre">PylonsApp</span></code> 尝试在 <code class="file docutils literal"><span class="pre">controllers</span></code>
+中查找匹配名字的控制器（控制器名字加上 Controller，比如 HelloController）。
+一旦找到控制器，就会和其他 WSGI 应用一样被 <code class="xref py py-class docutils literal"><span class="pre">PylonsApp</span></code>
+调用。</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.0: </span>Controller name can also be a dotted path to the module / callable that
+should be imported and called. For example, to use a controller named
+&#8216;Foo&#8217; that is in the &#8216;bar.controllers&#8217; package, the controller name
+would be <cite>bar.controllers:Foo</cite>.</p>
+</div>
+<p>这也是为什么工程中的 <code class="file docutils literal"><span class="pre">lib/base.py</span></code> 继承了
+<code class="xref py py-class docutils literal"><span class="pre">WSGIController</span></code> ，并且有 <cite>__call__</cite>
+方法来来设定 <cite>environ</cite> 和 <cite>start_response</cite> 。
+<code class="xref py py-class docutils literal"><span class="pre">WSGIController</span></code> 会查找路由给出的 <cite>action</cite>
+所在的类并调用它，然后返回请求的结果。</p>
+</div>
+<div class="section" id="paster">
+<h2>Paster<a class="headerlink" href="#paster" title="Permalink to this headline">¶</a></h2>
+<p>执行命令 <strong class="command">paster</strong> 就可以看到所有命令参数：</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ paster
+Usage: paster [paster_options] COMMAND [command_options]
+
+Options:
+  --version         show program&#39;s version number and exit
+  --plugin=PLUGINS  Add a plugin to the list of commands (plugins are Egg
+                    specs; will also require() the Egg)
+  -h, --help        Show this help message
+
+Commands:
+  create          Create the file layout for a Python distribution
+  grep            Search project for symbol
+  help            Display help
+  make-config     Install a package and create a fresh config file/directory
+  points          Show information about entry points
+  post            Run a request for the described application
+  request         Run a request for the described application
+  serve           Serve the described application
+  setup-app       Setup an application, given a config file
+
+pylons:
+  controller      Create a Controller and accompanying functional test
+  restcontroller  Create a REST Controller and accompanying functional test
+  shell           Open an interactive shell with the Pylons app loaded
+</pre></div>
+</div>
+<p>如果在 Pylons 项目目录下执行命令 <strong class="command">paster</strong> ，你会看上上述打印信息。
+如果不在目录下，最后一段 <cite>pylons</cite> 信息就不会被显示出来。这个判断依赖于
+<strong class="command">pylons</strong> 脚本的一个动态插件。</p>
+<p>Pylons 工程中，有一个目录是以 <cite>.egg-info</cite> 结尾，目录里有一个文件
+<code class="file docutils literal"><span class="pre">paster_plugins.txt</span></code> 。这个文件会被 <strong class="command">paster</strong> 读取，
+从而一些库被动态加载到命令中去。通过它们，Pylons 提供了上述几个快捷命令。</p>
+</div>
+<div class="section" id="id4">
+<h2>载入应用<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>只需键入 <strong class="command">paster</strong> 即可载入运行应用：</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster serve development.ini
+</pre></div>
+</div>
+<p>这条命令让 paster 启动服务器模式。它会尝试根据指定的配置文件加载服务器和 WSGI
+应用。 <cite>[server]</cite> 用来指定使用什么服务器， <cite>[app]</cite> 则用来指定哪个 WSGI 应用。</p>
+<p><cite>helloworld</cite> 的一个简单的 Python 包声明（蟒蛇蛋） <code class="file docutils literal"><span class="pre">development.ini</span></code> ：</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[app:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:helloworld</span>
+</pre></div>
+</div>
+<p>它将告诉 paster 需要加载 helloworld <a class="reference internal" href="glossary.html#term-egg"><span class="xref std std-term">egg</span></a> 来找到 WSGI 应用。
+每个 Pylons 应用都会在 <code class="file docutils literal"><span class="pre">setup.py</span></code> 中使用一行指定如何打包 WSGI 应用：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">entry_points</span><span class="o">=</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">[paste.app_factory]</span>
+<span class="s">main = helloworld.config.middleware:make_app</span>
+
+<span class="s">[paste.app_install]</span>
+<span class="s">main = pylons.util:PylonsInstaller</span>
+<span class="s">&quot;&quot;&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>如上， <cite>make_app</cite> 方法指定 Paster（在 <strong class="command">paster</strong> 包中） 需要加载
+<cite>main</cite> 这个 WSGI 应用。</p>
+<p><cite>make_app</cite> 方法会在稍后被调用，然后服务器（默认是 HTTP 服务器）就会运行这个
+WSGI 应用。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pylons 理念</a><ul>
+<li><a class="reference internal" href="#id1">Pylons 溯源</a></li>
+<li><a class="reference internal" href="#wsgi">WSGI 应用</a></li>
+<li><a class="reference internal" href="#wsgi-middleware">WSGI 中间件</a></li>
+<li><a class="reference internal" href="#controller">Controller 调度</a></li>
+<li><a class="reference internal" href="#paster">Paster</a></li>
+<li><a class="reference internal" href="#id4">载入应用</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gettingstarted.html"
+                        title="previous chapter">快速入门</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="controllers.html"
+                        title="next chapter">控制器</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="controllers.html" title="控制器"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gettingstarted.html" title="快速入门"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

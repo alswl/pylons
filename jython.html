@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pylons on Jython &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Security policy for bugs" href="security_policy_for_bugs.html" />
+    <link rel="prev" title="Windows Notes" href="windowsnotes.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="security_policy_for_bugs.html" title="Security policy for bugs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="windowsnotes.html" title="Windows Notes"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pylons-on-jython">
+<span id="jython"></span><h1>Pylons on Jython<a class="headerlink" href="#pylons-on-jython" title="Permalink to this headline">¶</a></h1>
+<p>Pylons supports <a class="reference external" href="http://www.jython.org">Jython</a> as of v0.9.7.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The installation process is the same as CPython, as described in
+<a class="reference internal" href="gettingstarted.html#getting-started"><span class="std std-ref">快速入门</span></a>. At least Jython 2.5b2 is required.</p>
+</div>
+<div class="section" id="deploying-to-java-web-servers">
+<span id="java-deployment"></span><h2>Deploying to Java Web servers<a class="headerlink" href="#deploying-to-java-web-servers" title="Permalink to this headline">¶</a></h2>
+<p>The Java platform defines the <a class="reference external" href="http://en.wikipedia.org/wiki/Java_Servlet">Servlet API</a> for creating web applications. The
+<a class="reference external" href="http://modjy.xhaus.com/">modjy</a> library included with Jython provides a gateway between Java Servlets
+and WSGI applications.</p>
+<p>The <a class="reference external" href="http://pypi.python.org/pypi/snakefight">snakefight</a> tool can create a <a class="reference external" href="http://en.wikipedia.org/wiki/Sun_WAR_(file_format)">WAR file</a> from a Pylons application (and
+modjy) that&#8217;s suitable for deployment to the various <a class="reference external" href="http://en.wikipedia.org/wiki/Servlet_container">Servlet containers</a> (such
+as <a class="reference external" href="http://tomcat.apache.org/">Apache Tomcat</a> or <a class="reference external" href="http://glassfish.org/">Sun&#8217;s Glassfish</a>).</p>
+<div class="section" id="creating-wars-with-snakefight">
+<h3>Creating .wars with snakefight<a class="headerlink" href="#creating-wars-with-snakefight" title="Permalink to this headline">¶</a></h3>
+<p>First, install snakefight:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install snakefight
+</pre></div>
+</div>
+<p>This adds an additional command to distutils: <strong class="command">bdist_war</strong>.</p>
+<p>Pylons applications are loaded from Paste, via its <code class="docutils literal"><span class="pre">paste.app_factory</span></code> entry
+point and a Paste style configuration file. <strong class="command">bdist_war</strong> knows how to
+setup Paste apps for deployment when specified the <code class="xref std std-option docutils literal"><span class="pre">--paste-config</span></code>
+option:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster make-config MyApp production.ini
+<span class="nv">$ </span>jython setup.py bdist_war --paste-config production.ini
+</pre></div>
+</div>
+<p>As with any distutils command the preferred options can instead be added to the
+<code class="file docutils literal"><span class="pre">setup.cfg</span></code> in the root directory of the project:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[bdist_war]</span>
+<span class="na">paste-config</span> <span class="o">=</span> <span class="s">production.ini</span>
+</pre></div>
+</div>
+<p>Then we can simply run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>jython setup.py bdist_war
+</pre></div>
+</div>
+<p><strong class="command">bdist_war</strong> creates a <code class="file docutils literal"><span class="pre">.war</span></code> with the following:</p>
+<ul class="simple">
+<li>Jython&#8217;s <code class="file docutils literal"><span class="pre">jar</span></code> files in <code class="file docutils literal"><span class="pre">WEB-INF/lib</span></code></li>
+<li>Jython&#8217;s stdlib in <code class="file docutils literal"><span class="pre">WEB-INF/lib-python</span></code></li>
+<li>Your application&#8217;s required eggs in <code class="file docutils literal"><span class="pre">WEB-INF/lib-python</span></code></li>
+</ul>
+<p>With the <code class="xref std std-option docutils literal"><span class="pre">--paste-config</span></code> option, it also:</p>
+<ul class="simple">
+<li>Creates a simple loader for the application/config</li>
+<li>Generates a <code class="file docutils literal"><span class="pre">web.xml</span></code> deployment descriptor configuring modjy to load
+the application with the simple loader</li>
+</ul>
+<p>For further information/usages, see <a class="reference external" href="http://pypi.python.org/pypi/snakefight">snakefight&#8217;s documentation</a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pylons on Jython</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#deploying-to-java-web-servers">Deploying to Java Web servers</a><ul>
+<li><a class="reference internal" href="#creating-wars-with-snakefight">Creating .wars with snakefight</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="windowsnotes.html"
+                        title="previous chapter">Windows Notes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="security_policy_for_bugs.html"
+                        title="next chapter">Security policy for bugs</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="security_policy_for_bugs.html" title="Security policy for bugs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="windowsnotes.html" title="Windows Notes"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

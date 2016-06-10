@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Adding commands to Paster &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Advanced Pylons" href="index.html" />
+    <link rel="next" title="Creating Paste templates" href="creating_paste_templates.html" />
+    <link rel="prev" title="WSGI, CLI scripts" href="paster.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="../_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="../index.html">
+      		<img class="logo" src="../_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="creating_paste_templates.html" title="Creating Paste templates"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="paster.html" title="WSGI, CLI scripts"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Advanced Pylons</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="adding-commands-to-paster">
+<h1>Adding commands to Paster<a class="headerlink" href="#adding-commands-to-paster" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="paster-command">
+<h2>Paster command<a class="headerlink" href="#paster-command" title="Permalink to this headline">¶</a></h2>
+<p>The command line will be <code class="docutils literal"><span class="pre">paster</span> <span class="pre">my-command</span> <span class="pre">arg1</span> <span class="pre">arg2</span></code> if the current directory is the application egg, or <code class="docutils literal"><span class="pre">paster</span> <span class="pre">--plugin=MyPylonsApp</span> <span class="pre">my-command</span> <span class="pre">arg1</span> <span class="pre">arg2</span></code> otherwise.  In the latter case, <code class="docutils literal"><span class="pre">MyPylonsApp</span></code> must have been installed via <code class="docutils literal"><span class="pre">easy_install</span></code> or <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code>.</p>
+<p>Make a package directory for your commands:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>mkdir myapp/commands
+<span class="nv">$ </span>touch myapp/commands/__init__.py
+</pre></div>
+</div>
+<p>Create a module <code class="docutils literal"><span class="pre">myapp/commands/my_command.py</span></code> like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paste.script.command</span> <span class="kn">import</span> <span class="n">Command</span>
+
+<span class="k">class</span> <span class="nc">MyCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+        <span class="c"># Parser configuration</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="s">&quot;--NO SUMMARY--&quot;</span>
+        <span class="n">usage</span> <span class="o">=</span> <span class="s">&quot;--NO USAGE--&quot;</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s">&quot;myapp&quot;</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">Command</span><span class="o">.</span><span class="n">standard_parser</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="kn">import</span> <span class="nn">pprint</span>
+                <span class="k">print</span> <span class="s">&quot;Hello, app script world!&quot;</span>
+                <span class="k">print</span>
+                <span class="k">print</span> <span class="s">&quot;My options are:&quot;</span>
+                <span class="k">print</span> <span class="s">&quot;    &quot;</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">))</span>
+                <span class="k">print</span> <span class="s">&quot;My args are:&quot;</span>
+                <span class="k">print</span> <span class="s">&quot;    &quot;</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+                <span class="k">print</span>
+                <span class="k">print</span> <span class="s">&quot;My parser help is:&quot;</span>
+                <span class="k">print</span>
+                <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">format_help</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The class _must_ define <code class="docutils literal"><span class="pre">.command</span></code>, <code class="docutils literal"><span class="pre">.parser</span></code>, and <code class="docutils literal"><span class="pre">.summary</span></code></p>
+</div>
+<p>Modify the <code class="docutils literal"><span class="pre">entry_points</span></code> argument in <code class="file docutils literal"><span class="pre">setup.py</span></code> to contain:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">paste</span><span class="o">.</span><span class="n">paster_command</span><span class="p">]</span>
+<span class="n">my</span><span class="o">-</span><span class="n">command</span> <span class="o">=</span> <span class="n">myapp</span><span class="o">.</span><span class="n">commands</span><span class="o">.</span><span class="n">my_command</span><span class="p">:</span><span class="n">MyCommand</span>
+</pre></div>
+</div>
+<p>Run <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code> or <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">.</span></code> to update the entry points in the egg in sys.path.</p>
+<p>Now you should be able to run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster --plugin<span class="o">=</span>MyApp my-command arg1 arg2
+Hello, MyApp script world!
+
+My options are:
+         <span class="o">{</span><span class="s1">&#39;interactive&#39;</span>: False, <span class="s1">&#39;overwrite&#39;</span>: False, <span class="s1">&#39;quiet&#39;</span>: 0, <span class="s1">&#39;verbose&#39;</span>: 0<span class="o">}</span>
+My args are:
+         <span class="o">[</span><span class="s1">&#39;arg1&#39;</span>, <span class="s1">&#39;arg2&#39;</span><span class="o">]</span>
+
+My parser <span class="nb">help </span>is:
+
+Usage: /usr/local/bin/paster my-command <span class="o">[</span>options<span class="o">]</span> --NO USAGE--
+--NO SUMMARY--
+
+Options:
+  -h, --help  show this <span class="nb">help </span>message and <span class="nb">exit</span>
+
+<span class="nv">$ </span>paster --plugin<span class="o">=</span>MyApp --help
+Usage: paster <span class="o">[</span>paster_options<span class="o">]</span> COMMAND <span class="o">[</span>command_options<span class="o">]</span>
+
+...
+myapp:
+  my-command      --NO SUMMARY--
+
+pylons:
+  controller      Create a Controller and accompanying functional <span class="nb">test</span>
+<span class="nb">  </span>restcontroller  Create a REST Controller and accompanying functional <span class="nb">test</span>
+<span class="nb">  </span>shell           Open an interactive shell with the Pylons app loaded
+</pre></div>
+</div>
+</div>
+<div class="section" id="required-class-attributes">
+<h2>Required class attributes<a class="headerlink" href="#required-class-attributes" title="Permalink to this headline">¶</a></h2>
+<p>In addition to the <code class="docutils literal"><span class="pre">.command</span></code> method, the class should define <code class="docutils literal"><span class="pre">.parser</span></code> and <code class="docutils literal"><span class="pre">.summary</span></code>.</p>
+</div>
+<div class="section" id="command-line-options">
+<h2>Command-line options<a class="headerlink" href="#command-line-options" title="Permalink to this headline">¶</a></h2>
+<p><code class="xref py py-func docutils literal"><span class="pre">Command.standard_parser()</span></code> returns a Python <code class="xref py py-obj docutils literal"><span class="pre">OptionParser</span></code>.  Calling <code class="docutils literal"><span class="pre">parser.add_option</span></code> enables the developer to add as many options as desired.  Inside the <code class="docutils literal"><span class="pre">.command</span></code> method, the user&#8217;s options are available under <code class="docutils literal"><span class="pre">self.options</span></code>, and any additional arguments are in <code class="docutils literal"><span class="pre">self.args</span></code>.</p>
+<p>There are several other class attributes that affect the parser; see them defined in <code class="docutils literal"><span class="pre">paste.script.command:Command</span></code>.  The most useful attributes are <code class="docutils literal"><span class="pre">.usage</span></code>, <code class="docutils literal"><span class="pre">.description</span></code>, <code class="docutils literal"><span class="pre">.min_args</span></code>, and <code class="docutils literal"><span class="pre">.max_args</span></code>.   <code class="docutils literal"><span class="pre">.usage</span></code> is the part of the usage string _after_ the command name.  The <code class="docutils literal"><span class="pre">.standard_parser()</span></code> method has several optional arguments to add standardized options; some of these got added to my parser although I don&#8217;t see how.</p>
+<p>See the <code class="docutils literal"><span class="pre">paster</span> <span class="pre">shell</span></code> command, <code class="docutils literal"><span class="pre">pylons.commands:ShellCommand</span></code>, for an example of using command-line options and loading the <code class="docutils literal"><span class="pre">.ini</span> <span class="pre">file</span></code> and model.</p>
+<p>Also see &#8220;paster setup-app&#8221; where it is defined in <code class="docutils literal"><span class="pre">paste.script.appinstall.SetupCommand</span></code>.  This is evident from the entry point in PasteScript  (<code class="file docutils literal"><span class="pre">PasteScript-VERSION.egg/EGG_INFO/entry_points.txt</span></code>).  It is a complex example of reading a config file and delegating to another entry point.</p>
+<p>The code for calling <code class="docutils literal"><span class="pre">myapp.websetup:setup_config</span></code> is in <code class="docutils literal"><span class="pre">paste.script.appinstall</span></code>.</p>
+<p>The <code class="docutils literal"><span class="pre">Command</span></code> class also has several convenience methods to handle console prompts, enable logging, verify directories exist and that files have expected content, insert text into a file, run a shell command, add files to Subversion, parse &#8220;var=value&#8221; arguments, add variables to an .ini file.</p>
+</div>
+<div class="section" id="using-paster-to-access-a-pylons-app">
+<h2>Using paster to access a Pylons app<a class="headerlink" href="#using-paster-to-access-a-pylons-app" title="Permalink to this headline">¶</a></h2>
+<p>Paster provides <code class="docutils literal"><span class="pre">request</span></code> and <code class="docutils literal"><span class="pre">post</span></code> commands for running requests on an application. These commands will be run in the full configuration context of a normal application.  Useful for cron jobs, the error handler will also be in place and you can get email reports of failed requests.</p>
+<p>Because arguments all just go in <code class="docutils literal"><span class="pre">QUERY_STRING</span></code>, <code class="docutils literal"><span class="pre">request.GET</span></code> and <code class="docutils literal"><span class="pre">request.PARAMS</span></code> won&#8217;t look like you expect.  But you can parse them with
+something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">parser</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionParser</span><span class="p">()</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="n">etc</span><span class="p">)</span>
+
+<span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span>
+        <span class="n">cgi</span><span class="o">.</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;QUERY_STRING&#39;</span><span class="p">])]</span>
+
+<span class="n">options</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="paster-request-post">
+<h3>paster request / post<a class="headerlink" href="#paster-request-post" title="Permalink to this headline">¶</a></h3>
+<p>Usage: paster request / post [options] CONFIG_FILE URL [OPTIONS/ARGUMENTS]</p>
+<p>Run a request for the described application</p>
+<p>This command makes an artifical request to a web application that uses a
+<code class="docutils literal"><span class="pre">paste.deploy</span></code> configuration file for the server and application.  Use &#8216;paster
+request config.ini /url&#8217; to request <code class="docutils literal"><span class="pre">/url</span></code>.</p>
+<p>Use &#8216;paster post config.ini /url &lt; data&#8217; to do a POST with the given request body.</p>
+<p>If the URL is relative (i.e. doesn&#8217;t begin with /) it is interpreted as relative to /.command/.</p>
+<p>The variable <code class="docutils literal"><span class="pre">environ['paste.command_request']</span></code> will be set to True in the request, so your application can distinguish these calls from normal requests.</p>
+<p>Note that you can pass options besides the options listed here; any unknown options will be passed to the application in <code class="docutils literal"><span class="pre">environ['QUERY_STRING']</span></code>.</p>
+<div class="highlight-none"><div class="highlight"><pre>Options:
+  -h, --help            show this help message and exit
+  -v, --verbose
+  -q, --quiet
+  -n NAME, --app-name=NAME
+                        Load the named application (default main)
+  --config-var=NAME:VALUE
+                        Variable to make available in the config for %()s
+                        substitution (you can use this option multiple times)
+  --header=NAME:VALUE   Header to add to request (you can use this option
+                        multiple times)
+  --display-headers     Display headers before the response body
+</pre></div>
+</div>
+</div>
+<div class="section" id="future-development">
+<h3>Future development<a class="headerlink" href="#future-development" title="Permalink to this headline">¶</a></h3>
+<p>A Pylons controller that handled some of this would probably be quite
+useful.  Probably even nicer with additions to the current template, so
+that <code class="docutils literal"><span class="pre">/.command/</span></code> all gets routed to a single controller that uses actions
+for the various sub-commands, and can provide a useful response to
+<code class="docutils literal"><span class="pre">/.command/?-h</span></code>, etc.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Adding commands to Paster</a><ul>
+<li><a class="reference internal" href="#paster-command">Paster command</a></li>
+<li><a class="reference internal" href="#required-class-attributes">Required class attributes</a></li>
+<li><a class="reference internal" href="#command-line-options">Command-line options</a></li>
+<li><a class="reference internal" href="#using-paster-to-access-a-pylons-app">Using paster to access a Pylons app</a><ul>
+<li><a class="reference internal" href="#paster-request-post">paster request / post</a></li>
+<li><a class="reference internal" href="#future-development">Future development</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="paster.html"
+                        title="previous chapter">WSGI, CLI scripts</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="creating_paste_templates.html"
+                        title="next chapter">Creating Paste templates</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="creating_paste_templates.html" title="Creating Paste templates"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="paster.html" title="WSGI, CLI scripts"
+             >previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Advanced Pylons</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

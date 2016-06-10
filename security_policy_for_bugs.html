@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Security policy for bugs &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="WSGI support" href="wsgi_support.html" />
+    <link rel="prev" title="Pylons on Jython" href="jython.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wsgi_support.html" title="WSGI support"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="jython.html" title="Pylons on Jython"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="security-policy-for-bugs">
+<span id="id1"></span><h1>Security policy for bugs<a class="headerlink" href="#security-policy-for-bugs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="receiving-security-updates">
+<h2>Receiving Security Updates<a class="headerlink" href="#receiving-security-updates" title="Permalink to this headline">¶</a></h2>
+<p>The Pylons team have set up a mailing list at <a class="reference external" href="mailto:wsgi-security-announce&#37;&#52;&#48;googlegroups&#46;com">wsgi-security-announce<span>&#64;</span>googlegroups<span>&#46;</span>com</a> to which any security vulnerabilities that affect Pylons will be announced. Anyone wishing to be notified of vulnerabilities in Pylons should subscribe to this list. Security announcements will only be made once a solution to the problem has been discovered.</p>
+</div>
+<div class="section" id="reporting-security-issues">
+<h2>Reporting Security Issues<a class="headerlink" href="#reporting-security-issues" title="Permalink to this headline">¶</a></h2>
+<p>Please report security issues by email to both the lead developers of Pylons at the following addresses:</p>
+<p>ben<img alt="at" src="_images/at.png" />groovie.org</p>
+<p>security<img alt="at" src="_images/at.png" />3aims.com</p>
+<p>Please DO NOT announce the vulnerability to any mailing lists or on the ticket system because we would not want any malicious person to be aware of the problem before a solution is available.</p>
+<p>In the event of a confirmed vulnerability in Pylons itself, we will take the following actions:</p>
+<ul class="simple">
+<li>Acknowledge to the reporter that we&#8217;ve received the report and that a fix is forthcoming. We&#8217;ll give a rough timeline and ask the reporter to keep the issue confidential until we announce it.</li>
+<li>Halt all other development as long as is needed to develop a fix, including patches against the current release.</li>
+<li>Publicly announce the vulnerability and the fix as soon as it is available to the WSGI security list at <a class="reference external" href="mailto:wsgi-security-announce&#37;&#52;&#48;googlegroups&#46;com">wsgi-security-announce<span>&#64;</span>googlegroups<span>&#46;</span>com</a>.</li>
+</ul>
+<p>This will probably mean a new release of Pylons, but in some cases it may simply be the release of documentation explaining how to avoid the vulnerability.</p>
+<p>In the event of a confirmed vulnerability in one of the components that Pylons uses, we will take the following actions:</p>
+<ul class="simple">
+<li>Acknowledge to the reporter that we&#8217;ve received the report and ask the reporter to keep the issue confidential until we announce it.</li>
+<li>Contact the developer or maintainer of the package containing the vulnerability.</li>
+<li>If the developer or maintainer fails to release a new version in a reasonable time-scale and the vulnerability is serious we will either create documentation explaining how to avoid the problem or as a last resort, create a patched version.</li>
+<li>Publicly announce the vulnerability and the fix as soon as it is available to the WSGI security list at <a class="reference external" href="mailto:wsgi-security-announce&#37;&#52;&#48;googlegroups&#46;com">wsgi-security-announce<span>&#64;</span>googlegroups<span>&#46;</span>com</a>.</li>
+</ul>
+</div>
+<div class="section" id="minimising-risk">
+<h2>Minimising Risk<a class="headerlink" href="#minimising-risk" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Only use official production versions of Pylons released publicly on the <a class="reference external" href="http://python.org/pypi">Python Package Index</a>.</li>
+<li>Only use stable releases of third party software not development, alpha, beta or release candidate code.</li>
+<li>Do not assume that related software is of the same quality as Pylons itself, even if Pylons users frequently make use of it.</li>
+<li>Subscribe to the <a class="reference external" href="mailto:wsgi-security-announce&#37;&#52;&#48;googlegroups&#46;com">wsgi-security-announce<span>&#64;</span>googlegroups<span>&#46;</span>com</a> mailing list to be informed of security issues and their solutions.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Security policy for bugs</a><ul>
+<li><a class="reference internal" href="#receiving-security-updates">Receiving Security Updates</a></li>
+<li><a class="reference internal" href="#reporting-security-issues">Reporting Security Issues</a></li>
+<li><a class="reference internal" href="#minimising-risk">Minimising Risk</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="jython.html"
+                        title="previous chapter">Pylons on Jython</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="wsgi_support.html"
+                        title="next chapter">WSGI support</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wsgi_support.html" title="WSGI support"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="jython.html" title="Pylons on Jython"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,658 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>模型 &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Advanced Models" href="advanced_models.html" />
+    <link rel="prev" title="Views" href="views.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="advanced_models.html" title="Advanced Models"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="Views"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="models">
+<span id="id1"></span><h1>模型<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id2">
+<h2>关于模型<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="_images/pylon3.jpg"><img alt="" class="align-left" src="_images/pylon3.jpg" style="width: 368px; height: 450px;" /></a>
+<p>在 MVC 模式中， <em>模型</em> 控制应用业务的数据表现，
+包括展现自身状态和响应响应外部指令来改变状态。</p>
+<p>模型描述业务数据和逻辑规则。在 MVC 设计模式中，模型层负责处理大部分这类任务。
+数据库在模型层的职责范围之内，经常被模块化为 <span class="xref std std-term">EJCs</span> 和
+<a class="reference internal" href="glossary.html#term-coldfusion-components"><span class="xref std std-term">ColdFusion Components</span></a> 这类的形式。</p>
+<p>模型返回的数据应该是原始没经过处理的。这样模型可以给很多数据展示方式提供数据。
+从而可以保证只要一次代码撰写，就可以将数据提供给所有的视图。</p>
+<p>比如，大部分数据通常以 HTML 展现，但是有时候也会通过 Flash 或 WAP 展示。</p>
+<p>模型同时会隔离并持久化数据。比如一个 Flash 站点或一个移动应用，
+都可以使用基于 session 的购物车，完成电子上午处理。</p>
+<p>由于模型独立并不依赖于控制器和视图，修改数据和业务逻辑不会带来太多的麻烦。
+当必须要迁移数据库时候，比如从 MySQL 到 Oracle，从 RDBMS 到 LDAP，
+唯一需要做的就是修改模型层。如果视图写的优美，
+它根本不会关注数据是来自数据库还是 LDAP。</p>
+<p>这种选择的自由要感谢基于 MVC 的应用内部有互为 <cite>黑盒</cite> 的三个部分。
+他们各自内部的处理流程都被隐藏了，相互之间耦合低。
+它提倡优雅的接口和独立的模块化组件。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><em>adapted from an Oct 2002 TechRepublic article by by Brian Kotek: &#8220;MVC design pattern brings about better organization and code reuse&#8221;</em> - <a class="reference external" href="http://articles.techrepublic.com.com/5100-10878_11-1049862.html">http://articles.techrepublic.com.com/5100-10878_11-1049862.html</a></p>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>模型基础应用<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>Pylons provides a <code class="xref py py-data docutils literal"><span class="pre">model</span></code> package to put your database code in but does not offer a database engine or API.  Instead there are several third-party APIs to choose from.</p>
+<p>The recommended and most commonly-adopted approach used in Pylons applications is to use SQLAlchemy with the declarative configuration style and develop with a relational database (Postgres, MySQL, etc).</p>
+<p><strong>This is the documented and recommended approach for creating a Pylons project with a SQL database</strong>.</p>
+<div class="section" id="install-sqlalchemy">
+<h3>Install SQLAlchemy<a class="headerlink" href="#install-sqlalchemy" title="Permalink to this headline">¶</a></h3>
+<p>We&#8217;ll assume you&#8217;ve already installed Pylons and have the <cite>easy_install</cite> command. At the command line, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre>easy_install SQLAlchemy
+</pre></div>
+</div>
+<p>Next you&#8217;ll have to install a database engine and its Python bindings. If you don&#8217;t know which one to choose, SQLite is a good one to start with. It&#8217;s small and easy to install, and Python 2.5 includes bindings for it. Installing the database engine is beyond the scope of this article, but here are the Python bindings you&#8217;ll need for the most popular engines:</p>
+<div class="highlight-bash"><div class="highlight"><pre>easy_install pysqlite <span class="c"># If you use SQLite and Python 2.4 (not needed for Python 2.5)</span>
+easy_install MySQL-python <span class="c"># If you use MySQL</span>
+easy_install psycopg2 <span class="c"># If you use PostgreSQL</span>
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="http://pypi.python.org/">Python Package Index</a> (formerly the Cheeseshop) for other database drivers.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>Checking Your Version</p>
+<p>To see which version of SQLAlchemy you have, go to a Python shell and look at <code class="docutils literal"><span class="pre">sqlalchemy.__version__</span></code> :</p>
+<div class="last highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sqlalchemy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqlalchemy</span><span class="o">.</span><span class="n">__version__</span>
+<span class="go">0.5.8</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="create-a-pylons-project-with-sqlalchemy">
+<h3>Create a Pylons Project with SQLAlchemy<a class="headerlink" href="#create-a-pylons-project-with-sqlalchemy" title="Permalink to this headline">¶</a></h3>
+<p>When creating a Pylons project, one of the questions asked as part of the project creation dialogue is whether the project should be configured with SQLAlchemy. Before continuing, ensure that the project was created with this option, if it&#8217;s missing the <code class="file docutils literal"><span class="pre">model/meta.py</span></code> file, then the project should be re-created with this option.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">The project doesn&#8217;t need to be deleted to add this option, just re-run
+the <cite>paster</cite> command in the project&#8217;s parent directory and answer &#8220;yes&#8221;
+to the SQLAlchemy prompt. The files will then be added and existing
+files will present a prompt on whether to replace them or leave the
+current file.</p>
+</div>
+</div>
+<div class="section" id="configure-sqlalchemy">
+<h3>Configure SQLAlchemy<a class="headerlink" href="#configure-sqlalchemy" title="Permalink to this headline">¶</a></h3>
+<p>When your Pylons application runs, it needs to know which database to connect to. Normally you put this information in <em>development.ini</em> and activate the model in <em>environment.py</em>: put the following in <em>development.ini</em> in the <cite>[app:main]</cite> section, depending on your database,</p>
+<div class="section" id="for-sqlite">
+<h4>For SQLite<a class="headerlink" href="#for-sqlite" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">sqlalchemy.url</span> <span class="o">=</span> <span class="s">sqlite:///%(here)s/mydatabasefilename.sqlite</span>
+</pre></div>
+</div>
+<p>Where <cite>mydatabasefilename.db</cite> is the path to your SQLite database file. &#8220;%(here)s&#8221; represents the directory containing the development.ini file. If you&#8217;re using an absolute path, use four slashes after the colon: &#8220;sqlite:////var/lib/myapp/database.sqlite&#8221;. Don&#8217;t use a relative path (three slashes) because the current directory could be anything. The example has three slashes because the value of &#8220;%(here)s&#8221; always starts with a slash (or the platform equivalent; e.g., &#8220;C:\foo&#8221; on Windows).</p>
+</div>
+<div class="section" id="for-mysql">
+<h4>For MySQL<a class="headerlink" href="#for-mysql" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">sqlalchemy.url</span> <span class="o">=</span> <span class="s">mysql://username:password@host:port/database</span>
+<span class="na">sqlalchemy.pool_recycle</span> <span class="o">=</span> <span class="s">3600</span>
+</pre></div>
+</div>
+<p>Enter your username, password, host (localhost if it is on your machine), port number (usually 3306) and the name of your database. The second line is an example of setting <a class="reference external" href="http://www.sqlalchemy.org/docs/04/dbengine.html#dbengine_options">engine options</a>.</p>
+<p>It&#8217;s important to set &#8220;pool_recycle&#8221; for MySQL to prevent &#8220;MySQL server has gone away&#8221; errors. This is because MySQL automatically closes idle database connections without informing the application. Setting the connection lifetime to 3600 seconds (1 hour) ensures that the connections will be expired and recreated before MySQL notices they&#8217;re idle.</p>
+<p>Don&#8217;t be tempted to use the &#8221;.echo&#8221; option to enable SQL logging because it may cause duplicate log output. Instead see the <a class="reference internal" href="#logging">Logging</a> section below to integrate MySQL logging into Paste&#8217;s logging system.</p>
+</div>
+<div class="section" id="for-postgresql">
+<h4>For PostgreSQL<a class="headerlink" href="#for-postgresql" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">sqlalchemy.url</span> <span class="o">=</span> <span class="s">postgres://username:password@host:port/database</span>
+</pre></div>
+</div>
+<p>Enter your username, password, host (localhost if it is on your machine),
+port number (usually 5432) and the name of your database.</p>
+</div>
+</div>
+</div>
+<div class="section" id="organizing">
+<h2>Organizing<a class="headerlink" href="#organizing" title="Permalink to this headline">¶</a></h2>
+<p>When you answer &#8220;yes&#8221; to the SQLAlchemy question when creating a Pylons
+project, it configures a simple default model.  The model consists of two
+files: <code class="file docutils literal"><span class="pre">model/__init__.py</span></code> and <code class="file docutils literal"><span class="pre">model/meta.py</span></code>.</p>
+<div class="section" id="model-init-py">
+<h3><code class="file docutils literal"><span class="pre">model/__init__.py</span></code><a class="headerlink" href="#model-init-py" title="Permalink to this headline">¶</a></h3>
+<p>The file <code class="file docutils literal"><span class="pre">model/__init__.py</span></code> contains the table definitions, the ORM
+classes and an <code class="xref py py-func docutils literal"><span class="pre">init_model()</span></code> function. This <code class="xref py py-func docutils literal"><span class="pre">init_model()</span></code> function
+must be called at application startup. In the Pylons default project template
+this call is made in the <code class="xref py py-func docutils literal"><span class="pre">load_environment()</span></code> function (in the file
+<code class="file docutils literal"><span class="pre">config/environment.py</span></code>).</p>
+</div>
+<div class="section" id="model-meta-py">
+<h3><code class="file docutils literal"><span class="pre">model/meta.py</span></code><a class="headerlink" href="#model-meta-py" title="Permalink to this headline">¶</a></h3>
+<p><code class="file docutils literal"><span class="pre">model/meta.py</span></code> is merely a container for a few housekeeping objects
+required by SQLAlchemy such as <code class="xref py py-class docutils literal"><span class="pre">Session</span></code>, <code class="docutils literal"><span class="pre">metadata</span></code> and <code class="docutils literal"><span class="pre">engine</span></code>
+to avoid import issues. In the context of the default Pylons application, only
+the <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> object is instantiated.</p>
+<p>The objects are optional in the context of other applications that do not make
+use of them and so if you answer &#8220;no&#8221; to the SQLAlchemy question when creating
+a Pylons project, the creation of <code class="file docutils literal"><span class="pre">model/meta.py</span></code> is simply skipped.</p>
+<p>It is recommended that, for each model, a new module inside the <code class="docutils literal"><span class="pre">model/</span></code>
+directory should be created. This keeps the models tidy when they get
+larger as more domain specific code is added to each one.</p>
+</div>
+</div>
+<div class="section" id="creating-a-model">
+<h2>Creating a Model<a class="headerlink" href="#creating-a-model" title="Permalink to this headline">¶</a></h2>
+<p>SQLAlchemy 0.5 has an optional <cite>Declarative</cite> syntax which offers the
+convenience of defining the table and the ORM class in one step. This
+is the recommended usage of SQLAlchemy.</p>
+<p>Create a <code class="file docutils literal"><span class="pre">model/person.py</span></code> module:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;Person model&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.types</span> <span class="k">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span>
+
+<span class="kn">from</span> <span class="nn">myapp.model.meta</span> <span class="k">import</span> <span class="n">Base</span>
+
+<span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&quot;person&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">email</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;&lt;Person(&#39;%s&#39;)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">Base</span></code> is imported from <code class="file docutils literal"><span class="pre">model/meta.py</span></code> to prevent recursive
+import problems when added to <code class="file docutils literal"><span class="pre">model/__init__.py</span></code> in the next
+step.</p>
+</div>
+<p>Then for convenience when using the models, import it in <code class="file docutils literal"><span class="pre">model/__init__.py</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;The application&#39;s model objects&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">myapp.model.meta</span> <span class="k">import</span> <span class="n">Session</span><span class="p">,</span> <span class="n">Base</span>
+
+<span class="kn">from</span> <span class="nn">myapp.model.person</span> <span class="k">import</span> <span class="n">Person</span>
+
+<span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Call me before using any of the tables or classes in the model&quot;&quot;&quot;</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-relation">
+<h2>Adding a Relation<a class="headerlink" href="#adding-a-relation" title="Permalink to this headline">¶</a></h2>
+<p>Here&#8217;s an example of a <code class="xref py py-class docutils literal"><span class="pre">Person</span></code> and an <code class="xref py py-class docutils literal"><span class="pre">Address</span></code> class with a
+one-to-many relationship on <cite>person.addresses</cite>.</p>
+<p>First, add a <code class="file docutils literal"><span class="pre">model/address.py</span></code> module:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;Address model&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">ForeignKey</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.types</span> <span class="k">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">relation</span><span class="p">,</span> <span class="n">backref</span>
+
+<span class="kn">from</span> <span class="nn">myapp.model.meta</span> <span class="k">import</span> <span class="n">Base</span>
+
+<span class="k">class</span> <span class="nc">Address</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&quot;address&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">city</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">person_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s">&#39;person.id&#39;</span><span class="p">))</span>
+
+    <span class="n">person</span> <span class="o">=</span> <span class="n">relation</span><span class="p">(</span><span class="s">&#39;Person&#39;</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="n">backref</span><span class="p">(</span><span class="s">&#39;addresses&#39;</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="nb">id</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;&lt;Person(&#39;%s&#39;)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+<p>When models are created using the declarative <code class="docutils literal"><span class="pre">Base</span></code>, each one is added by
+name to a mapping. This allows the <code class="docutils literal"><span class="pre">relation</span></code> option above to locate the
+model it should be related to based on the text string <code class="docutils literal"><span class="pre">'Person'</span></code>.</p>
+<p>Then add the import to the <code class="file docutils literal"><span class="pre">model/__init__.py</span></code> file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;The application&#39;s model objects&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">myapp.model.meta</span> <span class="k">import</span> <span class="n">Session</span><span class="p">,</span> <span class="n">Base</span>
+
+<span class="kn">from</span> <span class="nn">myapp.model.address</span> <span class="k">import</span> <span class="n">Address</span>
+<span class="kn">from</span> <span class="nn">myapp.model.person</span> <span class="k">import</span> <span class="n">Person</span>
+
+<span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Call me before using any of the tables or classes in the model&quot;&quot;&quot;</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://www.sqlalchemy.org/docs/05/ormtutorial.html#building-a-relation">Building a Relation</a>
+and
+<a class="reference external" href="http://www.sqlalchemy.org/docs/">SQLAlchemy manual</a></p>
+</div>
+</div>
+<div class="section" id="creating-the-database">
+<h2>Creating the Database<a class="headerlink" href="#creating-the-database" title="Permalink to this headline">¶</a></h2>
+<p>To actually create the tables in the database, you call the metadata&#8217;s <cite>.create_all()</cite> method. You can do this interactively or use <cite>paster</cite>&#8216;s application initialization feature. To do this, put the code in <code class="file docutils literal"><span class="pre">myapp/websetup.py</span></code>. After the <cite>load_environment()</cite> call, put:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">myapp.model.meta</span> <span class="kn">import</span> <span class="n">Base</span><span class="p">,</span> <span class="n">Session</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Creating tables&quot;</span><span class="p">)</span>
+<span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">drop_all</span><span class="p">(</span><span class="n">checkfirst</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bind</span><span class="o">=</span><span class="n">Session</span><span class="o">.</span><span class="n">bind</span><span class="p">)</span>
+<span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">Session</span><span class="o">.</span><span class="n">bind</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Successfully setup&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then run the following on the command line:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster setup-app development.ini
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-brief-guide-to-using-model-objects-in-the-controller">
+<h2>A brief guide to using model objects in the Controller<a class="headerlink" href="#a-brief-guide-to-using-model-objects-in-the-controller" title="Permalink to this headline">¶</a></h2>
+<p>In which we: query a model, update a model entity, create a model entity and delete several model entities, all inside a Pylons controller.</p>
+<p>To illustrate some typical ways of handling model objects in the Controller, we will draw from the example <code class="xref py py-class docutils literal"><span class="pre">PagesController</span></code> code of the <span class="xref std std-ref">QuickWiki Tutorial</span>.</p>
+<div class="section" id="the-session">
+<h3>The <code class="xref py py-class docutils literal"><span class="pre">Session</span></code><a class="headerlink" href="#the-session" title="Permalink to this headline">¶</a></h3>
+<p>The SQLAlchemy-provided <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> object is a crucially important facet when working with models and model object entities.</p>
+<p>The SQLAlchemy documentation describes the <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> thus: &#8220;In the most general sense, the Session establishes all conversations with the database and represents a &#8220;holding zone&#8221; for all the mapped instances which you’ve loaded or created during its lifespan.&#8221;</p>
+<p>All of the model access that takes place in a Pylons controller is done in the context of a <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> providing a database connection reference that is created at the start of the processing of each request and destroyed at the end of the processing of the request.</p>
+<p>These creation and destruction operations are performed automatically by the <code class="xref py py-class docutils literal"><span class="pre">BaseController</span></code> instantiated in <code class="file docutils literal"><span class="pre">MYAPP/lib/base.py</span></code> which is in turn subclassed for each standard Pylons controller, ensuring that subclassed controllers can access the database only in a request-specific context which, in turn, protects against data accidentally leaking across requests.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">SQLAlchemy documentation for the <a class="reference external" href="http://www.sqlalchemy.org/docs/session.html">Session object</a></p>
+</div>
+<p>The net effect of this is that a fully-instantiated <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> object is available for import and immediate use in the controller for, e.g. querying the model.</p>
+</div>
+<div class="section" id="querying-the-model">
+<h3>Querying the model<a class="headerlink" href="#querying-the-model" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> object provides a <code class="xref py py-func docutils literal"><span class="pre">query()</span></code> function that, when applied to a class of mapped model object, returns a SQLAlchemy <code class="xref py py-class docutils literal"><span class="pre">Query</span></code> object that can be passed around and repeatedly consulted.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">SQLAlchemy documentation for the <a class="reference external" href="http://www.sqlalchemy.org/docs/reference/orm/query.html">Query object</a></p>
+</div>
+<p>Standard usage is illustrated in this code for the <code class="xref py py-func docutils literal"><span class="pre">__before__()</span></code> function of the QuickWiki <code class="xref py py-class docutils literal"><span class="pre">PagesController</span></code> in which <code class="docutils literal"><span class="pre">self.page_q</span></code> is bound to the <code class="xref py py-class docutils literal"><span class="pre">Query</span></code> object returned by <code class="docutils literal"><span class="pre">Session.query(Page)</span></code> - where <code class="xref py py-class docutils literal"><span class="pre">Page</span></code> is the class of mapped model object that will be the subject of the queries.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">MYAPP.lib.base</span> <span class="kn">import</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">MYAPP.model</span> <span class="kn">import</span> <span class="n">Page</span>
+
+<span class="k">class</span> <span class="nc">PagesController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__before__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page_q</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Page</span><span class="p">)</span>
+
+    <span class="c"># [ ... ]</span>
+</pre></div>
+</div>
+<p>The <code class="xref py py-class docutils literal"><span class="pre">Query</span></code> object that is bound to <code class="docutils literal"><span class="pre">self.page_q</span></code> is now specialised to perform queries of the <code class="xref py py-class docutils literal"><span class="pre">Page</span></code> declarative base entity / mapped model entity.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">SQLAlchemy documentation for the <a class="reference external" href="http://www.sqlalchemy.org/docs/ormtutorial.html#querying">Querying the database</a></p>
+</div>
+<p>Here, in the context of a controller&#8217;s <code class="xref py py-func docutils literal"><span class="pre">index()</span></code> action, it is used in a very straighforward manner - <code class="xref py py-func docutils literal"><span class="pre">self.page_q.all()</span></code> - to fuel a list comprehension that returns a list containing the <code class="docutils literal"><span class="pre">title</span></code> of every <code class="xref py py-class docutils literal"><span class="pre">Page</span></code> object in the database:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="n">page</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_q</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/pages/index.mako&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and <code class="docutils literal"><span class="pre">self.page_q</span></code> is used in similarly direct manner for the <code class="xref py py-func docutils literal"><span class="pre">show()</span></code> action that retrieves a Page with a given value of <code class="docutils literal"><span class="pre">title</span></code> and then calls the Page&#8217;s  <code class="xref py py-func docutils literal"><span class="pre">get_wiki_content()</span></code> class method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_q</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">page</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">get_wiki_content</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/pages/show.mako&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">wikiwords</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/pages/new.mako&#39;</span><span class="p">)</span>
+    <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>the <code class="docutils literal"><span class="pre">title</span></code> argument to the function is bound when the request is dispatched by the Routes map, typically of the form:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;show_page&#39;</span><span class="p">,</span> <span class="s">&#39;/page/show/{title}&#39;</span><span class="p">,</span> <span class="n">controller</span><span class="o">=</span><span class="s">&#39;page&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;show&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The <code class="xref py py-class docutils literal"><span class="pre">Query</span></code> object has many other features, including filtering on conditions, ordering the results, grouping, etc. These are excellently described in the <a class="reference external" href="http://www.sqlalchemy.org/docs/">SQLAlchemy manual</a>. See especially the <a class="reference external" href="http://www.sqlalchemy.org/docs/datamapping.html">Data Mapping</a> and <a class="reference external" href="http://www.sqlalchemy.org/docs/unitofwork.html">Session / Unit of Work</a> chapters.</p>
+</div>
+<div class="section" id="creating-updating-and-deleting-model-entities">
+<h3>Creating, updating and deleting model entities<a class="headerlink" href="#creating-updating-and-deleting-model-entities" title="Permalink to this headline">¶</a></h3>
+<p>When performing operations that change the state of the database, the recommended approach is for Pylons users to take full advantage of the abstraction provided by the SQLAlchemy ORM and simply treat the retrieved or created model entities as Python objects, make changes to them in a conventional Pythonic way, add them to or delete them from the <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> &#8220;holding zone&#8221; and call <code class="xref py py-func docutils literal"><span class="pre">Session.commit()</span></code> to commit the changes to the database.</p>
+<p>The three examples shown below are condensed illustrations of how these operations are typically performed in controller actions.</p>
+<div class="section" id="creating-a-model-entity">
+<h4>Creating a model entity<a class="headerlink" href="#creating-a-model-entity" title="Permalink to this headline">¶</a></h4>
+<p>SQLAlchemy&#8217;s Declarative Base syntax allows model entity classes to act as constructors, accepting keyworded args and values. In this example, a new Page is created with the given title, the created model entity object is then added to the <code class="xref py py-class docutils literal"><span class="pre">Session</span></code> and then the change is committed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">redirect_to</span><span class="p">(</span><span class="s">&#39;show_page&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="updating-a-model-entity">
+<h4>Updating a model entity<a class="headerlink" href="#updating-a-model-entity" title="Permalink to this headline">¶</a></h4>
+<p>Perhaps the most straighforward use - a model entity object is retrieved from the database, a field value is updated and the change committed.</p>
+<p>(Note, this example is considerably abbreviated as a controller action - preliminary content checking has been omitted, as has exception handling for the database query.)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_q</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="o">=</span><span class="n">escape</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getone</span><span class="p">(</span><span class="s">&#39;content&#39;</span><span class="p">))</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">redirect_to</span><span class="p">(</span><span class="s">&#39;show_page&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="deleting-a-model-entity">
+<h4>Deleting a model entity<a class="headerlink" href="#deleting-a-model-entity" title="Permalink to this headline">¶</a></h4>
+<p>This example of shows the freedom that the Pylons user has to make repeated changes to the model (in this instance, repeatedly deleting entities from the database) before finally committing those changes by calling <code class="xref py py-func docutils literal"><span class="pre">Session.commit()</span></code>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">titles</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getall</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)</span>
+    <span class="n">pages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Page</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">titles</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">:</span>
+        <span class="n">Session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">redirect_to</span><span class="p">(</span><span class="s">&#39;pages&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="http://www.sqlalchemy.org/docs/ormtutorial.html">Object Relational tutorial</a> in the SQLAlchemy documentation covers a basic SQLAlchemy object-relational mapping scenario in much more detail and the <a class="reference external" href="http://www.sqlalchemy.org/docs/sqlexpression.html">SQL Expression tutorial</a> covers the details of manipulating and marshalling the model entity objects.</p>
+</div>
+</div>
+<div class="section" id="using-multiple-databases">
+<h3>Using multiple databases<a class="headerlink" href="#using-multiple-databases" title="Permalink to this headline">¶</a></h3>
+<p>In order to use multiple databases, in <code class="file docutils literal"><span class="pre">MYAPP/model/meta.py</span></code> create as many instances of <code class="xref py py-class docutils literal"><span class="pre">Base</span></code> as there are databases to connect to:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;SQLAlchemy Metadata and Session object&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">scoped_session</span><span class="p">,</span> <span class="n">sessionmaker</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Base&#39;</span><span class="p">,</span><span class="s">&#39;Base2&#39;</span><span class="p">,</span> <span class="s">&#39;Session&#39;</span><span class="p">]</span>
+
+<span class="c"># SQLAlchemy session manager. Updated by model.init_model()</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">())</span>
+
+<span class="c"># The declarative Base</span>
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+<span class="n">Base2</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Declare the different database URLs in <code class="file docutils literal"><span class="pre">development.ini</span></code>, appending an integer to the <code class="docutils literal"><span class="pre">sqlalchemy</span></code> keyword in order to differentiate between them.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">sqlalchemy.url</span> <span class="o">=</span> <span class="s">sqlite:///%(here)s/database_one.sqlite</span>
+<span class="na">sqlalchemy.echo</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">sqlalchemy2.url</span> <span class="o">=</span> <span class="s">sqlite:///%(here)s/database_two.sqlite</span>
+<span class="na">sqlalchemy2.echo</span> <span class="o">=</span> <span class="s">false</span>
+</pre></div>
+</div>
+<p>In <code class="file docutils literal"><span class="pre">MYAPP/config/environment.py</span></code>, pick up those db URL declarations by using the different keywords (in this example: <cite>sqlalchemy</cite> and <cite>sqlalchemy2</cite>). Create the engines and call <code class="xref py py-func docutils literal"><span class="pre">model.init_model()</span></code>, passing through both engines as parameters.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Setup the SQLAlchemy database engine</span>
+<span class="c"># Engine 0</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">engine_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s">&#39;sqlalchemy.&#39;</span><span class="p">)</span>
+<span class="n">engine2</span> <span class="o">=</span> <span class="n">engine_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s">&#39;sqlalchemy2.&#39;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">init_model</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">engine2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Bind the engines appropriately to the <code class="xref py py-class docutils literal"><span class="pre">Base</span></code>-specific metadata in <code class="file docutils literal"><span class="pre">MYAPP/model/__init__.py</span></code> - note <code class="xref py py-func docutils literal"><span class="pre">init_model()</span></code> is expecting both engines to be supplied as formal parameters.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">engine2</span><span class="p">):</span>
+    <span class="n">meta</span><span class="o">.</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">bind</span> <span class="o">=</span> <span class="n">engine</span>
+    <span class="n">meta</span><span class="o">.</span><span class="n">Base2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">bind</span> <span class="o">=</span> <span class="n">engine2</span>
+</pre></div>
+</div>
+<p>Then import <code class="xref py py-class docutils literal"><span class="pre">Base</span></code> and/or <code class="xref py py-class docutils literal"><span class="pre">Base2</span></code></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">MYAPP.model.meta</span> <span class="kn">import</span> <span class="n">Base</span><span class="p">,</span> <span class="n">Base2</span>
+</pre></div>
+</div>
+<p>and use as required, e.g.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Author</span><span class="p">(</span><span class="n">Base2</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;authors&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">keywords</span> <span class="o">=</span> <span class="n">relation</span><span class="p">(</span><span class="s">&quot;Keyword&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">keywords</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="avoiding-the-circular-imports-problem-of-model-interdependency">
+<h3>Avoiding the &#8220;circular imports&#8221; problem of model interdependency<a class="headerlink" href="#avoiding-the-circular-imports-problem-of-model-interdependency" title="Permalink to this headline">¶</a></h3>
+<p>Closely-interdependent models can sometimes cause &#8220;circular import&#8221; problems, where importing one model file causes a dependent model file to be imported, which then cause the first model file to be imported, and so on round and round in circles.</p>
+<p>In order to break the circle, define the model entities as globals in  <code class="file docutils literal"><span class="pre">MYAPP/model/meta.py</span></code></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;The application&#39;s model objects&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="kn">as</span> <span class="nn">sa</span>
+<span class="kn">from</span> <span class="nn">MYAPP.model</span> <span class="kn">import</span> <span class="n">meta</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">scoped_session</span><span class="p">,</span> <span class="n">sessionmaker</span>
+
+<span class="k">def</span> <span class="nf">init_model</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Call me before using any of the tables or classes in the model&quot;&quot;&quot;</span>
+    <span class="n">meta</span><span class="o">.</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">bind</span> <span class="o">=</span> <span class="n">engine</span>
+
+    <span class="kn">import</span> <span class="nn">MYAPP.model.user</span>
+    <span class="n">User</span> <span class="o">=</span> <span class="n">MYAPP</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">User</span>
+    <span class="k">global</span> <span class="n">User</span>
+
+    <span class="kn">import</span> <span class="nn">MYAPP.model.newsletter</span>
+    <span class="n">Newsletter</span> <span class="o">=</span> <span class="n">MYAPP</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">newsletter</span><span class="o">.</span><span class="n">Newsletter</span>
+    <span class="k">global</span> <span class="n">Newsletter</span>
+
+    <span class="kn">import</span> <span class="nn">MYAPP.model.submission</span>
+    <span class="n">Submission</span> <span class="o">=</span> <span class="n">MYAPP</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">Submission</span>
+    <span class="k">global</span> <span class="n">Submission</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-the-models">
+<h3>Testing the Models<a class="headerlink" href="#testing-the-models" title="Permalink to this headline">¶</a></h3>
+<p>Normal model usage works fine in model tests, however to use the metadata you must specify an engine connection for it. To have your tables created for every unit test in your project, use a <code class="file docutils literal"><span class="pre">test_models.py</span></code> such as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">myapp.tests</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">myapp</span> <span class="kn">import</span> <span class="n">model</span>
+<span class="kn">from</span> <span class="nn">myapp.model</span> <span class="kn">import</span> <span class="n">meta</span>
+
+<span class="k">class</span> <span class="nc">TestModels</span><span class="p">(</span><span class="n">TestController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># test your models</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Notice that the tests inherit from TestController. This is to ensure that the application is setup so that the models will work.</p>
+</div>
+<p>&#8220;nosetests &#8211;with-pylons=/path/to/test.ini ...&#8221; is another way to ensure that your model is properly initialized before the tests are run. This can be used when running non-controller tests.</p>
+</div>
+</div>
+<div class="section" id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<p>SQLAlchemy has several loggers that chat about the various aspects of its operation. To log all SQL statements executed along with their parameter values, put the following in <code class="file docutils literal"><span class="pre">development.ini</span></code>:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[logger_sqlalchemy]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">handlers</span> <span class="o">=</span>
+<span class="na">qualname</span> <span class="o">=</span> <span class="s">sqlalchemy.engine</span>
+</pre></div>
+</div>
+<p>Then modify the &#8220;[loggers]&#8221; section to enable your new logger:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[loggers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">root, myapp, sqlalchemy</span>
+</pre></div>
+</div>
+<p>To log the results along with the SQL statements, set the level to DEBUG. This can cause a lot of output! To stop logging the SQL, set the level to WARN or ERROR.</p>
+<p>SQLAlchemy has several other loggers you can configure in the same way. &#8220;sqlalchemy.pool&#8221; level INFO tells when connections are checked out from the engine&#8217;s connection pool and when they&#8217;re returned. &#8220;sqlalchemy.orm&#8221; and buddies log various ORM operations. See &#8220;Configuring Logging&#8221; in the <a class="reference external" href="http://www.sqlalchemy.org/docs/">SQLAlchemy manual</a>.</p>
+</div>
+<div class="section" id="about-sqlalchemy">
+<h2>About SQLAlchemy<a class="headerlink" href="#about-sqlalchemy" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://www.sqlalchemy.org/">SQLAlchemy</a> is by far the most common approach for Pylons databases.  It provides a connection pool, a SQL statement builder, an object-relational mapper (ORM), and transaction support.  SQLAlchemy works with several database engines (MySQL, PostgreSQL, SQLite, Oracle, Firebird, MS-SQL, Access via ODBC, etc) and understands the peculiar SQL dialect of each, making it possible to port a program from one engine to another by simply changing the connection string.  Although its API is still changing gradually, SQLAlchemy is well tested, widely deployed, has excellent documentation, and its mailing list is quick with answers.</p>
+<p>SQLAlchemy lets you work at three different levels, and you can even use
+multiple levels in the same program:</p>
+<ul class="simple">
+<li>The object-relational mapper (ORM) lets you interact with the database using your own object classes rather than writing SQL code.</li>
+<li>The SQL expression language has many methods to create customized SQL statements, and the result cursor is more friendly than DBAPI&#8217;s.</li>
+<li>The low-level execute methods accept literal SQL strings if you find something the SQL builder can&#8217;t do, such as adding a column to an existing table or modifying the column&#8217;s type. If they return results, you still get the benefit of SQLAlchemy&#8217;s result cursor.</li>
+</ul>
+<p>The first two levels are <em>database neutral</em>, meaning they hide the differences between the databases&#8217; SQL dialects. Changing to a different database is merely a matter of supplying a new connection URL. Of course there are limits to this, but SQLAlchemy is 90% easier than rewriting all your SQL queries.</p>
+<p>The <a class="reference external" href="http://www.sqlalchemy.org/docs/">SQLAlchemy manual</a> should be your next stop for questions not covered here. It&#8217;s very well written and thorough.</p>
+<div class="section" id="sqlalchemy-add-ons">
+<h3>SQLAlchemy add-ons<a class="headerlink" href="#sqlalchemy-add-ons" title="Permalink to this headline">¶</a></h3>
+<p>Most of these provide a higher-level ORM, either by combining the table definition and ORM class definition into one step, or supporting an &#8220;active record&#8221; style of access.</p>
+<p><em>Please take the time to learn how to do things &#8220;the regular way&#8221; before using these shortcuts in a production application</em>.</p>
+<p>Understanding what these add-ons do behind the scenes will help if you have to troubleshoot a database error or work around a limitation in the add-on later.</p>
+<p><a class="reference external" href="http://www.sqlalchemy.org/docs/05/plugins.html#plugins_sqlsoup">SQLSoup</a>, an extension to SQLAlchemy, provides a quick way to generate ORM classes based on existing database tables.</p>
+<p>If you&#8217;re familiar with ActiveRecord, used in Ruby on Rails, then you may want to use the <a class="reference external" href="http://elixir.ematia.de/">Elixir</a> layer on top of SQLAlchemy. This approach is less common since the introduction of the declarative extension, but has other features the declarative does not.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">模型</a><ul>
+<li><a class="reference internal" href="#id2">关于模型</a></li>
+<li><a class="reference internal" href="#id3">模型基础应用</a><ul>
+<li><a class="reference internal" href="#install-sqlalchemy">Install SQLAlchemy</a></li>
+<li><a class="reference internal" href="#create-a-pylons-project-with-sqlalchemy">Create a Pylons Project with SQLAlchemy</a></li>
+<li><a class="reference internal" href="#configure-sqlalchemy">Configure SQLAlchemy</a><ul>
+<li><a class="reference internal" href="#for-sqlite">For SQLite</a></li>
+<li><a class="reference internal" href="#for-mysql">For MySQL</a></li>
+<li><a class="reference internal" href="#for-postgresql">For PostgreSQL</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#organizing">Organizing</a><ul>
+<li><a class="reference internal" href="#model-init-py"><code class="file docutils literal"><span class="pre">model/__init__.py</span></code></a></li>
+<li><a class="reference internal" href="#model-meta-py"><code class="file docutils literal"><span class="pre">model/meta.py</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-model">Creating a Model</a></li>
+<li><a class="reference internal" href="#adding-a-relation">Adding a Relation</a></li>
+<li><a class="reference internal" href="#creating-the-database">Creating the Database</a></li>
+<li><a class="reference internal" href="#a-brief-guide-to-using-model-objects-in-the-controller">A brief guide to using model objects in the Controller</a><ul>
+<li><a class="reference internal" href="#the-session">The <code class="docutils literal"><span class="pre">Session</span></code></a></li>
+<li><a class="reference internal" href="#querying-the-model">Querying the model</a></li>
+<li><a class="reference internal" href="#creating-updating-and-deleting-model-entities">Creating, updating and deleting model entities</a><ul>
+<li><a class="reference internal" href="#creating-a-model-entity">Creating a model entity</a></li>
+<li><a class="reference internal" href="#updating-a-model-entity">Updating a model entity</a></li>
+<li><a class="reference internal" href="#deleting-a-model-entity">Deleting a model entity</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-multiple-databases">Using multiple databases</a></li>
+<li><a class="reference internal" href="#avoiding-the-circular-imports-problem-of-model-interdependency">Avoiding the &#8220;circular imports&#8221; problem of model interdependency</a></li>
+<li><a class="reference internal" href="#testing-the-models">Testing the Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#about-sqlalchemy">About SQLAlchemy</a><ul>
+<li><a class="reference internal" href="#sqlalchemy-add-ons">SQLAlchemy add-ons</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="views.html"
+                        title="previous chapter">Views</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="advanced_models.html"
+                        title="next chapter">Advanced Models</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="advanced_models.html" title="Advanced Models"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="Views"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

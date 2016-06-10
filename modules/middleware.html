@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pylons.middleware – WSGI Middleware &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Pylons Modules" href="index.html" />
+    <link rel="next" title="pylons.templating – Render functions and helpers" href="templating.html" />
+    <link rel="prev" title="pylons.log – Logging for WSGI errors" href="log.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="../_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="../index.html">
+      		<img class="logo" src="../_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="templating.html" title="pylons.templating – Render functions and helpers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="log.html" title="pylons.log – Logging for WSGI errors"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Pylons Modules</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pylons-middleware-wsgi-middleware">
+<h1><code class="xref py py-mod docutils literal"><span class="pre">pylons.middleware</span></code> &#8211; WSGI Middleware<a class="headerlink" href="#pylons-middleware-wsgi-middleware" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>The <code class="xref py py-data docutils literal"><span class="pre">errorware</span></code> dictionary is constructed from the settings in the <cite>DEFAULT</cite> section of development.ini. the recognised keys and settings at initialization are:</dt>
+<dd><ul class="first last simple">
+<li><code class="xref py py-data docutils literal"><span class="pre">error_email</span></code> = conf.get(&#8216;email_to&#8217;)</li>
+<li><code class="xref py py-data docutils literal"><span class="pre">error_log</span></code> = conf.get(&#8216;error_log&#8217;, None)</li>
+<li><code class="xref py py-data docutils literal"><span class="pre">smtp_server</span></code> = conf.get(&#8216;smtp_server&#8217;,&#8217;localhost&#8217;)</li>
+<li><code class="xref py py-data docutils literal"><span class="pre">error_subject_prefix</span></code> = conf.get(&#8216;error_subject_prefix&#8217;, &#8216;WebApp Error: &#8216;)</li>
+<li><code class="xref py py-data docutils literal"><span class="pre">from_address</span></code> = conf.get(&#8216;from_address&#8217;, conf.get(&#8216;error_email_from&#8217;, <a class="reference external" href="mailto:'pylons&#37;&#52;&#48;yourapp&#46;com">'pylons<span>&#64;</span>yourapp<span>&#46;</span>com</a>&#8216;))</li>
+<li><code class="xref py py-data docutils literal"><span class="pre">error_message</span></code> = conf.get(&#8216;error_message&#8217;, &#8216;An internal server error occurred&#8217;)</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="referenced-classes">
+<h2>Referenced classes<a class="headerlink" href="#referenced-classes" title="Permalink to this headline">¶</a></h2>
+<p>Pylons middleware uses <code class="xref py py-class docutils literal"><span class="pre">WebError</span></code> to effect the error-handling. The two classes implicated are:</p>
+<div class="section" id="errormiddleware">
+<h3>ErrorMiddleware<a class="headerlink" href="#errormiddleware" title="Permalink to this headline">¶</a></h3>
+<p><code class="xref py py-mod docutils literal"><span class="pre">weberror.errormiddleware</span></code>
+<code class="xref py py-class docutils literal"><span class="pre">weberror.errormiddleware.ErrorMiddleware</span></code></p>
+</div>
+<div class="section" id="evalexception">
+<h3>EvalException<a class="headerlink" href="#evalexception" title="Permalink to this headline">¶</a></h3>
+<p><code class="xref py py-mod docutils literal"><span class="pre">weberror.evalexception</span></code>
+<code class="xref py py-class docutils literal"><span class="pre">weberror.evalexception.EvalException</span></code></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">pylons.middleware</span></code> &#8211; WSGI Middleware</a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a></li>
+<li><a class="reference internal" href="#referenced-classes">Referenced classes</a><ul>
+<li><a class="reference internal" href="#errormiddleware">ErrorMiddleware</a></li>
+<li><a class="reference internal" href="#evalexception">EvalException</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="log.html"
+                        title="previous chapter"><code class="docutils literal"><span class="pre">pylons.log</span></code> &#8211; Logging for WSGI errors</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="templating.html"
+                        title="next chapter"><code class="docutils literal"><span class="pre">pylons.templating</span></code> &#8211; Render functions and helpers</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="templating.html" title="pylons.templating – Render functions and helpers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="log.html" title="pylons.log – Logging for WSGI errors"
+             >previous</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Pylons Modules</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

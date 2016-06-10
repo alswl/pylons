@@ -1,0 +1,454 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Caching &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Unit and functional testing" href="testing.html" />
+    <link rel="prev" title="Sessions" href="sessions.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="Unit and functional testing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="sessions.html" title="Sessions"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="caching">
+<span id="id1"></span><h1>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h1>
+<p>Inevitably, there will be occasions during applications development or deployment when some task is revealed to be taking a significant amount of time to complete. When this occurs, the best way to speed things up is with <a class="reference internal" href="glossary.html#term-caching"><span class="xref std std-term">caching</span></a>.</p>
+<p>Caching is enabled in Pylons using <a class="reference external" href="http://beaker.groovie.org">Beaker</a>, the same package that
+provides session handling. Beaker supports a variety of caching backends: in-memory, database, Google Datastore, filesystem, and memcached. Additional extensions are available that support Tokyo Cabinet,
+Redis, Dynomite, and Ringo. Back-ends can be added with Beaker&#8217;s extension
+system.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://github.com/didip/beaker_extensions/tree/master">Beaker Extension Add-ons</a></p>
+</div>
+<div class="section" id="types-of-caching">
+<h2>Types of Caching<a class="headerlink" href="#types-of-caching" title="Permalink to this headline">¶</a></h2>
+<p>Pylons offers a variety of caching options depending on the granularity of
+caching desired. Fine-grained caching down to specific sub-sections of a
+template, arbitrary Python functions, all the way up to entire controller
+actions and browser-side full-page caching are available.</p>
+<p>Available caching options (ordered by granularity, least to most specific):</p>
+<ul class="simple">
+<li><strong>Browser-side</strong> - HTTP/1.1 supports the <a class="reference internal" href="glossary.html#term-etag"><span class="xref std std-term">ETag</span></a> caching system that allows the browser to use its own cache instead of requiring regeneration of the entire page. ETag-based caching avoids repeated generation of content but if the browser has never seen the page before, the page will still be generated. Therefore using ETag caching in conjunction with one of the other types of caching listed here will achieve optimal throughput and avoid unnecessary calls on resource-intensive operations.</li>
+<li><strong>Controller Actions</strong> - A Pylons controller action can have its entire
+result cached, including response headers if desired.</li>
+<li><strong>Templates</strong> - The results of an entire rendered template can be cached using the <code class="xref py py-meth docutils literal"><span class="pre">3</span> <span class="pre">cache</span> <span class="pre">keyword</span> <span class="pre">arguments</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">render</span> <span class="pre">calls</span></code>. These render commands can also be used inside templates.</li>
+<li><strong>Arbitrary Functions</strong> - Any function can be independently cached using
+Beaker&#8217;s cache decorators. This allows fine-grained caching of just the
+parts of the code that can be cached.</li>
+<li><strong>Template Fragments</strong> - Built-in caching options are available for both <a class="reference external" href="http://www.makotemplates.org/">Mako</a> and <a class="reference external" href="http://www.myghty.org/docs/cache.myt">Myghty</a> template engines. They allow fine-grained caching of only certain sections of the template. This is also sometimes called fragment caching since individual fragments of a page can be cached.</li>
+</ul>
+</div>
+<div class="section" id="namespaces-and-keys">
+<h2>Namespaces and Keys<a class="headerlink" href="#namespaces-and-keys" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://beaker.groovie.org">Beaker</a> is used for caching arbitrary Python functions, template results,
+and in <a class="reference external" href="http://www.makotemplates.org/">Mako</a> for caching individual <cite>&lt;def&gt;</cite> blocks. Browser-side caching
+does <em>not</em> utilize <a class="reference external" href="http://beaker.groovie.org">Beaker</a>.</p>
+<p>The two primary concepts to bear in mind when caching with <a class="reference external" href="http://beaker.groovie.org">Beaker</a> are:</p>
+<ol class="arabic simple">
+<li>Caches have a <em>namespace</em>, this is to organize a cache such that variations
+of the same thing being cached are associated under a single place.</li>
+<li>Variations of something being cached, are <em>keys</em> which are under that
+namespace.</li>
+</ol>
+<p>For example, if we want to cache a function, the function
+name along with a unique name for it would be considered the <em>namespace</em>. The
+arguments it takes to differentiate the output to cache, are the <em>keys</em>.</p>
+<p>An example of caching with the <code class="xref py py-func docutils literal"><span class="pre">cache_region()</span></code> decorator:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="nd">@cache_region</span><span class="p">(</span><span class="s">&#39;short_term&#39;</span><span class="p">,</span> <span class="s">&#39;search_func&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="n">search_param</span><span class="p">):</span>
+    <span class="c"># do something to retrieve data</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">search_param</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">get_results</span><span class="p">(</span><span class="s">&#39;gophers&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example, the namespace will be the function name + module +
+&#8216;search_func&#8217;. Since a single module might have multiple methods of the
+same name you wish to cache, the <code class="xref py py-func docutils literal"><span class="pre">cache_region()</span></code> decorator
+takes another argument in addition to the region to use, which is added to the
+namespace.</p>
+<p>The key in this example is the <cite>search_param</cite> value. For each value of it, a
+separate result will be cached.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Stephen Pierzchala&#8217;s <a class="reference external" href="http://web.archive.org/web/20060424171425/http://www.webperformance.org/caching/caching_for_performance.pdf">Caching for Performance</a> (<a class="reference external" href="mailto:stephen&#37;&#52;&#48;pierzchala&#46;com">stephen<span>&#64;</span>pierzchala<span>&#46;</span>com</a>)
+Beaker <a class="reference external" href="http://beaker.groovie.org/caching.html">Caching Docs</a></p>
+</div>
+</div>
+<div class="section" id="configuring">
+<h2>Configuring<a class="headerlink" href="#configuring" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://beaker.groovie.org">Beaker</a>&#8216;s cache options can be easily configured in the project&#8217;s
+INI file. Beaker&#8217;s <a class="reference external" href="http://beaker.groovie.org/configuration.html">configuration documentation</a> explains how to setup
+the most common options.</p>
+<p>The cache options specified will be used in the absence of more specific
+keyword arguments to individual cache functions. Functions that support
+<a class="reference internal" href="#cache-regions"><span class="std std-ref">Cache Regions</span></a> will use the settings for that region.</p>
+<div class="section" id="cache-regions">
+<span id="id2"></span><h3>Cache Regions<a class="headerlink" href="#cache-regions" title="Permalink to this headline">¶</a></h3>
+<p>Cache regions are named groupings of related options. For example, in many web applications, there might be a few cache strategies used in a company, with short-term cached objects ending up in Memcached, and longer-term cached objects stored in the filesystem or a database.</p>
+<p>Using cache regions makes it easy to declare the cache strategies in one
+place, then use them throughout the application by referencing the cache
+strategy name.</p>
+<p>Cache regions should be setup in the <code class="file docutils literal"><span class="pre">development.ini</span></code> file, but can
+also be configured and passed directly into the <cite>CacheManager</cite> instance that
+is created in the <code class="file docutils literal"><span class="pre">lib/app_globals.py</span></code> file.</p>
+<p>Example INI section for two cache regions (put these under your <cite>[app:main]</cite>
+section):</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">beaker.cache.regions</span> <span class="o">=</span> <span class="s">short_term, long_term</span>
+<span class="na">beaker.cache.short_term.type</span> <span class="o">=</span> <span class="s">ext:memcached</span>
+<span class="na">beaker.cache.short_term.url</span> <span class="o">=</span> <span class="s">127.0.0.1:11211</span>
+<span class="na">beaker.cache.short_term.expire</span> <span class="o">=</span> <span class="s">3600</span>
+
+<span class="na">beaker.cache.long_term.type</span> <span class="o">=</span> <span class="s">ext:database</span>
+<span class="na">beaker.cache.long_term.url</span> <span class="o">=</span> <span class="s">mysql://dbuser:dbpass@127.0.0.1/cache_db</span>
+<span class="na">beaker.cache.long_term.expire</span> <span class="o">=</span> <span class="s">86400</span>
+</pre></div>
+</div>
+<p>This sets up two cache regions, <cite>short_term</cite> and <cite>long_term</cite>.</p>
+</div>
+</div>
+<div class="section" id="browser-side">
+<h2>Browser-Side<a class="headerlink" href="#browser-side" title="Permalink to this headline">¶</a></h2>
+<p>Browser-side caching can utilize one of several methods. The entire page can
+have cache headers associated with it to indicate to the browser that it
+should be cached. Or, using the ETag Cache header, a page can have more
+fine-grained caching rules applied.</p>
+<div class="section" id="cache-headers">
+<h3>Cache Headers<a class="headerlink" href="#cache-headers" title="Permalink to this headline">¶</a></h3>
+<p>Cache headers may be set directly on the
+<code class="xref py py-class docutils literal"><span class="pre">Response</span></code> object by setting the headers
+directly using the <code class="xref py py-meth docutils literal"><span class="pre">headers()</span></code> property, or
+by using the cache header helpers.</p>
+<p>To ensure pages aren’t accidentally cached in dynamic web
+applications, Pylons default behavior sets the <cite>Pragma</cite> and <cite>Cache-Control</cite> headers to
+<cite>no-cache</cite>. Before setting cache headers, these default values should be
+cleared.</p>
+<p>Clearing the default <cite>no-cache</cite> response headers:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="k">class</span> <span class="nc">SampleController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Clear the default cache headers</span>
+        <span class="k">del</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Cache-Control&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Pragma&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/index.html)</span>
+</pre></div>
+</div>
+<p>Using the response cache helpers:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Set an action response to expires in 30 seconds</span>
+<span class="k">class</span> <span class="nc">SampleController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Clear the default cache headers</span>
+        <span class="k">del</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Cache-Control&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Pragma&#39;</span><span class="p">]</span>
+
+        <span class="n">response</span><span class="o">.</span><span class="n">cache_expires</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/index.html&#39;</span><span class="p">)</span>
+
+<span class="c"># Set the cache-control to private with a max-age of 30 seconds</span>
+<span class="k">class</span> <span class="nc">SampleController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Clear the default cache headers</span>
+        <span class="k">del</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Cache-Control&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Pragma&#39;</span><span class="p">]</span>
+
+        <span class="n">response</span><span class="o">.</span><span class="n">cache_control</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;max-age&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;public&#39;</span><span class="p">:</span> <span class="k">True</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/index.html&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All of the values that can be passed to the <cite>cache_control</cite> property dict,
+also may be passed into the <cite>cache_expires</cite> function call. It&#8217;s recommended
+that you use the <cite>cache_expires</cite> helper as it also sets the Last-Modified and
+Expires headers to the second interval as well.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9">Cache Control Header RFC</a></p>
+</div>
+</div>
+<div class="section" id="e-tag-caching">
+<h3>E-Tag Caching<a class="headerlink" href="#e-tag-caching" title="Permalink to this headline">¶</a></h3>
+<p>Caching via ETag involves sending the browser an ETag header so that it knows
+to save and possibly use a cached copy of the page from its own cache, instead
+of requesting the application to send a fresh copy.</p>
+<p>Because the ETag cache relies on sending headers to the browser, it works in a
+slightly different manner to the other caching mechanisms.</p>
+<p>The <code class="xref py py-func docutils literal"><span class="pre">etag_cache()</span></code> function will set the proper HTTP headers if
+the browser doesn&#8217;t yet have a copy of the page. Otherwise, a 304 HTTP
+Exception will be thrown that is then caught by Paste middleware and
+turned into a proper 304 response to the browser. This will cause the
+browser to use its own locally-cached copy.</p>
+<p>ETag-based caching requires a single key which is sent in the ETag HTTP header
+back to the browser. The <a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">RFC specification for HTTP headers</a> indicates that an
+ETag header merely needs to be a string. This value of this string does not need
+to be unique for every URL as the browser itself determines whether to use its own
+copy, this decision is based on the URL and the ETag key.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">my_action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">etag_cache</span><span class="p">(</span><span class="s">&#39;somekey&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/show.myt&#39;</span><span class="p">,</span> <span class="n">cache_expire</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or to change other aspects of the response:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">my_action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">etag_cache</span><span class="p">(</span><span class="s">&#39;somekey&#39;</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;text/plain&#39;</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/show.myt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The frequency with which an ETag cache key is changed will depend on the web
+application and the developer&#8217;s assessment of how often the browser should be
+prompted to fetch a fresh copy of the page.</p>
+</div>
+</div>
+<div class="section" id="controller-actions">
+<h2>Controller Actions<a class="headerlink" href="#controller-actions" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="xref py py-func docutils literal"><span class="pre">beaker_cache()</span></code> decorator is for caching
+the results of a complete controller action.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pylons.decorators.cache</span> <span class="kn">import</span> <span class="n">beaker_cache</span>
+
+<span class="k">class</span> <span class="nc">SampleController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="c"># Cache this controller action forever (until the cache dir is</span>
+    <span class="c"># cleaned)</span>
+    <span class="nd">@beaker_cache</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">expensive_call</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/home.myt&#39;</span><span class="p">)</span>
+
+    <span class="c"># Cache this controller action by its GET args for 10 mins to memory</span>
+    <span class="nd">@beaker_cache</span><span class="p">(</span><span class="n">expire</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;memory&#39;</span><span class="p">,</span> <span class="n">query_args</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">expensive_call</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/show.myt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By default the decorator uses a composite of all of the decorated function&#8217;s arguments as the cache key. It can alternatively use a composite of the <cite>request.GET</cite> query args as the cache key when the <cite>query_args</cite> option is enabled.</p>
+<p>The cache key can be further customized via the <cite>key</cite> argument.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">By default, the <code class="xref py py-func docutils literal"><span class="pre">beaker_cache()</span></code> decorator
+will cache the entire response object. This means the headers that were
+generated during the action will be cached as well. This can be disabled
+by providing <cite>cache_response = False</cite> to the decorator.</p>
+</div>
+</div>
+<div class="section" id="templates">
+<h2>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h2>
+<p>All <code class="xref py py-func docutils literal"><span class="pre">render</span></code> commands have caching
+functionality built in. To use it, merely add the appropriate cache keyword
+to the render call.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">SampleController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Cache the template for 10 mins</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/index.html&#39;</span><span class="p">,</span> <span class="n">cache_expire</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="c"># Cache this version of the template for 3 mins</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/show.html&#39;</span><span class="p">,</span> <span class="n">cache_key</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">cache_expire</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">feed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Cache for 20 mins to memory</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/feed.html&#39;</span><span class="p">,</span> <span class="n">cache_type</span><span class="o">=</span><span class="s">&#39;memory&#39;</span><span class="p">,</span> <span class="n">cache_expire</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="c"># Cache this version of a page forever (until the cache dir</span>
+        <span class="c"># is cleaned)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/home.html&#39;</span><span class="p">,</span> <span class="n">cache_key</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">cache_expire</span><span class="o">=</span><span class="s">&#39;never&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">At the moment, these functions do not support the use of cache region
+pre-defined argument sets.</p>
+</div>
+</div>
+<div class="section" id="arbitrary-functions">
+<h2>Arbitrary Functions<a class="headerlink" href="#arbitrary-functions" title="Permalink to this headline">¶</a></h2>
+<p>Any Python function that returns a pickle-able result can be cached using
+<a class="reference external" href="http://beaker.groovie.org">Beaker</a>. The recommended way to cache functions is to use the
+<code class="xref py py-meth docutils literal"><span class="pre">cache_region()</span></code> decorator. This decorator requires the
+<a class="reference internal" href="#cache-regions"><span class="std std-ref">Cache Regions</span></a> to be configured.</p>
+<p>Using the <code class="xref py py-meth docutils literal"><span class="pre">cache_region()</span></code> decorator:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="nd">@cache_region</span><span class="p">(</span><span class="s">&#39;short_term&#39;</span><span class="p">,</span> <span class="s">&#39;search_func&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="n">search_param</span><span class="p">):</span>
+    <span class="c"># do something to retrieve data</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">search_param</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">get_results</span><span class="p">(</span><span class="s">&#39;gophers&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://beaker.groovie.org/caching.html">Beaker Caching Documentation</a></p>
+</div>
+<div class="section" id="invalidating">
+<h3>Invalidating<a class="headerlink" href="#invalidating" title="Permalink to this headline">¶</a></h3>
+<p>A cached function can be manually invalidated by using the
+<code class="xref py py-meth docutils literal"><span class="pre">region_invalidate()</span></code> function.</p>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">region_invalidate</span><span class="p">(</span><span class="n">get_results</span><span class="p">,</span> <span class="k">None</span><span class="p">,</span> <span class="s">&#39;search_func&#39;</span><span class="p">,</span> <span class="n">search_param</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="fragments">
+<h2>Fragments<a class="headerlink" href="#fragments" title="Permalink to this headline">¶</a></h2>
+<p>Individual template files, and <cite>&lt;def&gt;</cite> blocks within them can be independently
+cached. Since the caching system utilizes <a class="reference external" href="http://beaker.groovie.org">Beaker</a>, any available <a class="reference external" href="http://beaker.groovie.org">Beaker</a>
+back-ends are present in <a class="reference external" href="http://www.makotemplates.org/">Mako</a> as well.</p>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="o">&lt;%</span><span class="k">def</span> <span class="nf">name</span><span class="o">=</span><span class="s">&quot;mycomp&quot;</span> <span class="n">cached</span><span class="o">=</span><span class="s">&quot;True&quot;</span> <span class="n">cache_timeout</span><span class="o">=</span><span class="s">&quot;30&quot;</span> <span class="n">cache_type</span><span class="o">=</span><span class="s">&quot;memory&quot;</span><span class="o">&gt;</span>
+    <span class="n">other</span> <span class="n">text</span>
+<span class="o">&lt;/%</span><span class="n">def</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://www.makotemplates.org/docs/caching.html">Mako Caching Documentation</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Caching</a><ul>
+<li><a class="reference internal" href="#types-of-caching">Types of Caching</a></li>
+<li><a class="reference internal" href="#namespaces-and-keys">Namespaces and Keys</a></li>
+<li><a class="reference internal" href="#configuring">Configuring</a><ul>
+<li><a class="reference internal" href="#cache-regions">Cache Regions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#browser-side">Browser-Side</a><ul>
+<li><a class="reference internal" href="#cache-headers">Cache Headers</a></li>
+<li><a class="reference internal" href="#e-tag-caching">E-Tag Caching</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#controller-actions">Controller Actions</a></li>
+<li><a class="reference internal" href="#templates">Templates</a></li>
+<li><a class="reference internal" href="#arbitrary-functions">Arbitrary Functions</a><ul>
+<li><a class="reference internal" href="#invalidating">Invalidating</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fragments">Fragments</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="sessions.html"
+                        title="previous chapter">Sessions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="testing.html"
+                        title="next chapter">Unit and functional testing</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="Unit and functional testing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="sessions.html" title="Sessions"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

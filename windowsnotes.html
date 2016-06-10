@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Windows Notes &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Pylons on Jython" href="jython.html" />
+    <link rel="prev" title="Python 2.3 Installation Instructions" href="python23_install.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="jython.html" title="Pylons on Jython"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="python23_install.html" title="Python 2.3 Installation Instructions"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="windows-notes">
+<span id="id1"></span><h1>Windows Notes<a class="headerlink" href="#windows-notes" title="Permalink to this headline">¶</a></h1>
+<p>Python scripts installed as part of the Pylons install process will be put in the <code class="docutils literal"><span class="pre">Scripts</span></code> directory of your Python installation, typically in <code class="docutils literal"><span class="pre">C:\Python24\Scripts</span></code>. By default on Windows, this directory is not in your <code class="docutils literal"><span class="pre">PATH</span></code>; this can cause the following error message when running a command such as <code class="docutils literal"><span class="pre">paster</span></code> from the command prompt:</p>
+<div class="highlight-text"><div class="highlight"><pre>C:\Documents and Settings\James&gt;paster
+&#39;paster&#39; is not recognized as an internal or external command,
+operable program or batch file.
+</pre></div>
+</div>
+<p>To run the scripts installed with Pylons either the full path must be specified:</p>
+<div class="highlight-text"><div class="highlight"><pre>C:\Documents and Settings\James&gt;C:\Python24\Scripts\paster
+Usage: C:\Python24\Scripts\paster-script.py COMMAND
+usage: paster-script.py [paster_options] COMMAND [command_options]
+
+options:
+  --version         show program&#39;s version number and exit
+  --plugin=PLUGINS  Add a plugin to the list of commands (plugins are Egg
+                    specs; will also require() the Egg)
+  -h, --help        Show this help message
+
+... etc ...
+</pre></div>
+</div>
+<p>or (the preferable solution) the <code class="docutils literal"><span class="pre">Scripts</span></code> directory must be added to the <code class="docutils literal"><span class="pre">PATH</span></code> as described below.</p>
+<div class="section" id="for-win2k-or-winxp">
+<h2>For Win2K or WinXP<a class="headerlink" href="#for-win2k-or-winxp" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>From the desktop or Start Menu, right click My Computer and click Properties.</li>
+<li>In the System Properties window, click on the Advanced tab.</li>
+<li>In the Advanced section, click the Environment Variables button.</li>
+<li>Finally, in the Environment Variables window, highlight the path variable in the Systems Variable section and click edit. Add or modify the path lines with the paths you wish the computer to access. Each different directory is separated with a semicolon as shown below:</li>
+</ol>
+<div class="highlight-text"><div class="highlight"><pre>C:\Program Files;C:\WINDOWS;C:\WINDOWS\System32
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li>Add the path to your scripts directory:</li>
+</ol>
+<div class="highlight-text"><div class="highlight"><pre>C:\Program Files;C:\WINDOWS;C:\WINDOWS\System32;C:\Python24\Scripts
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="#finally">Finally</a> below.</p>
+</div>
+<div class="section" id="for-windows-95-98-and-me">
+<h2>For Windows 95, 98 and ME<a class="headerlink" href="#for-windows-95-98-and-me" title="Permalink to this headline">¶</a></h2>
+<p>Edit <code class="docutils literal"><span class="pre">autoexec.bat</span></code>, and add the following line to the end of the file:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nb">set </span><span class="nv">PATH</span><span class="o">=</span>%PATH%<span class="p">;</span>C:<span class="se">\P</span>ython24<span class="se">\S</span>cripts
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="#finally">Finally</a> below.</p>
+</div>
+<div class="section" id="finally">
+<h2>Finally<a class="headerlink" href="#finally" title="Permalink to this headline">¶</a></h2>
+<p>Restarting your computer may be required to enable the change to the <code class="docutils literal"><span class="pre">PATH</span></code>. Then commands may be entered from any location:</p>
+<div class="highlight-text"><div class="highlight"><pre>C:\Documents and Settings\James&gt;paster
+Usage: C:\Python24\Scripts\paster-script.py COMMAND
+usage: paster-script.py [paster_options] COMMAND [command_options]
+
+options:
+  --version         show program&#39;s version number and exit
+  --plugin=PLUGINS  Add a plugin to the list of commands (plugins are Egg
+                    specs; will also require() the Egg)
+  -h, --help        Show this help message
+
+... etc ...
+</pre></div>
+</div>
+<p>All documentation assumes the <code class="docutils literal"><span class="pre">PATH</span></code> is setup correctly as described above.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Windows Notes</a><ul>
+<li><a class="reference internal" href="#for-win2k-or-winxp">For Win2K or WinXP</a></li>
+<li><a class="reference internal" href="#for-windows-95-98-and-me">For Windows 95, 98 and ME</a></li>
+<li><a class="reference internal" href="#finally">Finally</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="python23_install.html"
+                        title="previous chapter">Python 2.3 Installation Instructions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="jython.html"
+                        title="next chapter">Pylons on Jython</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="jython.html" title="Pylons on Jython"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="python23_install.html" title="Python 2.3 Installation Instructions"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

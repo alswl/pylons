@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>WSGI support &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Advanced Pylons" href="advanced_pylons/index.html" />
+    <link rel="prev" title="Security policy for bugs" href="security_policy_for_bugs.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="advanced_pylons/index.html" title="Advanced Pylons"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="security_policy_for_bugs.html" title="Security policy for bugs"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="wsgi-support">
+<span id="id1"></span><h1>WSGI support<a class="headerlink" href="#wsgi-support" title="Permalink to this headline">¶</a></h1>
+<p>The Web Server Gateway Interface <a class="reference external" href="http://www.python.org/dev/peps/pep-0333/">defined in PEP 333</a> is a standard interface between web servers and Python web applications or frameworks, to promote web application portability across a variety of web servers.</p>
+<p>Pylons supports the Web Server Gateway Interface (or WSGI for short, pronounced &#8220;wizgy&#8221;) throughout its stack. This is important for developers because it means that as well coming with all the features you would expect of a modern web framework, Pylons is also extremely flexible. With the WSGI it is possible to change any part of the Pylons stack to add new functionality or modify a request or a response without having to take apart the whole framework.</p>
+<div class="section" id="paste-and-wsgi">
+<h2>Paste and WSGI<a class="headerlink" href="#paste-and-wsgi" title="Permalink to this headline">¶</a></h2>
+<p>Most of Pylons&#8217; WSGI capability comes from its close integration with Paste. Paste provides all the tools and middleware necessary to deploy WSGI applications. It can be thought of as a low-level WSGI framework designed for other web frameworks to build upon. Pylons is an example of a framework which makes full use of the possibilities of Paste.</p>
+<p>If you want to, you can get the WSGI application object from your Pylons configuration file like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paste.deploy</span> <span class="kn">import</span> <span class="n">loadapp</span>
+<span class="n">wsgi_app</span> <span class="o">=</span> <span class="n">loadapp</span><span class="p">(</span><span class="s">&#39;config:/path/to/config.ini&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can then serve the file using a WSGI server. Here is an example using the WSGI Reference Implementation included with Python 2.5:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paste.deploy</span> <span class="kn">import</span> <span class="n">loadapp</span>
+<span class="n">wsgi_app</span> <span class="o">=</span> <span class="n">loadapp</span><span class="p">(</span><span class="s">&#39;config:/path/to/config.ini&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">wsgiref</span> <span class="kn">import</span> <span class="n">simple_server</span>
+<span class="n">httpd</span> <span class="o">=</span> <span class="n">simple_server</span><span class="o">.</span><span class="n">WSGIServer</span><span class="p">((</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="mi">8000</span><span class="p">),</span> <span class="n">simple_server</span><span class="o">.</span><span class="n">WSGIRequestHandler</span><span class="p">)</span>
+<span class="n">httpd</span><span class="o">.</span><span class="n">set_app</span><span class="p">(</span><span class="n">wsgi_app</span><span class="p">)</span>
+<span class="n">httpd</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">paster</span> <span class="pre">serve</span></code> command you will be used to using during the development of Pylons projects combines these two steps of creating a WSGI app from the config file and serving the resulting file to give the illusion that it is serving the config file directly.</p>
+<p>Because the resulting Pylons application is a WSGI application it means you can do the same things with it that you can do with any WSGI application. For example add a middleware chain to it or serve it via FastCGI/SCGI/CGI/mod_python/AJP or standalone.</p>
+<p>You can also configure extra WSGI middleware, applications and more directly using the configuration file. The various options are described in the <a class="reference external" href="http://pythonpaste.org/deploy/">Paste Deploy Documentation</a> so we won&#8217;t repeat them here.</p>
+</div>
+<div class="section" id="using-a-wsgi-application-as-a-pylons-0-9-controller">
+<h2>Using a WSGI Application as a Pylons 0.9 Controller<a class="headerlink" href="#using-a-wsgi-application-as-a-pylons-0-9-controller" title="Permalink to this headline">¶</a></h2>
+<p>In Pylons 0.9 controllers are derived from <code class="docutils literal"><span class="pre">pylons.controllers.WSGIController</span></code> and are also valid WSGI applications. Unless your controller is derived from the legacy <code class="docutils literal"><span class="pre">pylons.controllers.Controller</span></code> class it is also assumed to be a WSGI application. This means that you don&#8217;t actually need to use a Pylons controller class in your controller, any WSGI application will work as long as you give it the same name.</p>
+<p>For example, if you added a <code class="docutils literal"><span class="pre">hello</span></code> controller by executing <code class="docutils literal"><span class="pre">paster</span> <span class="pre">controller</span> <span class="pre">hello</span></code>, you could modify it to look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">HelloController</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="n">start_response</span><span class="p">(</span><span class="s">&#39;200 OK&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span><span class="s">&#39;text/html&#39;</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s">&#39;Hello World!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>or use <code class="docutils literal"><span class="pre">yield</span></code> statements like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">HelloController</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="n">start_response</span><span class="p">(</span><span class="s">&#39;200 OK&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span><span class="s">&#39;text/html&#39;</span><span class="p">)])</span>
+    <span class="k">yield</span> <span class="s">&#39;Hello &#39;</span>
+    <span class="k">yield</span> <span class="s">&#39;World!&#39;</span>
+</pre></div>
+</div>
+<p>or use the standard Pylons <code class="docutils literal"><span class="pre">Response</span></code> object which is a valid WSGI response which takes care of calling <code class="docutils literal"><span class="pre">start_response()</span></code> for you:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">HelloController</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s">&#39;Hello World!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and you could use the <code class="docutils literal"><span class="pre">render()</span></code> and <code class="docutils literal"><span class="pre">render_response()</span></code> objects exactly like you would in a normal controller action.</p>
+<p>As well as writing your WSGI application as a function you could write it as a class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">HelloController</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+        <span class="n">start_response</span><span class="p">(</span><span class="s">&#39;200 OK&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span><span class="s">&#39;text/html&#39;</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s">&#39;Hello World!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>All the standard Pylons middleware defined in <code class="docutils literal"><span class="pre">config/middleware.py</span></code> is still available.</p>
+</div>
+<div class="section" id="running-a-wsgi-application-from-within-a-controller">
+<h2>Running a WSGI Application From Within a Controller<a class="headerlink" href="#running-a-wsgi-application-from-within-a-controller" title="Permalink to this headline">¶</a></h2>
+<p>There may be occasions where you don&#8217;t want to replace your entire controller with a WSGI application but simply want to run a WSGI application from with a controller action. If your project was called <code class="docutils literal"><span class="pre">test</span></code> and you had a WSGI application called <code class="docutils literal"><span class="pre">wsgi_app</span></code> you could even do this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">test.lib.base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">def</span> <span class="nf">wsgi_app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="n">start_response</span><span class="p">(</span><span class="s">&#39;200 OK&#39;</span><span class="p">,[(</span><span class="s">&#39;Content-type&#39;</span><span class="p">,</span><span class="s">&#39;text/html&#39;</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s">&#39;&lt;html&gt;</span><span class="se">\n</span><span class="s">&lt;body&gt;</span><span class="se">\n</span><span class="s">Hello World!</span><span class="se">\n</span><span class="s">&lt;/body&gt;</span><span class="se">\n</span><span class="s">&lt;/html&gt;&#39;</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">wsgi_app</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_response</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuring-middleware-within-a-pylons-application">
+<h2>Configuring Middleware Within a Pylons Application<a class="headerlink" href="#configuring-middleware-within-a-pylons-application" title="Permalink to this headline">¶</a></h2>
+<p>A Pylons application middleware stack is directly exposed in the project&#8217;s <code class="docutils literal"><span class="pre">config/middleware.py</span></code> file. This means that you can add and remove pieces from the stack as you choose.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you remove any of the default middleware you are likely to find that various parts of Pylons stop working!</p>
+</div>
+<p>As an example, if you wanted to add middleware that added a new key to the environ dictionary you might do this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># YOUR MIDDLEWARE</span>
+<span class="c"># Put your own middleware here, so that any problems are caught by the error</span>
+<span class="c"># handling middleware underneath</span>
+
+<span class="k">class</span> <span class="nc">KeyAdder</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+    <span class="k">if</span> <span class="s">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;WSGI environ keys must contain a &#39;.&#39; character&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">KeyAdder</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="s">&#39;test.hello&#39;</span><span class="p">,</span> <span class="s">&#39;Hello World&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then in your controller you could write:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;test.hello&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>and you would see your <code class="docutils literal"><span class="pre">Hello</span> <span class="pre">World!</span></code> message.</p>
+<p>Of course, this isn&#8217;t a particularly useful thing to do. Middleware classes can do one of four things or a combination of them:</p>
+<ul class="simple">
+<li>Change the environ dictionary</li>
+<li>Change the status</li>
+<li>Change the HTTP headers</li>
+<li>Change the response body of the application</li>
+</ul>
+<p>With the ability to do these things as a middleware you can create authentication code, error handling middleware and more but the great thing about WSGI is that someone probably already has so you can consult the <a class="reference external" href="http://wsgi.org/wsgi/Middleware_and_Utilities">wsgi.org middleware list</a> or have a look at the <a class="reference external" href="http://pythonpaste.org">Paste project</a> and reuse an exisiting piece of middleware.</p>
+</div>
+<div class="section" id="the-cascade">
+<h2>The Cascade<a class="headerlink" href="#the-cascade" title="Permalink to this headline">¶</a></h2>
+<p>Towards the end of the middleware stack in your project&#8217;s <code class="docutils literal"><span class="pre">config/middleware.py</span></code> file you will find a special piece of middleware called the cascade:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">app</span> <span class="o">=</span> <span class="n">Cascade</span><span class="p">([</span><span class="n">static_app</span><span class="p">,</span> <span class="n">javascripts_app</span><span class="p">,</span> <span class="n">app</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Passed a list of applications, <code class="docutils literal"><span class="pre">Cascade</span></code> will try each of them in turn. If one returns a 404 status code then the next application is tried until one of the applications returns a code other than <code class="docutils literal"><span class="pre">404</span></code> in which case its response is returned. If all applications fail, then the last application&#8217;s failure response is used.</p>
+<p>The three WSGI applications in the cascade serve files from your project&#8217;s <code class="docutils literal"><span class="pre">public</span></code> directory first then if nothing matches, the WebHelpers module JavaScripts are searched and finally if no JavaScripts are found your Pylons app is tried. This is why the <code class="docutils literal"><span class="pre">public/index.html</span></code> file is served before your controller is executed and why you can put <code class="docutils literal"><span class="pre">/javascripts/</span></code> into your HTML and the files will be found.</p>
+<p>You are free to change the order of the cascade or add extra WSGI applications to it before <code class="docutils literal"><span class="pre">app</span></code> so that other locations are checked before your Pylons application is executed.</p>
+</div>
+<div class="section" id="useful-resources">
+<h2>Useful Resources<a class="headerlink" href="#useful-resources" title="Permalink to this headline">¶</a></h2>
+<p>Whilst other frameworks have put WSGI adapters at the end of their stacks so that their applications can be served by WSGI servers, we hope you can see how fully Pylons embraces WSGI throughout its design to be the most flexible and extensible of the main Python web frameworks.</p>
+<p>To find out more about the Web Server Gateway Interface you might find the following resources useful:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.python.org/dev/peps/pep-0333/">PEP 333</a></li>
+<li><a class="reference external" href="http://wsgi.org">The WSGI website at wsgi.org</a></li>
+<li>XML.com articles: Introducing WSGI - Pythons Secret Web Weapon.html <a class="reference external" href="http://www.xml.com/pub/a/2006/09/27/introducing-wsgi-pythons-secret-web-weapon.html">Part 1</a> <a class="reference external" href="http://www.xml.com/pub/a/2006/10/04/introducing-wsgi-pythons-secret-web-weapon-part-two.html">Part 2</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">WSGI support</a><ul>
+<li><a class="reference internal" href="#paste-and-wsgi">Paste and WSGI</a></li>
+<li><a class="reference internal" href="#using-a-wsgi-application-as-a-pylons-0-9-controller">Using a WSGI Application as a Pylons 0.9 Controller</a></li>
+<li><a class="reference internal" href="#running-a-wsgi-application-from-within-a-controller">Running a WSGI Application From Within a Controller</a></li>
+<li><a class="reference internal" href="#configuring-middleware-within-a-pylons-application">Configuring Middleware Within a Pylons Application</a></li>
+<li><a class="reference internal" href="#the-cascade">The Cascade</a></li>
+<li><a class="reference internal" href="#useful-resources">Useful Resources</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="security_policy_for_bugs.html"
+                        title="previous chapter">Security policy for bugs</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="advanced_pylons/index.html"
+                        title="next chapter">Advanced Pylons</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="advanced_pylons/index.html" title="Advanced Pylons"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="security_policy_for_bugs.html" title="Security policy for bugs"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

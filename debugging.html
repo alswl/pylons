@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Errors, Troubleshooting, and Debugging &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Upgrading" href="upgrading.html" />
+    <link rel="prev" title="Unit and functional testing" href="testing.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="upgrading.html" title="Upgrading"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="Unit and functional testing"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="errors-troubleshooting-and-debugging">
+<span id="debugging"></span><h1>Errors, Troubleshooting, and Debugging<a class="headerlink" href="#errors-troubleshooting-and-debugging" title="Permalink to this headline">¶</a></h1>
+<p>When a web application has an error in production, a few different options for handling it are available. Pylons comes with error handlers to allow the following options:</p>
+<ul class="simple">
+<li>E-mail the traceback as HTML to the administrators</li>
+<li>Show the <a class="reference internal" href="#interactive-debugging"><span class="std std-ref">Interactive Debugging</span></a> interface to the developer</li>
+<li>Programmatically handle the error in another controller</li>
+<li>Display a plain error on the web page</li>
+</ul>
+<p>Some of these options can be combined by enabling or disabling the appropriate middleware.</p>
+<div class="section" id="error-middleware">
+<h2>Error Middleware<a class="headerlink" href="#error-middleware" title="Permalink to this headline">¶</a></h2>
+<p>In a new Pylons project, the error handling middleware is configured in the projects <code class="file docutils literal"><span class="pre">config/middleware.py</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Excerpt of applicable section</span>
+
+<span class="k">if</span> <span class="n">asbool</span><span class="p">(</span><span class="n">full_stack</span><span class="p">):</span>
+    <span class="c"># Handle Python exceptions</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">ErrorHandler</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">global_conf</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.errorware&#39;</span><span class="p">])</span>
+
+    <span class="c"># Display error documents for 401, 403, 404 status codes (and</span>
+    <span class="c"># 500 when debug is disabled)</span>
+    <span class="k">if</span> <span class="n">asbool</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;debug&#39;</span><span class="p">]):</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">StatusCodeRedirect</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">StatusCodeRedirect</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="mi">403</span><span class="p">,</span> <span class="mi">404</span><span class="p">,</span> <span class="mi">500</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The first middleware configured, <code class="xref py py-func docutils literal"><span class="pre">ErrorHandler()</span></code>, actually configures one of two <code class="xref py py-mod docutils literal"><span class="pre">WebError</span></code> middlewares depending on whether the project is in <code class="docutils literal"><span class="pre">debug</span></code> mode or not. If it is in <code class="docutils literal"><span class="pre">debug</span></code> mode, then the <a class="reference internal" href="#interactive-debugging"><span class="std std-ref">Interactive Debugging</span></a> is enabled, otherwise, the <a class="reference internal" href="#error-emails"><span class="std std-ref">e-mail error handling</span></a> will be used.</p>
+<p>The second middleware configured is the <code class="xref py py-class docutils literal"><span class="pre">StatusCodeRedirect</span></code> middleware. This middleware watches the request, and if the application returns a response containing one of the status code&#8217;s listed, it will call back into the application to the error controller, and use that output instead.</p>
+<p>None of these are required for a Pylons project to run, and commenting them all out results in the plain text of the error to display on the web page.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If no middleware at all is used, the error will appear on the screen in
+its entirety, <em>including full traceback output</em>.</p>
+</div>
+<div class="section" id="recommended-configurations">
+<h3>Recommended Configurations<a class="headerlink" href="#recommended-configurations" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">For plain-text output or errors and non-200 status codes, comment out the <code class="xref py py-class docutils literal"><span class="pre">StatusCodeRedirect</span></code>. Tracebacks will be e-mailed to you in production, and the <a class="reference internal" href="#interactive-debugging"><span class="std std-ref">Interactive Debugging</span></a> will be used during development.</p>
+</li>
+<li><p class="first">For programmatic error and non-200 status code handling, keep the stack as-is.</p>
+</li>
+<li><p class="first">To <em>not</em> have tracebacks e-mailed, remove only the <code class="xref py py-func docutils literal"><span class="pre">ErrorHandler()</span></code> middleware. This will also disable <a class="reference internal" href="#interactive-debugging"><span class="std std-ref">Interactive Debugging</span></a> however. To retain <a class="reference internal" href="#interactive-debugging"><span class="std std-ref">Interactive Debugging</span></a> but disable traceback e-mails:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="k">if</span> <span class="n">asbool</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;debug&#39;</span><span class="p">]):</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">ErrorHandler</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">global_conf</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.errorware&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To only capture specific non-200 status codes, the <code class="xref py py-class docutils literal"><span class="pre">StatusCodeRedirect</span></code> middleware can be passed a list of the codes that it should intercept and redirect to the error controller. When in non-debug mode, it captures the 400-404, and 500 status codes. Altering the list will capture more or less types of requests as desired.</p>
+</div>
+</div>
+<div class="section" id="avoiding-displaying-tracebacks">
+<h3>Avoiding Displaying Tracebacks<a class="headerlink" href="#avoiding-displaying-tracebacks" title="Permalink to this headline">¶</a></h3>
+<p>When disabling the <code class="xref py py-func docutils literal"><span class="pre">ErrorHandler()</span></code> middleware, a replacement middleware should be created and used that captures exceptions and changes them into a normal WSGI response, otherwise the raw traceback error will be displayed on the browser.</p>
+<p>An example middleware that just captures exceptions and changes them to a 500 error:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">webob</span> <span class="k">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
+
+<span class="k">class</span> <span class="nc">EatExceptions</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">environ</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">()</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">status_int</span> <span class="o">=</span> <span class="mi">500</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s">&#39;An error has occured&#39;</span>
+        <span class="k">return</span> <span class="n">response</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Replacing the <code class="docutils literal"><span class="pre">ErrorHandler</span></code> with this middleware will cause tracebacks to not be displayed to the user.</p>
+</div>
+</div>
+<div class="section" id="interactive-debugging">
+<span id="id1"></span><h2>Interactive Debugging<a class="headerlink" href="#interactive-debugging" title="Permalink to this headline">¶</a></h2>
+<p>Things break, and when they do, quickly pinpointing what went wrong and why makes a huge difference. By default, Pylons uses a customized version of <a class="reference external" href="http://blog.ianbicking.org/">Ian Bicking&#8217;s</a> EvalException middleware that also includes full Mako/Myghty Traceback information.</p>
+<div class="section" id="the-debugging-screen">
+<h3>The Debugging Screen<a class="headerlink" href="#the-debugging-screen" title="Permalink to this headline">¶</a></h3>
+<p>The debugging screen has three tabs at the top:</p>
+<p><code class="docutils literal"><span class="pre">Traceback</span></code>
+Provides the raw exception trace with the interactive debugger</p>
+<p><code class="docutils literal"><span class="pre">Extra</span> <span class="pre">Data</span></code>
+Displays CGI, WSGI variables at the time of the exception, in addition to configuration information</p>
+<p><code class="docutils literal"><span class="pre">Template</span></code>
+Human friendly traceback for Mako or Myghty templates</p>
+<p>Since Mako and Myghty compile their templates to Python modules, it can be difficult to accurately figure out what line of the template resulted in the error. The <cite>Template</cite> tab provides the full Mako or Myghty traceback which contains accurate line numbers for your templates, and where the error originated from. If your exception was triggered before a template was rendered, no Template information will be available in this section.</p>
+</div>
+<div class="section" id="example-exploring-the-traceback">
+<h3>Example: Exploring the Traceback<a class="headerlink" href="#example-exploring-the-traceback" title="Permalink to this headline">¶</a></h3>
+<p>Using the interactive debugger can also be useful to gain a deeper insight into objects present only during the web request like the <code class="docutils literal"><span class="pre">session</span></code> and <code class="docutils literal"><span class="pre">request</span></code> objects.</p>
+<p>To trigger an error so that we can explore what&#8217;s happening just raise an exception inside an action you&#8217;re curious about. In this example, we&#8217;ll raise an error in the action that&#8217;s used to display the page you&#8217;re reading this on. Here&#8217;s what the docs controller looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">DocsController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">path_info</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;docs&#39;</span><span class="p">):</span>
+            <span class="n">redirect</span><span class="p">(</span><span class="n">url</span><span class="p">(</span><span class="s">&#39;/docs/&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/docs/&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Since we want to explore the <code class="docutils literal"><span class="pre">session</span></code> and <code class="docutils literal"><span class="pre">request</span></code>, we&#8217;ll need to bind them first. Here&#8217;s what our action now looks like with the binding and raising an exception:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="s">&quot;hi&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">path_info</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;docs&#39;</span><span class="p">):</span>
+        <span class="n">redirect</span><span class="p">(</span><span class="n">url</span><span class="p">(</span><span class="s">&#39;/docs/&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/docs/&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here&#8217;s what exploring the Traceback from the above example looks like (Excerpt of the relevant portion):</p>
+<a class="reference internal image-reference" href="_images/doctraceback.png"><img alt="_images/doctraceback.png" src="_images/doctraceback.png" style="width: 750px; height: 260px;" /></a>
+</div>
+</div>
+<div class="section" id="e-mailing-errors">
+<span id="error-emails"></span><h2>E-mailing Errors<a class="headerlink" href="#e-mailing-errors" title="Permalink to this headline">¶</a></h2>
+<p>You can make various of changes to how the debugging works. For example if you disable the <code class="docutils literal"><span class="pre">debug</span></code> variable in the config file Pylons will email you an error report instead of displaying it as long as you provide your email address at the top of the config file:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">error_email_from</span> <span class="o">=</span> <span class="s">you@example.com</span>
+</pre></div>
+</div>
+<p>This is very useful for a production site. Emails are sent via SMTP so you need to specify a valid SMTP server too.</p>
+</div>
+<div class="section" id="programmatically-handling-errors">
+<h2>Programmatically Handling Errors<a class="headerlink" href="#programmatically-handling-errors" title="Permalink to this headline">¶</a></h2>
+<p>By default, the <code class="xref py py-class docutils literal"><span class="pre">StatusCodeRedirect</span></code> will redirect any response with the designated status codes back into the application again. This will result in the <code class="docutils literal"><span class="pre">error</span></code> controller in the Pylons project being called. This is why there is a default route in <code class="file docutils literal"><span class="pre">config/routing.py</span></code> of:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;/error/{action}&#39;</span><span class="p">,</span> <span class="n">controller</span><span class="o">=</span><span class="s">&#39;error&#39;</span><span class="p">)</span>
+<span class="nb">map</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;/error/{action}/{id}&#39;</span><span class="p">,</span> <span class="n">controller</span><span class="o">=</span><span class="s">&#39;error&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The error controller allows a project to theme the error message appropriately by changing it to render a template, or redirect as desired.</p>
+<div class="section" id="original-request-information">
+<h3>Original Request Information<a class="headerlink" href="#original-request-information" title="Permalink to this headline">¶</a></h3>
+<p>The original request and response that resulted in the error controller being called is available inside the error controller as:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Original request</span>
+<span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;pylons.original_request&#39;</span><span class="p">]</span>
+
+<span class="c"># Original response</span>
+<span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;pylons.original_response&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If an <code class="xref py py-exc docutils literal"><span class="pre">HTTPException</span></code> was thrown in the controller (the <code class="xref py py-func docutils literal"><span class="pre">abort()</span></code> function throws these), the original object is available as:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;pylons.controller.exception&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This allows access to the error message on the exception object.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Errors, Troubleshooting, and Debugging</a><ul>
+<li><a class="reference internal" href="#error-middleware">Error Middleware</a><ul>
+<li><a class="reference internal" href="#recommended-configurations">Recommended Configurations</a></li>
+<li><a class="reference internal" href="#avoiding-displaying-tracebacks">Avoiding Displaying Tracebacks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interactive-debugging">Interactive Debugging</a><ul>
+<li><a class="reference internal" href="#the-debugging-screen">The Debugging Screen</a></li>
+<li><a class="reference internal" href="#example-exploring-the-traceback">Example: Exploring the Traceback</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#e-mailing-errors">E-mailing Errors</a></li>
+<li><a class="reference internal" href="#programmatically-handling-errors">Programmatically Handling Errors</a><ul>
+<li><a class="reference internal" href="#original-request-information">Original Request Information</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="testing.html"
+                        title="previous chapter">Unit and functional testing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="upgrading.html"
+                        title="next chapter">Upgrading</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="upgrading.html" title="Upgrading"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="Unit and functional testing"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

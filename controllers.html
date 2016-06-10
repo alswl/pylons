@@ -1,0 +1,659 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>控制器 &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Views" href="views.html" />
+    <link rel="prev" title="Pylons 理念" href="concepts.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="Views"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Pylons 理念"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="controllers">
+<span id="id1"></span><h1>控制器<a class="headerlink" href="#controllers" title="Permalink to this headline">¶</a></h1>
+<p>译者：<a class="reference external" href="http://log4d.com/">alswl</a></p>
+<a class="reference internal image-reference" href="_images/pylon2.jpg"><img alt="" class="align-left" src="_images/pylon2.jpg" style="width: 368px; height: 450px;" /></a>
+<p>在 <a class="reference internal" href="glossary.html#term-mvc"><span class="xref std std-term">MVC</span></a> 模型中， <em>控制器</em> 处理输入内容，按预设的方法操作模型和展示视图。
+Pylons 控制器的理念是进行优雅地扩展，一个 Pylons 控制器不直接处理输入内容，
+而仅仅使用模型层合适的方法来装配数据，并返回给恰当的模板。</p>
+<p>控制器响应用户的请求，并调用所需要的模型和视图。
+每当用户点击一个超链接或提交一个表单时候，
+控制器本身不产生任何内容或进行实际的操作。
+而是获取请求，并决定使用哪些模型渲染，哪种格式来生成返回数据。</p>
+<p>Pylons 的控制器的父类提供 <a class="reference internal" href="glossary.html#term-wsgi"><span class="xref std std-term">WSGI</span></a> 接口，它自身则处理分发具体的应用逻辑。</p>
+<p>Pylons WSGI 控制器处理从 Pylons WSGI 应用 <code class="xref py py-class docutils literal"><span class="pre">PylonsApp</span></code>
+分配过来的 web 请求。</p>
+<p>请求发生时候，一个 <code class="xref py py-class docutils literal"><span class="pre">WSGIController</span></code> 实例被创建，
+然后通过被路由匹配捕捉。随后通过 start_response 方法返回标准 WSGI 响应。</p>
+<p>尽管 Pylons 控制器是被 WSGI 接口调用的，
+但标准 WSGI 应用也同样可以直接作为 Pylons 控制器使用。</p>
+<div class="section" id="id2">
+<h2>标准控制器<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>标准控制器为 web 开发者们提供了下面方法：</p>
+<div class="section" id="id3">
+<h3>使用私有方法<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>默认情况下，url 路由可能映射并调用任意控制器方法，有时候我们需要避免这种情况。</p>
+<p>Pylons 使用常规 Python 办法：以 <code class="docutils literal"><span class="pre">_</span></code> 开头的方法就是私有方法。
+比如要隐藏 <code class="docutils literal"><span class="pre">edit_generic</span></code> 这个类方法，只需将 <code class="docutils literal"><span class="pre">_</span></code> 添加到方法名之前。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">UserController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;This is the index.&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_edit_generic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;I can&#39;t be called from the web!&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>特殊方法<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>有一些特殊方法你也许用的上：</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">__before__</span></code></dt>
+<dd>这个方法将在控制器方法作用之前触发，一般用来设定变量、对象，
+权限控制和其他需要在控制器方法作用之前被调用的地方。</dd>
+<dt><code class="docutils literal"><span class="pre">__after__</span></code></dt>
+<dd>这个方法在控制器作用之后触发，除非出现预料之外的异常。而所有
+<code class="xref py py-class docutils literal"><span class="pre">HTTPException</span></code> 的子类都是预料中的（比如 <code class="docutils literal"><span class="pre">redirect_to</span></code>
+和 <code class="docutils literal"><span class="pre">abort</span></code> 这些就是）， <code class="docutils literal"><span class="pre">__after__</span></code> 就能被触发成功并做一些跳转动作。</dd>
+</dl>
+</div>
+<div class="section" id="id5">
+<h3>动态添加控制器<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>我们也能添加控制器而不需重启应用。只需要告诉路由重新扫描控制器文件夹目录即可。</p>
+<p>新控制器可以通过 paster 命令添加，或者通过其他方法来创建控制器文件。</p>
+<p>要想路由发现控制器目录多了一个东西，
+可以通过一个内部标志来提醒路由需要重新扫描目录。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">routes</span> <span class="kn">import</span> <span class="n">request_config</span>
+
+<span class="n">mapper</span> <span class="o">=</span> <span class="n">request_config</span><span class="p">()</span><span class="o">.</span><span class="n">mapper</span>
+<span class="n">mapper</span><span class="o">.</span><span class="n">_created_regs</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p>那么下次请求时候，路由会重新扫描控制器目录，
+新增加的部分能够被路由匹配到。</p>
+</div>
+<div class="section" id="id6">
+<h3>自定义控制器名称<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>默认情况下，Pylons 会查找名为 XXXController 的控制器。
+这种命名方法可以通过定义一个模块级的变量来设定：定义一个名为 <code class="docutils literal"><span class="pre">__controller__</span></code>
+的变量来标明控制器的名称:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="k">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">tmpl_context</span> <span class="k">as</span> <span class="n">c</span>
+<span class="kn">from</span> <span class="nn">pylons.controllers.util</span> <span class="k">import</span> <span class="n">abort</span><span class="p">,</span> <span class="n">redirect_to</span>
+
+<span class="kn">from</span> <span class="nn">helloworld.lib.base</span> <span class="k">import</span> <span class="n">BaseController</span><span class="p">,</span> <span class="n">render</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">__controller__</span> <span class="o">=</span> <span class="s">&#39;Hello&#39;</span>
+
+<span class="k">class</span> <span class="nc">Hello</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Return a rendered template</span>
+        <span class="c">#return render(&#39;/hello.mako&#39;)</span>
+        <span class="c"># or, return a string</span>
+        <span class="k">return</span> <span class="s">&#39;Hello World&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="attaching-wsgi-apps">
+<h3>Attaching WSGI apps<a class="headerlink" href="#attaching-wsgi-apps" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This recipe assumes a basic level of familiarity with the WSGI Specification (PEP 333)</p>
+</div>
+<p>WSGI runs deep through Pylons, and is present in many parts of the architecture. Since Pylons controllers are actually called with the WSGI interface, normal WSGI applications can also be Pylons &#8216;controllers&#8217;.</p>
+<p>Optionally, if a full WSGI app should be mounted and handle the remainder of the URL, Routes can automatically move the right part of the URL into the <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal"><span class="pre">SCRIPT_NAME</span></code>, so that the WSGI application can properly handle its <span class="target" id="index-1"></span><code class="xref std std-envvar docutils literal"><span class="pre">PATH_INFO</span></code> part.</p>
+<p>This recipe will demonstrate adding a basic WSGI app as a Pylons controller.</p>
+<p>Create a new controller file in your Pylons project directory:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ paster controller wsgiapp
+</pre></div>
+</div>
+<p>This sets up the basic imports that you may want available when using other WSGI applications.</p>
+<p>Edit your controller so it looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">YOURPROJ.lib.base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">WsgiappController</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="n">start_response</span><span class="p">(</span><span class="s">&#39;200 OK&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="s">&#39;Content-type&#39;</span><span class="p">,</span> <span class="s">&#39;text/plain&#39;</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s">&quot;Hello World&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>When hooking up other WSGI applications, they will expect the part of the URL that was used to get to this controller to have been moved into <span class="target" id="index-2"></span><code class="xref std std-envvar docutils literal"><span class="pre">SCRIPT_NAME</span></code>. <code class="xref py py-mod docutils literal"><span class="pre">Routes</span></code> can properly adjust the environ if a map route for this controller is added to the <code class="file docutils literal"><span class="pre">config/routing.py</span></code> file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># CUSTOM ROUTES HERE</span>
+
+<span class="c"># Map the WSGI application</span>
+<span class="nb">map</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;wsgiapp/{path_info:.*}&#39;</span><span class="p">,</span> <span class="n">controller</span><span class="o">=</span><span class="s">&#39;wsgiapp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By specifying the <code class="docutils literal"><span class="pre">path_info</span></code> dynamic path, Routes will put everything leading up to the <code class="docutils literal"><span class="pre">path_info</span></code> in the <span class="target" id="index-3"></span><code class="xref std std-envvar docutils literal"><span class="pre">SCRIPT_NAME</span></code> and the rest will go in the <span class="target" id="index-4"></span><code class="xref std std-envvar docutils literal"><span class="pre">PATH_INFO</span></code>.</p>
+</div>
+</div>
+<div class="section" id="using-the-wsgi-controller-to-provide-a-wsgi-service">
+<h2>Using the WSGI Controller to provide a WSGI service<a class="headerlink" href="#using-the-wsgi-controller-to-provide-a-wsgi-service" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-pylons-wsgi-controller">
+<h3>The Pylons WSGI Controller<a class="headerlink" href="#the-pylons-wsgi-controller" title="Permalink to this headline">¶</a></h3>
+<p>Pylons&#8217; own WSGI Controller follows the WSGI spec for calling and return
+values</p>
+<p>The Pylons WSGI Controller handles incoming web requests that are
+dispatched from <code class="docutils literal"><span class="pre">PylonsApp</span></code>. These requests result in a new
+instance of the <code class="docutils literal"><span class="pre">WSGIController</span></code> being created, which is then called
+with the dict options from the Routes match. The standard WSGI
+response is then returned with <code class="xref py py-meth docutils literal"><span class="pre">start_response()</span></code> called as per
+the WSGI spec.</p>
+</div>
+<div class="section" id="wsgicontroller-methods">
+<h3>WSGIController methods<a class="headerlink" href="#wsgicontroller-methods" title="Permalink to this headline">¶</a></h3>
+<p>Special <code class="docutils literal"><span class="pre">WSGIController</span></code> methods you may define:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">__before__</span></code></dt>
+<dd>This method will be run before your action is, and should be
+used for setting up variables/objects, restricting access to
+other actions, or other tasks which should be executed before
+the action is called.</dd>
+<dt><code class="docutils literal"><span class="pre">__after__</span></code></dt>
+<dd>Method to run after the action is run. This method will
+<em>always</em> be run after your method, even if it raises an
+Exception or redirects.</dd>
+</dl>
+<p>Each action to be called is inspected with <code class="xref py py-meth docutils literal"><span class="pre">_inspect_call()</span></code> so
+that it is only passed the arguments in the Routes match dict that
+it asks for. The arguments passed into the action can be customized
+by overriding the <code class="xref py py-meth docutils literal"><span class="pre">_get_method_args()</span></code> function which is
+expected to return a dict.</p>
+<p>In the event that an action is not found to handle the request, the
+Controller will raise an &#8220;Action Not Found&#8221; error if in debug mode,
+otherwise a <code class="docutils literal"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> error will be returned.</p>
+</div>
+</div>
+<div class="section" id="using-the-rest-controller-with-a-restful-api">
+<span id="rest-controller"></span><h2>Using the REST Controller with a RESTful API<a class="headerlink" href="#using-the-rest-controller-with-a-restful-api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="using-the-paster-restcontroller-template">
+<h3>Using the paster restcontroller template<a class="headerlink" href="#using-the-paster-restcontroller-template" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster restcontroller --help
+</pre></div>
+</div>
+<p>Create a REST Controller and accompanying functional test</p>
+<p>The RestController command will create a REST-based Controller file
+for use with the <code class="xref py py-meth docutils literal"><span class="pre">resource()</span></code>
+REST-based dispatching. This template includes the methods that
+<code class="xref py py-meth docutils literal"><span class="pre">resource()</span></code> dispatches to in
+addition to doc strings for clarification on when the methods will
+be called.</p>
+<p>The first argument should be the singular form of the REST
+resource. The second argument is the plural form of the word. If
+its a nested controller, put the directory information in front as
+shown in the second example below.</p>
+<p>Example usage:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster restcontroller comment comments
+Creating yourproj/yourproj/controllers/comments.py
+Creating yourproj/yourproj/tests/functional/test_comments.py
+</pre></div>
+</div>
+<p>If you&#8217;d like to have controllers underneath a directory, just
+include the path as the controller name and the necessary
+directories will be created for you:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster restcontroller admin/trackback admin/trackbacks
+Creating yourproj/controllers/admin
+Creating yourproj/yourproj/controllers/admin/trackbacks.py
+Creating yourproj/yourproj/tests/functional/test_admin_trackbacks.py
+</pre></div>
+</div>
+</div>
+<div class="section" id="an-atom-style-rest-controller-for-users">
+<h3>An Atom-Style REST Controller for Users<a class="headerlink" href="#an-atom-style-rest-controller-for-users" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># From http://pylonshq.com/pasties/503</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">formencode.api</span> <span class="kn">import</span> <span class="n">Invalid</span>
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="kn">import</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">simplejson</span> <span class="kn">import</span> <span class="n">dumps</span>
+
+<span class="kn">from</span> <span class="nn">restmarks.lib.base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">UsersController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;REST Controller styled on the Atom Publishing Protocol&quot;&quot;&quot;</span>
+    <span class="c"># To properly map this controller, ensure your</span>
+    <span class="c"># config/routing.py file has a resource setup:</span>
+    <span class="c">#     map.resource(&#39;user&#39;, &#39;users&#39;)</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;html&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;GET /users: All items in the collection.&lt;br&gt;</span>
+<span class="sd">            @param format the format passed from the URI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#url(&#39;users&#39;)</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;json&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="s">&#39;original&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+                <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">]</span>
+                <span class="n">d</span><span class="p">[</span><span class="s">&#39;link&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;text/javascript&#39;</span>
+            <span class="k">return</span> <span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="n">users</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/users/index_user.mako&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;POST /users: Create a new item.&quot;&quot;&quot;</span>
+        <span class="c"># url(&#39;users&#39;)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">get_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="c"># The client tried to create a user that already exists</span>
+            <span class="n">abort</span><span class="p">(</span><span class="mi">409</span><span class="p">,</span> <span class="s">&#39;409 Conflict&#39;</span><span class="p">,</span>
+                  <span class="n">headers</span><span class="o">=</span><span class="p">[(</span><span class="s">&#39;location&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">))])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c"># Validate the data that was sent to us</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forms</span><span class="o">.</span><span class="n">UserForm</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">Invalid</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c"># Something didn&#39;t validate correctly</span>
+                <span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s">&#39;400 Bad Request -- </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">objectstore</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">201</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">user_name</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/users/created_user.mako&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;html&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;GET /users/new: Form to create a new item.</span>
+<span class="sd">            @param format the format passed from the URI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># url(&#39;new_user&#39;)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/users/new_user.mako&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;PUT /users/id: Update an existing item.</span>
+<span class="sd">            @param id the id (name) of the user to be updated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Forms posted to this method should contain a hidden field:</span>
+        <span class="c">#    &lt;input type=&quot;hidden&quot; name=&quot;_method&quot; value=&quot;PUT&quot; /&gt;</span>
+        <span class="c"># Or using helpers:</span>
+        <span class="c">#    h.form(url(&#39;user&#39;, id=ID),</span>
+        <span class="c">#           method=&#39;put&#39;)</span>
+        <span class="c"># url(&#39;user&#39;, id=ID)</span>
+        <span class="n">old_name</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="n">new_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">get_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">old_name</span> <span class="o">!=</span> <span class="n">new_name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">get_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">new_name</span><span class="p">):</span>
+                <span class="n">abort</span><span class="p">(</span><span class="mi">409</span><span class="p">,</span> <span class="s">&#39;409 Conflict&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forms</span><span class="o">.</span><span class="n">UserForm</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">full_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;full_name&#39;</span><span class="p">]</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">]</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">]</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">objectstore</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">old_name</span><span class="p">:</span>
+                    <span class="n">abort</span><span class="p">(</span><span class="mi">301</span><span class="p">,</span> <span class="s">&#39;301 Moved Permanently&#39;</span><span class="p">,</span>
+                          <span class="p">[(</span><span class="s">&#39;Location&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">(</span><span class="s">&#39;users&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">))])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;DELETE /users/id: Delete an existing item.</span>
+<span class="sd">            @param id the id (name) of the user to be updated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Forms posted to this method should contain a hidden field:</span>
+        <span class="c">#    &lt;input type=&quot;hidden&quot; name=&quot;_method&quot; value=&quot;DELETE&quot; /&gt;</span>
+        <span class="c"># Or using helpers:</span>
+        <span class="c">#    h.form(url(&#39;user&#39;, id=ID),</span>
+        <span class="c">#           method=&#39;delete&#39;)</span>
+        <span class="c"># url(&#39;user&#39;, id=ID)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">get_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">objectstore</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;html&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;GET /users/id: Show a specific item.</span>
+<span class="sd">            @param id the id (name) of the user to be updated.</span>
+<span class="sd">            @param format the format of the URI requested.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># url(&#39;user&#39;, id=ID)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">get_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">format</span><span class="o">==</span><span class="s">&#39;json&#39;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="s">&#39;original&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+                <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">]</span>
+                <span class="n">data</span><span class="p">[</span><span class="s">&#39;link&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;text/javascript&#39;</span>
+                <span class="k">return</span> <span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">user</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/users/show_user.mako&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">,</span> <span class="s">&#39;404 Not Found&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;html&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;GET /users/id;edit: Form to edit an existing item.</span>
+<span class="sd">            @param id the id (name) of the user to be updated.</span>
+<span class="sd">            @param format the format of the URI requested.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># url(&#39;edit_user&#39;, id=ID)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">get_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">,</span> <span class="s">&#39;404 Not Found&#39;</span><span class="p">)</span>
+        <span class="c"># Get the form values from the table</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forms</span><span class="o">.</span><span class="n">UserForm</span><span class="o">.</span><span class="n">from_python</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/users/edit_user.mako&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-the-xml-rpc-controller-for-xml-rpc-requests">
+<span id="xmlrpc-controller"></span><h2>Using the XML-RPC Controller for XML-RPC requests<a class="headerlink" href="#using-the-xml-rpc-controller-for-xml-rpc-requests" title="Permalink to this headline">¶</a></h2>
+<p>In order to deploy this controller you will need at least a passing familiarity with XML-RPC itself. We will first review the basics of XML-RPC and then describe the workings of the <code class="docutils literal"><span class="pre">Pylons</span> <span class="pre">XMLRPCController</span></code>. Finally, we will show an example of how to use the controller to implement a simple web service.</p>
+<p>After you&#8217;ve read this document, you may be interested in reading the companion document: &#8220;A blog publishing web service in XML-RPC&#8221; which takes the subject further, covering details of the MetaWeblog API (a popular XML-RPC service) and demonstrating how to construct some basic service methods to act as the core of a MetaWeblog blog publishing service.</p>
+<div class="section" id="a-brief-introduction-to-xml-rpc">
+<h3>A brief introduction to XML-RPC<a class="headerlink" href="#a-brief-introduction-to-xml-rpc" title="Permalink to this headline">¶</a></h3>
+<p>XML-RPC is a specification that describes a Remote Procedure Call (RPC) interface by which an application can use the Internet to execute a specified procedure call on a remote XML-RPC server. The name of the procedure to be called and any required parameter values are &#8220;marshalled&#8221; into XML. The XML forms the body of a POST request which is despatched via HTTP to the XML-RPC server. At the server, the procedure is executed, the returned value(s) is/are marshalled into XML and despatched back to the application. XML-RPC is designed to be as simple as possible, while allowing complex data structures to be transmitted, processed and returned.</p>
+</div>
+<div class="section" id="xml-rpc-controller-that-speaks-wsgi">
+<h3>XML-RPC Controller that speaks WSGI<a class="headerlink" href="#xml-rpc-controller-that-speaks-wsgi" title="Permalink to this headline">¶</a></h3>
+<p>Pylons uses Python&#8217;s xmlrpclib library to provide a specialised <code class="xref py py-class docutils literal"><span class="pre">XMLRPCController</span></code> class that gives you the full range of these XML-RPC Introspection facilities for use in your service methods and provides the foundation for constructing a set of specialised service methods that provide a useful web service &#8212; such as a blog publishing interface.</p>
+<p>This controller handles XML-RPC responses and complies with the <a class="reference external" href="http://www.xmlrpc.com/spec">XML-RPC Specification</a> as well as the <a class="reference external" href="http://scripts.incutio.com/xmlrpc/introspection.html">XML-RPC Introspection</a> specification.</p>
+<p>As part of its basic functionality an XML-RPC server provides three standard introspection procedures or &#8220;service methods&#8221; as they are called. The Pylons <code class="xref py py-class docutils literal"><span class="pre">XMLRPCController</span></code> class provides these standard service methods ready-made for you:</p>
+<ul class="simple">
+<li><code class="xref py py-meth docutils literal"><span class="pre">system.listMethods()</span></code> Returns a list of XML-RPC methods for this XML-RPC resource</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">system.methodSignature()</span></code> Returns an array of arrays for the valid signatures for a method. The first value of each array is the return value of the method. The result is an array to indicate multiple signatures a method may be capable of.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">system.methodHelp()</span></code> Returns the documentation for a method</li>
+</ul>
+<p>By default, methods with names containing a dot are translated to use an underscore. For example, the <code class="docutils literal"><span class="pre">system.methodHelp</span></code> is handled by the method <code class="xref py py-meth docutils literal"><span class="pre">system_methodHelp()</span></code>.</p>
+<p>Methods in the XML-RPC controller will be called with the method given in the XML-RPC body. Methods may be annotated with a signature attribute to declare the valid arguments and return types.</p>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyXML</span><span class="p">(</span><span class="n">XMLRPCController</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">userstatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;basic string&#39;</span>
+    <span class="n">userstatus</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="p">[[</span><span class="s">&#39;string&#39;</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">userinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">LookUpUser</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">age</span> <span class="ow">and</span> <span class="n">age</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">age</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="n">userinfo</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="p">[[</span><span class="s">&#39;struct&#39;</span><span class="p">,</span> <span class="s">&#39;string&#39;</span><span class="p">],</span>
+                          <span class="p">[</span><span class="s">&#39;struct&#39;</span><span class="p">,</span> <span class="s">&#39;string&#39;</span><span class="p">,</span> <span class="s">&#39;int&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Since XML-RPC methods can take different sets of data, each set of valid arguments is its own list. The first value in the list is the type of the return argument. The rest of the arguments are the types of the data that must be passed in.</p>
+<p>In the last method in the example above, since the method can optionally take an integer value, both sets of valid parameter lists should be provided.</p>
+<p>Valid types that can be checked in the signature and their corresponding Python types:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">XMLRPC</th>
+<th class="head">Python</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>string</td>
+<td>str</td>
+</tr>
+<tr class="row-odd"><td>array</td>
+<td>list</td>
+</tr>
+<tr class="row-even"><td>boolean</td>
+<td>bool</td>
+</tr>
+<tr class="row-odd"><td>int</td>
+<td>int</td>
+</tr>
+<tr class="row-even"><td>double</td>
+<td>float</td>
+</tr>
+<tr class="row-odd"><td>struct</td>
+<td>dict</td>
+</tr>
+<tr class="row-even"><td>dateTime.iso8601</td>
+<td>xmlrpclib.DateTime</td>
+</tr>
+<tr class="row-odd"><td>base64</td>
+<td>xmlrpclib.Binary</td>
+</tr>
+</tbody>
+</table>
+<p>Note, requiring a signature is optional.</p>
+<p>Also note that a convenient fault handler function is provided.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">xmlrpc_fault</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convenience method to return a Pylons response XMLRPC Fault&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>(The <a class="reference external" href="http://www.xmlrpc.com/">XML-RPC Home page</a> and the <a class="reference external" href="http://www.faqs.org/docs/Linux-HOWTO/XML-RPC-HOWTO.html">XML-RPC HOW-TO</a> both provide further detail on the XML-RPC specification.)</p>
+</div>
+<div class="section" id="a-simple-xml-rpc-service">
+<h3>A simple XML-RPC service<a class="headerlink" href="#a-simple-xml-rpc-service" title="Permalink to this headline">¶</a></h3>
+<p>This simple service <code class="docutils literal"><span class="pre">test.battingOrder</span></code> accepts a positive integer &lt; 51 as the parameter <code class="docutils literal"><span class="pre">posn</span></code> and returns a string containing the name of the US state occupying that ranking in the order of ratifying the constitution / joining the union.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">xmlrpclib</span>
+
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">pylons.controllers</span> <span class="kn">import</span> <span class="n">XMLRPCController</span>
+
+<span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Delaware&#39;</span><span class="p">,</span> <span class="s">&#39;Pennsylvania&#39;</span><span class="p">,</span> <span class="s">&#39;New Jersey&#39;</span><span class="p">,</span> <span class="s">&#39;Georgia&#39;</span><span class="p">,</span>
+          <span class="s">&#39;Connecticut&#39;</span><span class="p">,</span> <span class="s">&#39;Massachusetts&#39;</span><span class="p">,</span> <span class="s">&#39;Maryland&#39;</span><span class="p">,</span> <span class="s">&#39;South Carolina&#39;</span><span class="p">,</span>
+          <span class="s">&#39;New Hampshire&#39;</span><span class="p">,</span> <span class="s">&#39;Virginia&#39;</span><span class="p">,</span> <span class="s">&#39;New York&#39;</span><span class="p">,</span> <span class="s">&#39;North Carolina&#39;</span><span class="p">,</span>
+          <span class="s">&#39;Rhode Island&#39;</span><span class="p">,</span> <span class="s">&#39;Vermont&#39;</span><span class="p">,</span> <span class="s">&#39;Kentucky&#39;</span><span class="p">,</span> <span class="s">&#39;Tennessee&#39;</span><span class="p">,</span> <span class="s">&#39;Ohio&#39;</span><span class="p">,</span>
+          <span class="s">&#39;Louisiana&#39;</span><span class="p">,</span> <span class="s">&#39;Indiana&#39;</span><span class="p">,</span> <span class="s">&#39;Mississippi&#39;</span><span class="p">,</span> <span class="s">&#39;Illinois&#39;</span><span class="p">,</span> <span class="s">&#39;Alabama&#39;</span><span class="p">,</span>
+          <span class="s">&#39;Maine&#39;</span><span class="p">,</span> <span class="s">&#39;Missouri&#39;</span><span class="p">,</span> <span class="s">&#39;Arkansas&#39;</span><span class="p">,</span> <span class="s">&#39;Michigan&#39;</span><span class="p">,</span> <span class="s">&#39;Florida&#39;</span><span class="p">,</span> <span class="s">&#39;Texas&#39;</span><span class="p">,</span>
+          <span class="s">&#39;Iowa&#39;</span><span class="p">,</span> <span class="s">&#39;Wisconsin&#39;</span><span class="p">,</span> <span class="s">&#39;California&#39;</span><span class="p">,</span> <span class="s">&#39;Minnesota&#39;</span><span class="p">,</span> <span class="s">&#39;Oregon&#39;</span><span class="p">,</span>
+          <span class="s">&#39;Kansas&#39;</span><span class="p">,</span> <span class="s">&#39;West Virginia&#39;</span><span class="p">,</span> <span class="s">&#39;Nevada&#39;</span><span class="p">,</span> <span class="s">&#39;Nebraska&#39;</span><span class="p">,</span> <span class="s">&#39;Colorado&#39;</span><span class="p">,</span>
+          <span class="s">&#39;North Dakota&#39;</span><span class="p">,</span> <span class="s">&#39;South Dakota&#39;</span><span class="p">,</span> <span class="s">&#39;Montana&#39;</span><span class="p">,</span> <span class="s">&#39;Washington&#39;</span><span class="p">,</span> <span class="s">&#39;Idaho&#39;</span><span class="p">,</span>
+          <span class="s">&#39;Wyoming&#39;</span><span class="p">,</span> <span class="s">&#39;Utah&#39;</span><span class="p">,</span> <span class="s">&#39;Oklahoma&#39;</span><span class="p">,</span> <span class="s">&#39;New Mexico&#39;</span><span class="p">,</span> <span class="s">&#39;Arizona&#39;</span><span class="p">,</span> <span class="s">&#39;Alaska&#39;</span><span class="p">,</span>
+          <span class="s">&#39;Hawaii&#39;</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">RpctestController</span><span class="p">(</span><span class="n">XMLRPCController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">test_battingOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">posn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This docstring becomes the content of the</span>
+<span class="sd">        returned value for system.methodHelp called with</span>
+<span class="sd">        the parameter &quot;test.battingOrder&quot;). The method</span>
+<span class="sd">        signature will be appended below ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># XML-RPC checks agreement for arity and parameter datatype, so</span>
+        <span class="c"># by the time we get called, we know we have an int.</span>
+        <span class="k">if</span> <span class="n">posn</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">posn</span> <span class="o">&lt;</span> <span class="mi">51</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">states</span><span class="p">[</span><span class="n">posn</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Technically, the param value is correct: it is an int.</span>
+            <span class="c"># Raising an error is inappropriate, so instead we</span>
+            <span class="c"># return a facetious message as a string.</span>
+            <span class="k">return</span> <span class="s">&#39;Out of cheese error.&#39;</span>
+    <span class="n">test_battingOrder</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="p">[[</span><span class="s">&#39;string&#39;</span><span class="p">,</span> <span class="s">&#39;int&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-the-service">
+<h3>Testing the service<a class="headerlink" href="#testing-the-service" title="Permalink to this headline">¶</a></h3>
+<p>For developers using OS X, there&#8217;s an <a class="reference external" href="http://www.ditchnet.org/xmlrpc/">XML/RPC client</a> that is an extremely useful diagnostic tool when developing XML-RPC (it&#8217;s free ... but not entirely bug-free). Or, you can just use the Python interpreter:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">xmlrpclib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">srvr</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="s">&quot;http://example.com/rpctest/&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">srvr</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">listMethods</span><span class="p">())</span>
+<span class="go">[&#39;system.listMethods&#39;,</span>
+<span class="go"> &#39;system.methodHelp&#39;,</span>
+<span class="go"> &#39;system.methodSignature&#39;,</span>
+<span class="go"> &#39;test.battingOrder&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">srvr</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">methodHelp</span><span class="p">(</span><span class="s">&#39;test.battingOrder&#39;</span><span class="p">)</span>
+<span class="go">This docstring becomes the content of the</span>
+<span class="go">returned value for system.methodHelp called with</span>
+<span class="go">the parameter &quot;test.battingOrder&quot;). The method</span>
+<span class="go">signature will be appended below ...</span>
+
+<span class="go">Method signature: [[&#39;string&#39;, &#39;int&#39;]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">srvr</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">methodSignature</span><span class="p">(</span><span class="s">&#39;test.battingOrder&#39;</span><span class="p">))</span>
+<span class="go">[[&#39;string&#39;, &#39;int&#39;]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">srvr</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">battingOrder</span><span class="p">(</span><span class="mi">12</span><span class="p">))</span>
+<span class="go">&#39;North Carolina&#39;</span>
+</pre></div>
+</div>
+<p>To debug XML-RPC servers from Python, create the client object using the optional verbose=1 parameter. You can then use the client as normal and watch as the XML-RPC request and response is displayed in the console.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">控制器</a><ul>
+<li><a class="reference internal" href="#id2">标准控制器</a><ul>
+<li><a class="reference internal" href="#id3">使用私有方法</a></li>
+<li><a class="reference internal" href="#id4">特殊方法</a></li>
+<li><a class="reference internal" href="#id5">动态添加控制器</a></li>
+<li><a class="reference internal" href="#id6">自定义控制器名称</a></li>
+<li><a class="reference internal" href="#attaching-wsgi-apps">Attaching WSGI apps</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-wsgi-controller-to-provide-a-wsgi-service">Using the WSGI Controller to provide a WSGI service</a><ul>
+<li><a class="reference internal" href="#the-pylons-wsgi-controller">The Pylons WSGI Controller</a></li>
+<li><a class="reference internal" href="#wsgicontroller-methods">WSGIController methods</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-rest-controller-with-a-restful-api">Using the REST Controller with a RESTful API</a><ul>
+<li><a class="reference internal" href="#using-the-paster-restcontroller-template">Using the paster restcontroller template</a></li>
+<li><a class="reference internal" href="#an-atom-style-rest-controller-for-users">An Atom-Style REST Controller for Users</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-xml-rpc-controller-for-xml-rpc-requests">Using the XML-RPC Controller for XML-RPC requests</a><ul>
+<li><a class="reference internal" href="#a-brief-introduction-to-xml-rpc">A brief introduction to XML-RPC</a></li>
+<li><a class="reference internal" href="#xml-rpc-controller-that-speaks-wsgi">XML-RPC Controller that speaks WSGI</a></li>
+<li><a class="reference internal" href="#a-simple-xml-rpc-service">A simple XML-RPC service</a></li>
+<li><a class="reference internal" href="#testing-the-service">Testing the service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="concepts.html"
+                        title="previous chapter">Pylons 理念</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="views.html"
+                        title="next chapter">Views</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="Views"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Pylons 理念"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

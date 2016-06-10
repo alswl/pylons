@@ -1,0 +1,636 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Understanding Unicode &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="../index.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="../_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="../index.html">
+      		<img class="logo" src="../_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="understanding-unicode">
+<span id="unicode"></span><h1>Understanding Unicode<a class="headerlink" href="#understanding-unicode" title="Permalink to this headline">¶</a></h1>
+<p>If you&#8217;ve ever come across text in a foreign language that contains lots of <code class="docutils literal"><span class="pre">????</span></code> characters or have written some Python code and received a message such as <code class="docutils literal"><span class="pre">UnicodeDecodeError:</span> <span class="pre">'ascii'</span> <span class="pre">codec</span> <span class="pre">can't</span> <span class="pre">decode</span> <span class="pre">byte</span> <span class="pre">0xff</span> <span class="pre">in</span> <span class="pre">position</span> <span class="pre">6:</span> <span class="pre">ordinal</span> <span class="pre">not</span> <span class="pre">in</span> <span class="pre">range(128)</span></code> then you have run into a problem with character sets, encodings, Unicode and the like.</p>
+<p>The truth is that many developers are put off by Unicode because most of the time it is possible to muddle through rather than take the time to learn the basics. To make the problem worse if you have a system that manages to fudge the issues and just about work and then start trying to do things properly with
+Unicode it often highlights problems in other parts of your code.</p>
+<p>The good news is that Python has great Unicode support, so the rest of
+this article will show you how to correctly use Unicode in Pylons to avoid
+unwanted <code class="docutils literal"><span class="pre">?</span></code> characters and <code class="docutils literal"><span class="pre">UnicodeDecodeErrors</span></code>.</p>
+<div class="section" id="what-is-unicode">
+<h2>What is Unicode?<a class="headerlink" href="#what-is-unicode" title="Permalink to this headline">¶</a></h2>
+<p>When computers were first being used the characters that were most important
+were unaccented English letters. Each of these letters could be represented by
+a number between 32 and 127 and thus was born ASCII, a character set where
+space was 32, the letter &#8220;A&#8221; was 65 and everything could be stored in 7 bits.</p>
+<p>Most computers in those days were using 8-bit bytes so people quickly realized
+that they could use the codes 128-255 for their own purposes. Different people
+used the codes 128-255 to represent different characters and before long these
+different sets of characters were also standardized into <em>code pages</em>. This
+meant that if you needed some non-ASCII characters in a document you could also
+specify a codepage which would define which extra characters were available.
+For example Israel DOS used a code page called 862, while Greek users used 737.
+This just about worked for Western languages provided you didn&#8217;t want to write
+an Israeli document with Greek characters but it didn&#8217;t work at all for Asian
+languages where there are many more characters than can be represented in 8
+bits.</p>
+<p>Unicode is a character set that solves these problems by uniquely defining
+<em>every</em> character that is used anywhere in the world. Rather than defining a
+character as a particular combination of bits in the way ASCII does, each
+character is assigned a <em>code point</em>. For example the word <code class="docutils literal"><span class="pre">hello</span></code> is made
+from code points <code class="docutils literal"><span class="pre">U+0048</span> <span class="pre">U+0065</span> <span class="pre">U+006C</span> <span class="pre">U+006C</span> <span class="pre">U+006F</span></code>. The full list of code
+points can be found at <a class="reference external" href="http://www.unicode.org/charts/">http://www.unicode.org/charts/</a>.</p>
+<p>There are lots of different ways of encoding Unicode code points into bits but
+the most popular encoding is UTF-8. Using UTF-8, every code point from 0-127 is
+stored in a single byte. Only code points 128 and above are stored using 2, 3,
+in fact, up to 6 bytes. This has the useful side effect that English text looks
+exactly the same in UTF-8 as it did in ASCII, because for every
+ASCII character with hexadecimal value 0xXY, the corresponding Unicode
+code point is U+00XY. This backwards compatibility is why if you are developing
+an application that is only used by English speakers you can often get away
+without handling characters properly and still expect things to work most of
+the time. Of course, if you use a different encoding such as UTF-16 this
+doesn&#8217;t apply since none of the code points are encoded to 8 bits.</p>
+<p>The important things to note from the discussion so far are that:</p>
+<ul>
+<li><p class="first">Unicode can represent pretty much any character in any writing system in widespread use today</p>
+</li>
+<li><p class="first">Unicode uses code points to represent characters and the way these map to bits in memory depends on the encoding</p>
+</li>
+<li><dl class="first docutils">
+<dt>The most popular encoding is UTF-8 which has several convenient properties</dt>
+<dd><ol class="first last arabic simple">
+<li>It can handle any Unicode code point</li>
+<li>A Unicode string is turned into a string of bytes containing no embedded  zero bytes. This avoids byte-ordering issues, and means UTF-8 strings can be  processed by C functions such as strcpy() and sent through protocols that can&#8217;t handle zero bytes</li>
+<li>A string of ASCII text is also valid UTF-8 text</li>
+<li>UTF-8 is fairly compact; the majority of code points are turned into two  bytes, and values less than 128 occupy only a single byte.</li>
+<li>If bytes are corrupted or lost, it&#8217;s possible to determine the start of  the next UTF-8-encoded code point and resynchronize.</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Since Unicode 3.1, some extensions have even been defined so that the defined range is now U+000000 to U+10FFFF (21 bits), and formally, the character set is defined as 31-bits to allow for future expansion. It is a myth that there are 65,536 Unicode code points and that every Unicode letter can really be squeezed into two bytes. It is also incorrect to think that UTF-8 can represent less characters than UTF-16. UTF-8 simply uses a variable number of bytes for a character, sometimes just one byte (8 bits).</p>
+</div>
+</div>
+<div class="section" id="unicode-in-python">
+<h2>Unicode in Python<a class="headerlink" href="#unicode-in-python" title="Permalink to this headline">¶</a></h2>
+<p>In Python Unicode strings are expressed as instances of the built-in
+<code class="docutils literal"><span class="pre">unicode</span></code> type. Under the hood, Python represents Unicode strings as either
+16 or 32 bit integers, depending on how the Python interpreter was compiled.</p>
+<p>The <code class="docutils literal"><span class="pre">unicode()</span></code> constructor has the signature <code class="docutils literal"><span class="pre">unicode(string[,</span> <span class="pre">encoding,</span>
+<span class="pre">errors])</span></code>. All of its arguments should be 8-bit strings. The first argument is
+converted to Unicode using the specified encoding; if you leave off the
+encoding argument, the ASCII encoding is used for the conversion, so characters
+greater than 127 will be treated as errors:</p>
+<div class="highlight-pycon"><div class="highlight"><pre>&gt;&gt;&gt; unicode(&#39;hello&#39;)
+u&#39;hello&#39;
+&gt;&gt;&gt; s = unicode(&#39;hello&#39;)
+&gt;&gt;&gt; type(s)
+&lt;type &#39;unicode&#39;&gt;
+&gt;&gt;&gt; unicode(&#39;hello&#39; + chr(255))
+Traceback (most recent call last):
+File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+UnicodeDecodeError: &#39;ascii&#39; codec can&#39;t decode byte 0xff in position 6:
+ordinal not in range(128)
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">errors</span></code> argument specifies what to do if the string can&#8217;t be decoded to
+ascii. Legal values for this argument are <code class="docutils literal"><span class="pre">'strict'</span></code> (raise a
+<code class="docutils literal"><span class="pre">UnicodeDecodeError</span></code> exception), <code class="docutils literal"><span class="pre">'replace'</span></code> (replace the character that
+can&#8217;t be decoded with another one), or <code class="docutils literal"><span class="pre">'ignore'</span></code> (just leave the character
+out of the Unicode result).</p>
+<div class="highlight-pycon"><div class="highlight"><pre>&gt;&gt;&gt; unicode(&#39;\x80abc&#39;, errors=&#39;strict&#39;)
+Traceback (most recent call last):
+File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+UnicodeDecodeError: &#39;ascii&#39; codec can&#39;t decode byte 0x80 in position 0:
+ordinal not in range(128)
+&gt;&gt;&gt; unicode(&#39;\x80abc&#39;, errors=&#39;replace&#39;)
+u&#39;\ufffdabc&#39;
+&gt;&gt;&gt; unicode(&#39;\x80abc&#39;, errors=&#39;ignore&#39;)
+u&#39;abc&#39;
+</pre></div>
+</div>
+<p>It is important to understand the difference between <em>encoding</em> and <em>decoding</em>.
+Unicode strings are considered to be the Unicode code points but any
+representation of the Unicode string has to be encoded to something else, for
+example UTF-8 or ASCII. So when you are converting an ASCII or UTF-8 string to
+Unicode you are <em>decoding</em> it and when you are converting from Unicode to UTF-8
+or ASCII you are <em>encoding</em> it. This is why the error in the example above says
+that the ASCII codec cannot decode the byte <code class="docutils literal"><span class="pre">0x80</span></code> from ASCII to Unicode
+because it is not in the range(128) or 0-127. In fact <code class="docutils literal"><span class="pre">0x80</span></code> is hex for 128
+which the first number outside the ASCII range. However if we tell Python that
+the character <code class="docutils literal"><span class="pre">0x80</span></code> is encoded with the <code class="docutils literal"><span class="pre">'latin-1'</span></code>, <code class="docutils literal"><span class="pre">'iso_8859_1'</span></code> or
+<code class="docutils literal"><span class="pre">'8859'</span></code> character sets (which incidentally are different names for the same
+thing) we get the result we expected:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">unicode</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\x80</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;latin-1&#39;</span><span class="p">)</span>
+<span class="go">u&#39;\x80&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The character encodings Python supports are listed at <a class="reference external" href="http://docs.python.org/lib/standard-encodings.html">http://docs.python.org/lib/standard-encodings.html</a></p>
+</div>
+<p>Unicode objects in Python have most of the same methods that normal Python
+strings provide. Python will try to use the <code class="docutils literal"><span class="pre">'ascii'</span></code> codec to convert
+strings to Unicode if you do an operation on both types:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="s">&#39;hello&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="s">&#39; world!&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="go">u&#39;hello world!&#39;</span>
+</pre></div>
+</div>
+<p>You can encode a Unicode string using a particular encoding like this:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="s">u&#39;Hello World!&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+<span class="go">&#39;Hello World!&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="unicode-literals-in-python-source-code">
+<h2>Unicode Literals in Python Source Code<a class="headerlink" href="#unicode-literals-in-python-source-code" title="Permalink to this headline">¶</a></h2>
+<p>In Python source code, Unicode literals are written as strings prefixed with
+the &#8216;u&#8217; or &#8216;U&#8217; character:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="s">u&#39;abcdefghijk&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s">U&#39;lmnopqrstuv&#39;</span>
+</pre></div>
+</div>
+<p>You can also use <code class="docutils literal"><span class="pre">&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;&quot;&quot;`</span></code> or <code class="docutils literal"><span class="pre">'''</span></code> versions too. For example:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="sd">u&quot;&quot;&quot;This</span>
+<span class="gp">... </span><span class="sd">is a really long</span>
+<span class="gp">... </span><span class="sd">Unicode string&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Specific code points can be written using the <code class="docutils literal"><span class="pre">\u</span></code> escape sequence, which is
+followed by four hex digits giving the code point. If you use <code class="docutils literal"><span class="pre">\U</span></code> instead
+you specify 8 hex digits instead of 4. Unicode literals can also use the same
+escape sequences as 8-bit strings, including <code class="docutils literal"><span class="pre">\x</span></code>, but <code class="docutils literal"><span class="pre">\x</span></code> only takes two
+hex digits so it can&#8217;t express all the available code points. You can add
+characters to Unicode strings using the <code class="docutils literal"><span class="pre">unichr()</span></code> built-in function and find
+out what the ordinal is with <code class="docutils literal"><span class="pre">ord()</span></code>.</p>
+<p>Here is an example demonstrating the different alternatives:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="s">u&quot;</span><span class="se">\x66\u0072\u0061\U0000006e</span><span class="s">&quot;</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">231</span><span class="p">)</span> <span class="o">+</span> <span class="s">u&quot;ais&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># ^^^^ two-digit hex escape</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># ^^^^^^ four-digit Unicode escape</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># ^^^^^^^^^^ eight-digit Unicode escape</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span> <span class="k">print</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+<span class="gp">...</span>
+<span class="go">97 102 114 97 110 231 97 105 115</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">s</span>
+<span class="go">français</span>
+</pre></div>
+</div>
+<p>Using escape sequences for code points greater than 127 is fine in small doses
+but Python 2.4 and above support writing Unicode literals in any encoding as
+long as you declare the encoding being used by including a special comment as
+either the first or second line of the source file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: latin-1 -*-</span>
+<span class="n">u</span> <span class="o">=</span> <span class="s">u&#39;abcdé&#39;</span>
+<span class="k">print</span> <span class="nb">ord</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>If you don&#8217;t include such a comment, the default encoding used will be ASCII.
+Versions of Python before 2.4 were Euro-centric and assumed Latin-1 as a
+default encoding for string literals; in Python 2.4, characters greater than
+127 still work but result in a warning. For example, the following program has
+no encoding declaration:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="n">u</span> <span class="o">=</span> <span class="s">u&#39;abcdé&#39;</span>
+<span class="k">print</span> <span class="nb">ord</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>When you run it with Python 2.4, it will output the following warning:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="go">sys:1: DeprecationWarning: Non-ASCII character &#39;\xe9&#39; in file testas.py on line 2, but</span>
+<span class="go"> no encoding declared; see http://www.python.org/peps/pep-0263.html for details</span>
+</pre></div>
+</div>
+<p>and then the following output:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="go">233</span>
+</pre></div>
+</div>
+<p>For real world use it is recommended that you use the UTF-8 encoding for your
+file but you must be sure that your text editor actually saves the file as
+UTF-8 otherwise the Python interpreter will try to parse UTF-8 characters but
+they will actually be stored as something else.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Windows users who use the <a class="reference external" href="http://www.scintilla.org/SciTE.html">SciTE</a> editor can specify the encoding of their file from the menu using the  <code class="docutils literal"><span class="pre">File-&gt;Encoding</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you are working with Unicode in detail you might also be interested in the <code class="docutils literal"><span class="pre">unicodedata</span></code> module which can be used to find out Unicode properties  such as a character&#8217;s name, category, numeric value and the like.</p>
+</div>
+</div>
+<div class="section" id="input-and-output">
+<h2>Input and Output<a class="headerlink" href="#input-and-output" title="Permalink to this headline">¶</a></h2>
+<p>We now know how to use Unicode in Python source code but input and output can
+also be different using Unicode. Of course, some libraries natively support
+Unicode and if these libraries return Unicode objects you will not have to do
+anything special to support them. XML parsers and SQL databases frequently
+support Unicode for example.</p>
+<p>If you remember from the discussion earlier, Unicode data consists of code
+points. In order to send Unicode data via a socket or write it to a file you
+usually need to encode it to a series of bytes and then decode the data back to
+Unicode when reading it. You can of course perform the encoding manually
+reading a byte at the time but since encodings such as UTF-8 can have variable
+numbers of bytes per character it is usually much easier to use Python&#8217;s
+built-in support in the form of the <code class="docutils literal"><span class="pre">codecs</span></code> module.</p>
+<p>The codecs module includes a version of the <code class="docutils literal"><span class="pre">open()</span></code> function that
+returns a file-like object that assumes the file&#8217;s contents are in a specified
+encoding and accepts Unicode parameters for methods such as <code class="docutils literal"><span class="pre">.read()</span></code> and
+<code class="docutils literal"><span class="pre">.write()</span></code>.</p>
+<p>The function&#8217;s parameters are open(filename, mode=&#8217;rb&#8217;, encoding=None,
+errors=&#8217;strict&#8217;, buffering=1). <code class="docutils literal"><span class="pre">mode</span></code> can be &#8216;r&#8217;, &#8216;w&#8217;, or &#8216;a&#8217;, just like the
+corresponding parameter to the regular built-in <code class="docutils literal"><span class="pre">open()</span></code> function. You can
+add a <code class="docutils literal"><span class="pre">+</span></code> character to update the file. <code class="docutils literal"><span class="pre">buffering</span></code> is similar to the
+standard function&#8217;s parameter. <code class="docutils literal"><span class="pre">encoding</span></code> is a string giving the encoding to
+use, if not specified or specified as <code class="docutils literal"><span class="pre">None</span></code>, a regular Python file object
+that accepts 8-bit strings is returned. Otherwise, a wrapper object is
+returned, and data written to or read from the wrapper object will be converted
+as needed. <code class="docutils literal"><span class="pre">errors</span></code> specifies the action for encoding errors and can be one
+of the usual values of <code class="docutils literal"><span class="pre">'strict'</span></code>, <code class="docutils literal"><span class="pre">'ignore'</span></code>, or <code class="docutils literal"><span class="pre">'replace'</span></code> which we
+saw right at the begining of this document when we were encoding strings in
+Python source files.</p>
+<p>Here is an example of how to read Unicode from a UTF-8 encoded file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">codecs</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;unicode.txt&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It&#8217;s also possible to open files in update mode, allowing both reading and writing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;unicode.txt&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;w+&#39;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">u&quot;</span><span class="se">\x66\u0072\u0061\U0000006e</span><span class="s">&quot;</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">231</span><span class="p">)</span> <span class="o">+</span> <span class="s">u&quot;ais&quot;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()[:</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Notice that we used the <code class="docutils literal"><span class="pre">repr()</span></code> function to display the Unicode data. This
+is very useful because if you tried to print the Unicode data directly, Python
+would need to encode it before it could be sent the console and depending on
+which characters were present and the character set used by the console, an
+error might be raised. This is avoided if you use <code class="docutils literal"><span class="pre">repr()</span></code>.</p>
+<p>The Unicode character <code class="docutils literal"><span class="pre">U+FEFF</span></code> is used as a byte-order mark or BOM, and is often written as the first character of a file in order to assist with auto-detection of the file&#8217;s byte ordering. Some encodings, such as UTF-16, expect a BOM to be present at the start of a file, but with others such as UTF-8 it isn&#8217;t necessary.</p>
+<p>When such an encoding is used, the BOM will be automatically written as the
+first character and will be silently dropped when the file is read. There are
+variants of these encodings, such as &#8216;utf-16-le&#8217; and &#8216;utf-16-be&#8217; for
+little-endian and big-endian encodings, that specify one particular byte
+ordering and don&#8217;t skip the BOM.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Some editors including SciTE will put a byte order mark (BOM) in the text
+file when saved as UTF-8, which is strange because UTF-8 doesn&#8217;t need BOMs.</p>
+</div>
+</div>
+<div class="section" id="unicode-filenames">
+<h2>Unicode Filenames<a class="headerlink" href="#unicode-filenames" title="Permalink to this headline">¶</a></h2>
+<p>Most modern operating systems support the use of Unicode filenames. The
+filenames are transparently converted to the underlying filesystem encoding.
+The type of encoding depends on the operating system.</p>
+<p>On Windows 9x, the encoding is <code class="docutils literal"><span class="pre">mbcs</span></code>.</p>
+<p>On Mac OS X, the encoding is <code class="docutils literal"><span class="pre">utf-8</span></code>.</p>
+<p>On Unix, the encoding is the user&#8217;s preference according to the
+result of nl_langinfo(CODESET), or None if the nl_langinfo(CODESET) failed.</p>
+<p>On Windows NT+, file names are Unicode natively, so no conversion is performed.
+getfilesystemencoding still returns <code class="docutils literal"><span class="pre">mbcs</span></code>, as this is the encoding that
+applications should use when they explicitly want to convert Unicode strings to
+byte strings that are equivalent when used as file names.</p>
+<p><code class="docutils literal"><span class="pre">mbcs</span></code> is a special encoding for Windows that effectively means &#8220;use
+whichever encoding is appropriate&#8221;. In Python 2.3 and above you can find out
+the system encoding with <code class="docutils literal"><span class="pre">sys.getfilesystemencoding()</span></code>.</p>
+<p>Most file and directory functions and methods support Unicode. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">filename</span> <span class="o">=</span> <span class="s">u&quot;</span><span class="se">\x66\u0072\u0061\U0000006e</span><span class="s">&quot;</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">231</span><span class="p">)</span> <span class="o">+</span> <span class="s">u&quot;ais&quot;</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Some data</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Other functions such as <code class="docutils literal"><span class="pre">os.listdir()</span></code> will return Unicode if you pass a
+Unicode argument and will try to return strings if you pass an ordinary 8 bit
+string. For example running this example as <code class="docutils literal"><span class="pre">test.py</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">filename</span> <span class="o">=</span> <span class="s">u&quot;Sample &quot;</span> <span class="o">+</span> <span class="n">unichar</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">u&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will produce the following output:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="s">&#39;Sample?&#39;</span><span class="p">,</span> <span class="s">&#39;test.py&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="s">u&#39;Sample</span><span class="se">\u1388</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">u&#39;test.py&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="applying-this-to-web-programming">
+<h3>Applying this to Web Programming<a class="headerlink" href="#applying-this-to-web-programming" title="Permalink to this headline">¶</a></h3>
+<p>So far we&#8217;ve seen how to use encoding in source files and seen how to decode
+text to Unicode and encode it back to text. We&#8217;ve also seen that Unicode
+objects can be manipulated in similar ways to strings and we&#8217;ve seen how to
+perform input and output operations on files. Next we are going to look at how
+best to use Unicode in a web app.</p>
+<p>The main rule is this:</p>
+<p><strong>Your application should use Unicode for all strings internally, decoding any
+input to Unicode as soon as it enters the application and encoding the Unicode
+to UTF-8 or another encoding only on output.</strong></p>
+<p>If you fail to do this you will find that <code class="docutils literal"><span class="pre">UnicodeDecodeError</span></code> s will start
+popping up in unexpected places when Unicode strings are used with normal 8-bit
+strings because Python&#8217;s default encoding is ASCII and it will try to decode
+the text to ASCII and fail. It is always better to do any encoding or decoding
+at the edges of your application otherwise you will end up patching lots of
+different parts of your application unnecessarily as and when errors pop up.</p>
+<p>Unless you have a very good reason not to it is wise to use UTF-8 as the
+default encoding since it is so widely supported.</p>
+<p>The second rule is:</p>
+<p><strong>Always test your application with characters above 127 and above 255 wherever
+possible.</strong></p>
+<p>If you fail to do this you might think your application is working fine, but as
+soon as your users do put in non-ASCII characters you will have problems.
+Using arabic is always a good test and www.google.ae is a good source of sample
+text.</p>
+<p>The third rule is:</p>
+<p><strong>Always do any checking of a string for illegal characters once it&#8217;s in the
+form that will be used or stored, otherwise the illegal characters might be
+disguised.</strong></p>
+<p>For example, let&#8217;s say you have a content management system that takes a
+Unicode filename, and you want to disallow paths with a &#8216;/&#8217; character. You
+might write this code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s">&#39;/&#39;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;&#39;/&#39; not allowed in filenames&quot;</span><span class="p">)</span>
+    <span class="n">unicode_name</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">unicode_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+    <span class="c"># ... return contents of file ...</span>
+</pre></div>
+</div>
+<p>This is INCORRECT. If an attacker could specify the &#8216;base64&#8217; encoding, they
+could pass <code class="docutils literal"><span class="pre">L2V0Yy9wYXNzd2Q=</span></code> which is the base-64 encoded form of the string
+<code class="docutils literal"><span class="pre">'/etc/passwd'</span></code> which is a file you clearly don&#8217;t want an attacker to get
+hold of. The above code looks for <code class="docutils literal"><span class="pre">/</span></code> characters in the encoded form and
+misses the dangerous character in the resulting decoded form.</p>
+<p>Those are the three basic rules so now we will look at some of the places you
+might want to perform Unicode decoding in a Pylons application.</p>
+</div>
+</div>
+<div class="section" id="request-parameters">
+<h2>Request Parameters<a class="headerlink" href="#request-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Pylons automatically coerces incoming form parameters (<code class="docutils literal"><span class="pre">request.POST</span></code>, <code class="docutils literal"><span class="pre">GET</span></code> (quote GET) and <code class="docutils literal"><span class="pre">params</span></code>) into unicode objects (as of Pylons 0.9.6).</p>
+<p>The request object contains a <code class="docutils literal"><span class="pre">charset</span></code> (encoding) attribute defining what the parameters should be decoded to (via value.decode(charset, errors)), and the decoding <code class="docutils literal"><span class="pre">errors</span></code> handler.</p>
+<p>The unicode conversion of parameters can be disabled when <code class="docutils literal"><span class="pre">charset</span></code> is set to
+None.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c">#request.charset = &#39;utf-8&#39; # utf-8 is the default charset</span>
+    <span class="c">#request.errors = &#39;replace&#39; # replace is the default error handler</span>
+    <span class="c"># a MultiDict-like object of string names and unicode values</span>
+    <span class="n">decoded_get</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span>
+
+    <span class="c"># The raw data is always still available when charset is None</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">charset</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">raw_get</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span>
+    <span class="n">raw_params</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">params</span>
+</pre></div>
+</div>
+<p>Pylons can also be configured to not coerece parameters to unicode objects by
+default. This is done by setting the following in the Pylons config object (at
+the bottom of your project&#8217;s <code class="docutils literal"><span class="pre">config/environment.py</span></code>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Don&#39;t coerce parameters to unicode</span>
+<span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.request_options&#39;</span><span class="p">][</span><span class="s">&#39;charset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="c"># You can also change the default error handler</span>
+<span class="c">#config[&#39;pylons.request_options&#39;][&#39;errors&#39;] = &#39;strict&#39;</span>
+</pre></div>
+</div>
+<p>When the <code class="docutils literal"><span class="pre">request</span></code> object is instructed to always automatically decode to
+unicode via the <code class="docutils literal"><span class="pre">request_settings</span></code> dictionary, the dictionary&#8217;s <code class="docutils literal"><span class="pre">charset</span></code>
+value acts as a fallback charset. If a <code class="docutils literal"><span class="pre">charset</span></code> was sent by the browser (via
+the <code class="docutils literal"><span class="pre">Content-Type</span></code> header), the browser&#8217;s value will take precedent: this
+takes place when the <code class="docutils literal"><span class="pre">request</span></code> object is constructed.</p>
+<p><code class="docutils literal"><span class="pre">FieldStorage</span></code> (file upload) objects will be handled specially for unicode
+parameters: what&#8217;s provided is a copy of the original <code class="docutils literal"><span class="pre">FieldStorage</span></code> object
+with a unicode version of its <code class="docutils literal"><span class="pre">filename</span></code> attribute.</p>
+<p>See <a class="reference internal" href="../forms.html#file-uploads"><span class="std std-ref">File Uploads</span></a> for more information on working with file uploads/<code class="docutils literal"><span class="pre">FieldStorage</span></code> objects.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Only parameter values (not their associated names) are decoded to unicode
+by default. Since parameter names commonly map directly to Python variable
+names (which are restricted to the ASCII character set), it&#8217;s usually
+preferable to handle them as strings. For example, passing form parameters
+to a function as keyword arguments (e.g. **request.params.mixed())
+doesn&#8217;t work with unicode keys.</p>
+<p class="last">To make <code class="docutils literal"><span class="pre">WSGIRequest</span></code> decode parameter names anyway, enable the
+<code class="docutils literal"><span class="pre">decode_param_names</span></code> option on either the WSGIRequest object or the
+<code class="docutils literal"><span class="pre">request_settings</span></code> dictionary. <code class="docutils literal"><span class="pre">FieldStorage's</span></code> <code class="docutils literal"><span class="pre">name</span></code> attributes are
+also decoded to unicode when this option is enabled.</p>
+</div>
+</div>
+<div class="section" id="templating">
+<h2>Templating<a class="headerlink" href="#templating" title="Permalink to this headline">¶</a></h2>
+<p>Pylons uses Mako as its default templating language. Mako handles all content
+as unicode internally. It only deals in raw strings upon the final rendering of
+the template (the Mako <code class="docutils literal"><span class="pre">render()</span></code> function, used by the Pylons <code class="docutils literal"><span class="pre">render()</span></code>
+function/Buffet plugin). The encoding of the rendered string can be configured;
+Pylons sets the default value to UTF-8. To change this value, edit your
+project&#8217;s <code class="docutils literal"><span class="pre">config/environment.py</span></code> file and add the following option:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Customize templating options via this variable</span>
+<span class="n">tmpl_options</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;buffet.template_options&#39;</span><span class="p">]</span>
+
+<span class="n">tmpl_options</span><span class="p">[</span><span class="s">&#39;mako.output_encoding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;utf-8&#39;</span>
+</pre></div>
+</div>
+<p>replacing <code class="docutils literal"><span class="pre">utf-8</span></code> with the encoding you wish to use.</p>
+<p>More information can be found at <a class="reference external" href="http://www.makotemplates.org/docs/unicode.html">Mako&#8217;s Unicode Chapter</a>.</p>
+</div>
+<div class="section" id="output-encoding">
+<h2>Output Encoding<a class="headerlink" href="#output-encoding" title="Permalink to this headline">¶</a></h2>
+<p>Web pages should be generated with a specific encoding, most likely UTF-8. At
+the very least, that means you should specify the following in the <code class="docutils literal"><span class="pre">&lt;head&gt;</span></code>
+section:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">&quot;Content-Type&quot;</span> <span class="na">content=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>The charset should also be specified in the <code class="docutils literal"><span class="pre">Content-Type</span></code> header (which
+Pylons automatically does for you):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Content-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span>
+</pre></div>
+</div>
+<p>Pylons has a notion of <code class="docutils literal"><span class="pre">response_options</span></code>, complimenting the
+<code class="docutils literal"><span class="pre">request_options</span></code> mentioned in the <a class="reference internal" href="#request-parameters">Request Parameters</a> section above. The
+default request charset can be changed by setting the following in the Pylons
+config object (at the bottom of your project&#8217;s <code class="docutils literal"><span class="pre">config/environment.py</span></code>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">config</span><span class="p">[</span><span class="s">&#39;pylons.response_options&#39;</span><span class="p">][</span><span class="s">&#39;charset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;utf-8&#39;</span>
+</pre></div>
+</div>
+<p>replacing <code class="docutils literal"><span class="pre">utf-8</span></code> with the charset you wish to use.</p>
+<p>If you specify that your output is UTF-8, generally the web browser will
+give you UTF-8. If you want the browser to submit data using a different
+character set, you can set the encoding by adding the <code class="docutils literal"><span class="pre">accept-encoding</span></code>
+tag to your form. Here is an example:</p>
+<div class="highlight-html"><div class="highlight"><pre>&lt;form accept-encoding=&quot;US-ASCII&quot; ...&gt;
+</pre></div>
+</div>
+<p>However, be forewarned that if the user tries to give you non-ASCII
+text, then:</p>
+<ul class="simple">
+<li>Firefox will translate the non-ASCII text into HTML entities.</li>
+<li>IE will ignore your suggested encoding and give you UTF-8 anyway.</li>
+</ul>
+<p>The lesson to be learned is that if you output UTF-8, you had better be
+prepared to accept UTF-8 by decoding the data in <code class="docutils literal"><span class="pre">request.params</span></code> as
+described in the section above entitled <a class="reference internal" href="#request-parameters">Request Parameters</a>&#8216;.</p>
+<p>Another technique which is sometimes used to determine the character set is to
+use an algorithm to analyse the input and guess the encoding based on
+probabilities.</p>
+<p>For instance, if you get a file, and you don&#8217;t know what encoding it is encoded
+in, you can often rename the file with a .txt extension and then try to open it
+in Firefox. Then you can use the &#8220;View-&gt;Character Encoding&#8221; menu to try to
+auto-detect the encoding.</p>
+</div>
+<div class="section" id="databases">
+<h2>Databases<a class="headerlink" href="#databases" title="Permalink to this headline">¶</a></h2>
+<p>Your database driver should automatically convert from Unicode objects to a
+particular charset when writing and back again when reading. Again it is normal
+to use UTF-8 which is well supported.</p>
+<p>You should check your database&#8217;s documentation for information on how it handles Unicode.</p>
+<p>For example MySQL&#8217;s Unicode documentation is here <a class="reference external" href="http://dev.mysql.com/doc/refman/5.0/en/charset-unicode.html">http://dev.mysql.com/doc/refman/5.0/en/charset-unicode.html</a></p>
+<p>Also note that you need to consider both the encoding of the database and the encoding used by the database driver.</p>
+<p>If you&#8217;re using MySQL together with SQLAlchemy, see the following, as
+there are some bugs in MySQLdb that you&#8217;ll need to work around:</p>
+<p><a class="reference external" href="http://www.mail-archive.com/sqlalchemy&#64;googlegroups.com/msg00366.html">http://www.mail-archive.com/sqlalchemy&#64;googlegroups.com/msg00366.html</a></p>
+<div class="section" id="summary">
+<h3>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<p>Hopefully you now understand the history of Unicode, how to use it in Python  and where to apply Unicode encoding and decoding in a Pylons application. You  should also be able to use Unicode in your web app remembering the basic rule to use UTF-8 to talk to the world, do the encode and decode at the edge of your  application.</p>
+</div>
+<div class="section" id="further-reading">
+<h3>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h3>
+<p>This information is based partly on the following articles which can be
+consulted for further information.:</p>
+<p><a class="reference external" href="http://www.joelonsoftware.com/articles/Unicode.html">http://www.joelonsoftware.com/articles/Unicode.html</a></p>
+<p><a class="reference external" href="http://www.amk.ca/python/howto/unicode">http://www.amk.ca/python/howto/unicode</a></p>
+<p>Please feel free to report any mistakes to the Pylons mailing list or to the
+author. Any corrections or clarifications would be gratefully received.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Understanding Unicode</a><ul>
+<li><a class="reference internal" href="#what-is-unicode">What is Unicode?</a></li>
+<li><a class="reference internal" href="#unicode-in-python">Unicode in Python</a></li>
+<li><a class="reference internal" href="#unicode-literals-in-python-source-code">Unicode Literals in Python Source Code</a></li>
+<li><a class="reference internal" href="#input-and-output">Input and Output</a></li>
+<li><a class="reference internal" href="#unicode-filenames">Unicode Filenames</a><ul>
+<li><a class="reference internal" href="#applying-this-to-web-programming">Applying this to Web Programming</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#request-parameters">Request Parameters</a></li>
+<li><a class="reference internal" href="#templating">Templating</a></li>
+<li><a class="reference internal" href="#output-encoding">Output Encoding</a></li>
+<li><a class="reference internal" href="#databases">Databases</a><ul>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#further-reading">Further Reading</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    	<li><a href="../index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,2172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Internationalization and Localization &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Sessions" href="sessions.html" />
+    <link rel="prev" title="Forms" href="forms.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sessions.html" title="Sessions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="forms.html" title="Forms"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="internationalization-and-localization">
+<span id="i18n"></span><h1>Internationalization and Localization<a class="headerlink" href="#internationalization-and-localization" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Internationalization and localization are means of adapting software for
+non-native environments, especially for other nations and cultures.</p>
+<p>Parts of an application which might need to be localized might include:</p>
+<ul class="simple">
+<li>Language</li>
+<li>Date/time format</li>
+<li>Formatting of numbers e.g. decimal points, positioning of separators, character used as separator</li>
+<li>Time zones (UTC in internationalized environments)</li>
+<li>Currency</li>
+<li>Weights and measures</li>
+</ul>
+<p>The distinction between internationalization and localization is subtle but
+important. Internationalization is the adaptation of products for potential use
+virtually everywhere, while localization is the addition of special features
+for use in a specific locale.</p>
+<p>For example, in terms of language used in software, internationalization is the
+process of marking up all strings that might need to be translated whilst
+localization is the process of producing translations for a particular locale.</p>
+<p>Pylons provides built-in support to enable you to internationalize language but
+leaves you to handle any other aspects of internationalization which might be
+appropriate to your application.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Internationalization is often abbreviated as I18N (or i18n or I18n) where the
+number 18 refers to the number of letters omitted.
+Localization is often abbreviated L10n or l10n in the same manner. These
+abbreviations also avoid picking one spelling (internationalisation vs.
+internationalization, etc.) over the other.</p>
+</div>
+<p>In order to represent characters from multiple languages, you will
+need to utilize Unicode. This document assumes you have read the
+<a class="reference internal" href="tutorials/understanding_unicode.html#unicode"><span class="std std-ref">Understanding Unicode</span></a>.</p>
+<p>By now you should have a good idea of what Unicode is, how to use it in Python
+and which areas of you application need to pay specific attention to decoding and
+encoding Unicode data.</p>
+<p>This final section will look at the issue of making your application work with
+multiple languages.</p>
+<p>Pylons uses the <a class="reference external" href="http://docs.python.org/lib/module-gettext.html">Python gettext module</a> for internationalization.
+It is based off the <a class="reference external" href="http://www.gnu.org/software/gettext/">GNU gettext API</a>.</p>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>Everywhere in your code where you want strings to be available in different
+languages you wrap them in the <code class="docutils literal"><span class="pre">_()</span></code> function. There are also a number of
+other translation functions which are documented in the API reference at
+<a class="reference external" href="http://pylonshq.com/docs/module-pylons.i18n.translation.html">http://pylonshq.com/docs/module-pylons.i18n.translation.html</a></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal"><span class="pre">_()</span></code> function is a reference to the <code class="docutils literal"><span class="pre">ugettext()</span></code> function. <code class="docutils literal"><span class="pre">_()</span></code> is a convention for marking text to be translated and saves on keystrokes. <code class="docutils literal"><span class="pre">ugettext()</span></code> is the Unicode version of <code class="docutils literal"><span class="pre">gettext()</span></code>; it returns unicode strings.</p>
+</div>
+<p>In our example we want the string <code class="docutils literal"><span class="pre">'Hello'</span></code> to appear in three different
+languages: English, French and Spanish. We also want to display the word
+<code class="docutils literal"><span class="pre">'Hello'</span></code> in the default language. We&#8217;ll then go on to use some plural words
+too.</p>
+<p>Lets call our project <code class="docutils literal"><span class="pre">translate_demo</span></code>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster create -t pylons translate_demo
+</pre></div>
+</div>
+<p>Now lets add a friendly controller that says hello:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>translate_demo
+<span class="nv">$ </span>paster controller hello
+</pre></div>
+</div>
+<p>Edit <code class="docutils literal"><span class="pre">controllers/hello.py</span></code> to make use of the <code class="docutils literal"><span class="pre">_()</span></code> function everywhere
+where the string <code class="docutils literal"><span class="pre">Hello</span></code> appears:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons.i18n</span> <span class="kn">import</span> <span class="n">get_lang</span><span class="p">,</span> <span class="n">set_lang</span>
+
+<span class="kn">from</span> <span class="nn">translate_demo.lib.base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Default: </span><span class="si">%s</span><span class="s">&lt;br /&gt;&#39;</span> <span class="o">%</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;fr&#39;</span><span class="p">,</span><span class="s">&#39;en&#39;</span><span class="p">,</span><span class="s">&#39;es&#39;</span><span class="p">]:</span>
+            <span class="n">set_lang</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&lt;br /&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">get_lang</span><span class="p">(),</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>When writing wrapping strings in the gettext functions, it is important not to
+piece sentences together manually; certain languages might need to invert the
+grammars. Don&#8217;t do this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># BAD!</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s">&quot;He told her &quot;</span><span class="p">)</span>
+<span class="n">msg</span> <span class="o">+=</span> <span class="n">_</span><span class="p">(</span><span class="s">&quot;not to go outside.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>but this is perfectly acceptable:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># GOOD</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s">&quot;He told her not to go outside&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The controller has now been internationalized, but it will raise a
+<code class="docutils literal"><span class="pre">LanguageError</span></code> until we have setup the alternative language catalogs.</p>
+<p>GNU gettext use three types of files in the translation framework.</p>
+<div class="section" id="pot-portable-object-template-files">
+<h3>POT (Portable Object Template) files<a class="headerlink" href="#pot-portable-object-template-files" title="Permalink to this headline">¶</a></h3>
+<p>The first step in the localization process. A program is used to search
+through your project&#8217;s source code and pick out every string passed to one
+of the translation functions, such as <code class="docutils literal"><span class="pre">_()</span></code>. This list is put together in
+a specially-formatted template file that will form the basis of all
+translations. This is the <code class="docutils literal"><span class="pre">.pot</span></code> file.</p>
+</div>
+<div class="section" id="po-portable-object-files">
+<h3>PO (Portable Object) files<a class="headerlink" href="#po-portable-object-files" title="Permalink to this headline">¶</a></h3>
+<p>The second step in the localization process. Using the POT file as a
+template, the list of messages are translated and saved as a <code class="docutils literal"><span class="pre">.po</span></code> file.</p>
+</div>
+<div class="section" id="mo-machine-object-files">
+<h3>MO (Machine Object) files<a class="headerlink" href="#mo-machine-object-files" title="Permalink to this headline">¶</a></h3>
+<p>The final step in the localization process. The PO file is run through a
+program that turns it into an optimized machine-readable binary file, which
+is the <code class="docutils literal"><span class="pre">.mo</span></code> file. Compiling the translations to machine code makes the
+localized program much faster in retrieving the translations while it is
+running.</p>
+<p>GNU gettext provides a suite of command line programs for extracting messages
+from source code and working with the associated gettext catalogs. The <a class="reference external" href="http://babel.edgewall.org/">Babel</a> project provides pure Python alternative
+versions of these tools. Unlike the GNU gettext tool <cite>xgettext</cite>, Babel
+supports extracting translatable strings from Python templating languages
+(currently Mako and Genshi).</p>
+</div>
+</div>
+<div class="section" id="using-babel">
+<h2>Using Babel<a class="headerlink" href="#using-babel" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/babel_logo.png" src="_images/babel_logo.png" />
+<p>To use Babel, you must first install it via easy_install. Run the command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install Babel
+</pre></div>
+</div>
+<p>Pylons (as of 0.9.6) includes some sane defaults for Babel&#8217;s distutils commands
+in the setup.cfg file.</p>
+<p>It also includes an extraction method mapping in the setup.py file. It is
+commented out by default, to avoid distutils warning about it being an
+unrecognized option when Babel is not installed. These lines should be
+uncommented before proceeding with the rest of this walk through:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">message_extractors</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;translate_demo&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s">&#39;**.py&#39;</span><span class="p">,</span> <span class="s">&#39;python&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;templates/**.mako&#39;</span><span class="p">,</span> <span class="s">&#39;mako&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;public/**&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)]},</span>
+</pre></div>
+</div>
+<p>We&#8217;ll use Babel to extract messages to a <code class="docutils literal"><span class="pre">.pot</span></code> file in your project&#8217;s
+<code class="docutils literal"><span class="pre">i18n</span></code> directory. First, the directory needs to be created. Don&#8217;t forget to
+add it to your revision control system if one is in use:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>translate_demo
+<span class="nv">$ </span>mkdir translate_demo/i18n
+<span class="nv">$ </span>svn add translate_demo/i18n
+</pre></div>
+</div>
+<p>Next we can extract all messages from the project with the following command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py extract_messages
+running extract_messages
+extracting messages from translate_demo/__init__.py
+extracting messages from translate_demo/websetup.py
+...
+extracting messages from translate_demo/tests/functional/test_hello.py
+writing PO template file to translate_demo/i18n/translate_demo.pot
+</pre></div>
+</div>
+<p>This will create a <code class="docutils literal"><span class="pre">.pot</span></code> file in the <code class="docutils literal"><span class="pre">i18n</span></code> directory that looks something
+like this:</p>
+<div class="highlight-pot"><div class="highlight"><pre><span class="c1"># Translations template for translate_demo.</span>
+<span class="c1"># Copyright (C) 2007 ORGANIZATION</span>
+<span class="c1"># This file is distributed under the same license as the translate_demo project.</span>
+<span class="c1"># FIRST AUTHOR &lt;EMAIL@ADDRESS&gt;, 2007.</span>
+<span class="c1">#</span>
+<span class="kt">#, fuzzy</span>
+<span class="nv">msgid</span> <span class="s">&quot;&quot;</span>
+<span class="nv">msgstr</span> <span class="s">&quot;&quot;</span>
+<span class="s">&quot;</span><span class="py">Project-Id-Version:</span><span class="s"> translate_demo 0.0.0\n&quot;</span>
+<span class="s">&quot;</span><span class="py">Report-Msgid-Bugs-To:</span><span class="s"> EMAIL@ADDRESS\n&quot;</span>
+<span class="s">&quot;</span><span class="py">POT-Creation-Date:</span><span class="s"> 2007-08-02 18:01-0700\n&quot;</span>
+<span class="s">&quot;</span><span class="py">PO-Revision-Date:</span><span class="s"> YEAR-MO-DA HO:MI+ZONE\n&quot;</span>
+<span class="s">&quot;</span><span class="py">Last-Translator:</span><span class="s"> FULL NAME &lt;EMAIL@ADDRESS&gt;\n&quot;</span>
+<span class="s">&quot;</span><span class="py">Language-Team:</span><span class="s"> LANGUAGE &lt;LL@li.org&gt;\n&quot;</span>
+<span class="s">&quot;</span><span class="py">MIME-Version:</span><span class="s"> 1.0\n&quot;</span>
+<span class="s">&quot;</span><span class="py">Content-Type:</span><span class="s"> text/plain; charset=utf-8\n&quot;</span>
+<span class="s">&quot;</span><span class="py">Content-Transfer-Encoding:</span><span class="s"> 8bit\n&quot;</span>
+<span class="s">&quot;</span><span class="py">Generated-By:</span><span class="s"> Babel 0.9dev-r215\n&quot;</span>
+
+<span class="kd">#: translate_demo/controllers/hello.py:10 translate_demo/controllers/hello.py:13</span>
+<span class="nv">msgid</span> <span class="s">&quot;Hello&quot;</span>
+<span class="nv">msgstr</span> <span class="s">&quot;&quot;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">.pot</span></code> details that appear here can be customized via the
+<code class="docutils literal"><span class="pre">extract_messages</span></code> configuration in your project&#8217;s <code class="docutils literal"><span class="pre">setup.cfg</span></code> (See the
+<a class="reference external" href="http://babel.edgewall.org/wiki/Documentation/cmdline.html#extract">Babel Command-Line Interface Documentation</a> for all
+configuration options).</p>
+<p>Next, we&#8217;ll initialize a catalog (<code class="docutils literal"><span class="pre">.po</span></code> file) for the Spanish language:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py init_catalog -l es
+running init_catalog
+creating catalog <span class="s1">&#39;translate_demo/i18n/es/LC_MESSAGES/translate_demo.po&#39;</span> based on
+<span class="s1">&#39;translate_demo/i18n/translate_demo.pot&#39;</span>
+</pre></div>
+</div>
+<p>Then we can edit the last line of the new Spanish <code class="docutils literal"><span class="pre">.po</span></code> file to add a
+translation of <code class="docutils literal"><span class="pre">&quot;Hello&quot;</span></code>:</p>
+<div class="highlight-bash"><div class="highlight"><pre>msgid <span class="s2">&quot;Hello&quot;</span>
+msgstr <span class="s2">&quot;¡Hola!&quot;</span>
+</pre></div>
+</div>
+<p>Finally, to utilize these translations in our application, we need to compile
+the <code class="docutils literal"><span class="pre">.po</span></code> file to a <code class="docutils literal"><span class="pre">.mo</span></code> file:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py compile_catalog
+running compile_catalog
+<span class="m">1</span> of <span class="m">1</span> messages <span class="o">(</span>100%<span class="o">)</span> translated in <span class="s1">&#39;translate_demo/i18n/es/LC_MESSAGES/translate_demo.po&#39;</span>
+compiling catalog <span class="s1">&#39;translate_demo/i18n/es/LC_MESSAGES/translate_demo.po&#39;</span> to
+<span class="s1">&#39;translate_demo/i18n/es/LC_MESSAGES/translate_demo.mo&#39;</span>
+</pre></div>
+</div>
+<p>We can also use the <code class="docutils literal"><span class="pre">update_catalog</span></code> command to merge new messages from the
+<code class="docutils literal"><span class="pre">.pot</span></code> to the <code class="docutils literal"><span class="pre">.po</span></code> files. For example, if we later added the following
+line of code to the end of HelloController&#8217;s index method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Goodbye: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Goodbye&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>We&#8217;d then need to re-extract the messages from the project, then run the
+<code class="docutils literal"><span class="pre">update_catalog</span></code> command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py extract_messages
+running extract_messages
+extracting messages from translate_demo/__init__.py
+extracting messages from translate_demo/websetup.py
+...
+extracting messages from translate_demo/tests/functional/test_hello.py
+writing PO template file to translate_demo/i18n/translate_demo.pot
+<span class="nv">$ </span>python setup.py update_catalog
+running update_catalog
+updating catalog <span class="s1">&#39;translate_demo/i18n/es/LC_MESSAGES/translate_demo.po&#39;</span> based on
+<span class="s1">&#39;translate_demo/i18n/translate_demo.pot&#39;</span>
+</pre></div>
+</div>
+<p>We&#8217;d then edit our catalog to add a translation for &#8220;Goodbye&#8221;, and recompile
+the <code class="docutils literal"><span class="pre">.po</span></code> file as we did above.</p>
+<p>For more information, see the <a class="reference external" href="http://babel.edgewall.org/wiki/Documentation/index.html">Babel documentation</a> and the <a class="reference external" href="http://www.gnu.org/software/gettext/manual/gettext.html">GNU
+Gettext Manual</a>.</p>
+</div>
+<div class="section" id="back-to-work">
+<h2>Back To Work<a class="headerlink" href="#back-to-work" title="Permalink to this headline">¶</a></h2>
+<p>Next we&#8217;ll need to repeat the process of creating a <code class="docutils literal"><span class="pre">.mo</span></code> file for the <code class="docutils literal"><span class="pre">en</span></code>
+and <code class="docutils literal"><span class="pre">fr</span></code> locales:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py init_catalog -l en
+running init_catalog
+creating catalog <span class="s1">&#39;translate_demo/i18n/en/LC_MESSAGES/translate_demo.po&#39;</span> based on
+<span class="s1">&#39;translate_demo/i18n/translate_demo.pot&#39;</span>
+<span class="nv">$ </span>python setup.py init_catalog -l fr
+running init_catalog
+creating catalog <span class="s1">&#39;translate_demo/i18n/fr/LC_MESSAGES/translate_demo.po&#39;</span> based on
+<span class="s1">&#39;translate_demo/i18n/translate_demo.pot&#39;</span>
+</pre></div>
+</div>
+<p>Modify the last line of the <code class="docutils literal"><span class="pre">fr</span></code> catalog to look like this:</p>
+<div class="highlight-po"><div class="highlight"><pre><span class="kd">#: translate_demo/controllers/hello.py:10 translate_demo/controllers/hello.py:13</span>
+<span class="nv">msgid</span> <span class="s">&quot;Hello&quot;</span>
+<span class="nv">msgstr</span> <span class="s">&quot;Bonjour&quot;</span>
+</pre></div>
+</div>
+<p>Since our original messages are already in English, the <code class="docutils literal"><span class="pre">en</span></code> catalog can stay
+blank; gettext will fallback to the original.</p>
+<p>Once you&#8217;ve edited these new <code class="docutils literal"><span class="pre">.po</span></code> files and compiled them to <code class="docutils literal"><span class="pre">.mo</span></code> files,
+you&#8217;ll end up with an <code class="docutils literal"><span class="pre">i18n</span></code> directory containing:</p>
+<div class="highlight-text"><div class="highlight"><pre>i18n/translate_demo.pot
+i18n/en/LC_MESSAGES/translate_demo.po
+i18n/en/LC_MESSAGES/translate_demo.mo
+i18n/es/LC_MESSAGES/translate_demo.po
+i18n/es/LC_MESSAGES/translate_demo.mo
+i18n/fr/LC_MESSAGES/translate_demo.po
+i18n/fr/LC_MESSAGES/translate_demo.mo
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-the-application">
+<h2>Testing the Application<a class="headerlink" href="#testing-the-application" title="Permalink to this headline">¶</a></h2>
+<p>Start the server with the following command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster serve --reload development.ini
+</pre></div>
+</div>
+<p>Test your controller by visiting <a class="reference external" href="http://localhost:5000/hello">http://localhost:5000/hello</a>. You should see
+the following output:</p>
+<div class="highlight-text"><div class="highlight"><pre>Default: Hello
+fr: Bonjour
+en: Hello
+es: ¡Hola!
+</pre></div>
+</div>
+<p>You can now set the language used in a controller on the fly.</p>
+<p>For example this could be used to allow a user to set which language they
+wanted your application to work in. You could save the value to the session
+object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">session</span><span class="p">[</span><span class="s">&#39;lang&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;en&#39;</span>
+<span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>then on each controller call the language to be used could be read from the
+session and set in your controller&#8217;s <code class="docutils literal"><span class="pre">__before__()</span></code> method so that the pages
+remained in the same language that was previously set:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">__before__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s">&#39;lang&#39;</span> <span class="ow">in</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">set_lang</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;lang&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Pylons also supports defining the default language to be used in the
+configuration file. Set a <code class="docutils literal"><span class="pre">lang</span></code> variable to the desired default language in
+your <code class="docutils literal"><span class="pre">development.ini</span></code> file, and Pylons will automatically call <code class="docutils literal"><span class="pre">set_lang</span></code>
+with that language at the beginning of every request.</p>
+<p>E.g. to set the default language to Spanish, you would add <code class="docutils literal"><span class="pre">lang</span> <span class="pre">=</span> <span class="pre">es</span></code> to
+your <code class="docutils literal"><span class="pre">development.ini</span></code>:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[app:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:translate_demo</span>
+<span class="na">lang</span> <span class="o">=</span> <span class="s">es</span>
+</pre></div>
+</div>
+<p>If you are running the server with the <code class="docutils literal"><span class="pre">--reload</span></code> option the server will
+automatically restart if you change the <code class="docutils literal"><span class="pre">development.ini</span></code> file. Otherwise
+restart the server manually and the output would this time be as follows:</p>
+<div class="highlight-text"><div class="highlight"><pre>Default: ¡Hola!
+fr: Bonjour
+en: Hello
+es: ¡Hola!
+</pre></div>
+</div>
+</div>
+<div class="section" id="fallback-languages">
+<h2>Fallback Languages<a class="headerlink" href="#fallback-languages" title="Permalink to this headline">¶</a></h2>
+<p>If your code calls <code class="docutils literal"><span class="pre">_()</span></code> with a string that doesn&#8217;t exist at all in your
+language catalog, the string passed to <code class="docutils literal"><span class="pre">_()</span></code> is returned instead.</p>
+<p>Modify the last line of the hello controller to look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;World&#39;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Hi!&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Of course, in real life breaking up sentences in this way is very dangerous
+because some grammars might require the order of the words to be different.</p>
+</div>
+<p>If you run the example again the output will be:</p>
+<div class="highlight-text"><div class="highlight"><pre>Default: ¡Hola!
+fr: Bonjour World!
+en: Hello World!
+es: ¡Hola! World!
+</pre></div>
+</div>
+<p>This is because we never provided a translation for the string <code class="docutils literal"><span class="pre">'World!'</span></code> so
+the string itself is used.</p>
+<p>Pylons also provides a mechanism for fallback languages, so that you can
+specify other languages to be used if the word is omitted from the main
+language&#8217;s catalog.</p>
+<p>In this example we choose <code class="docutils literal"><span class="pre">fr</span></code> as the main language but <code class="docutils literal"><span class="pre">es</span></code> as a fallback:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons.i18n</span> <span class="kn">import</span> <span class="n">set_lang</span>
+
+<span class="kn">from</span> <span class="nn">translate_demo.lib.base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">set_lang</span><span class="p">([</span><span class="s">&#39;fr&#39;</span><span class="p">,</span> <span class="s">&#39;es&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;World&#39;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Hi!&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal"><span class="pre">Hello</span></code> is in the <code class="docutils literal"><span class="pre">fr</span></code> <code class="docutils literal"><span class="pre">.mo</span></code> file as <code class="docutils literal"><span class="pre">Bonjour</span></code>, <code class="docutils literal"><span class="pre">World</span></code> is only in
+<code class="docutils literal"><span class="pre">es</span></code> as <code class="docutils literal"><span class="pre">Mundo</span></code> and none of the catalogs contain <code class="docutils literal"><span class="pre">Hi!</span></code>, you&#8217;ll get the
+multilingual message: <code class="docutils literal"><span class="pre">Bonjour</span> <span class="pre">Mundo,</span> <span class="pre">Hi!</span></code>. This is a combination of the
+French, Spanish and original (English in this case, as defined in our source
+code) words.</p>
+<p>You can also add fallback languages after calling <code class="docutils literal"><span class="pre">set_lang</span></code> via the
+<code class="docutils literal"><span class="pre">pylons.i18n.add_fallback</span></code> function. Translations will be tested in the order
+you add them.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Fallbacks are reset after calling <code class="docutils literal"><span class="pre">set_lang(lang)</span></code> &#8211; that is, fallbacks
+are associated with the currently selected language.</p>
+</div>
+<p>One case where using fallbacks in this way is particularly useful is when you
+wish to display content based on the languages requested by the browser in the
+<code class="docutils literal"><span class="pre">HTTP_ACCEPT_LANGUAGE</span></code> header. Typically the browser may submit a number of
+languages so it is useful to be add fallbacks in the order specified by the
+browser so that you always try to display words in the language of preference
+and search the other languages in order if a translation cannot be found. The
+languages defined in the <code class="docutils literal"><span class="pre">HTTP_ACCEPT_LANGUAGE</span></code> header are available in
+Pylons as <code class="docutils literal"><span class="pre">request.languages</span></code> and can be used like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">languages</span><span class="p">:</span>
+    <span class="n">add_fallback</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="translations-within-templates">
+<h2>Translations Within Templates<a class="headerlink" href="#translations-within-templates" title="Permalink to this headline">¶</a></h2>
+<p>You can also use the <code class="docutils literal"><span class="pre">_()</span></code> function within templates in exactly the same way
+you do in code. For example, in a Mako template:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">${</span><span class="n">_</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">)</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>would produce the string <code class="docutils literal"><span class="pre">'Hello'</span></code> in the language you had set.</p>
+<p>Babel currently supports extracting gettext messages from Mako and Genshi
+templates. The Mako extractor also provides support for translator comments.
+Babel can be extended to extract messages from other sources via a <a class="reference external" href="http://babel.edgewall.org/wiki/Documentation/messages.html#writing-extraction-methods">custom
+extraction method plugin</a>.</p>
+<p>Pylons (as of 0.9.6) automatically configures a Babel extraction mapping for
+your Python source code and Mako templates. This is defined in your project&#8217;s
+setup.py file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">message_extractors</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;translate_demo&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s">&#39;**.py&#39;</span><span class="p">,</span> <span class="s">&#39;python&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;templates/**.mako&#39;</span><span class="p">,</span> <span class="s">&#39;mako&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;public/**&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)]},</span>
+</pre></div>
+</div>
+<p>For a project using Genshi instead of Mako, the Mako line might be replaced with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">&#39;templates/**.html, &#39;</span><span class="n">genshi</span><span class="s">&#39;, None),</span>
+</pre></div>
+</div>
+<p>See <a class="reference external" href="http://babel.edgewall.org/wiki/Documentation/messages.html#message-extraction">Babel&#8217;s documentation on Message Extraction</a>
+for more information.</p>
+</div>
+<div class="section" id="lazy-translations">
+<h2>Lazy Translations<a class="headerlink" href="#lazy-translations" title="Permalink to this headline">¶</a></h2>
+<p>Occasionally you might come across a situation when you need to translate a
+string when it is accessed, not when the <code class="docutils literal"><span class="pre">_()</span></code> or other functions are called.</p>
+<p>Consider this example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons.i18n</span> <span class="kn">import</span> <span class="n">get_lang</span><span class="p">,</span> <span class="n">set_lang</span>
+
+<span class="kn">from</span> <span class="nn">translate_demo.lib.base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Default: </span><span class="si">%s</span><span class="s">&lt;br /&gt;&#39;</span> <span class="o">%</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;fr&#39;</span><span class="p">,</span><span class="s">&#39;en&#39;</span><span class="p">,</span><span class="s">&#39;es&#39;</span><span class="p">]:</span>
+            <span class="n">set_lang</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&lt;br /&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">get_lang</span><span class="p">(),</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">)))</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Text: </span><span class="si">%s</span><span class="s">&lt;br /&gt;&#39;</span> <span class="o">%</span> <span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we run this we get the following output:</p>
+<div class="highlight-text"><div class="highlight"><pre>Default: Hello
+[&#39;fr&#39;]: Bonjour
+[&#39;en&#39;]: Good morning
+[&#39;es&#39;]: Hola
+Text: Hello
+</pre></div>
+</div>
+<p>This is because the function <code class="docutils literal"><span class="pre">_('Hello')</span></code> just after the imports is called
+when the default language is <code class="docutils literal"><span class="pre">en</span></code> so the variable <code class="docutils literal"><span class="pre">text</span></code> gets the value of
+the English translation even though when the string was used the default
+language was Spanish.</p>
+<p>The rule of thumb in these situations is to try to avoid using the translation
+functions in situations where they are not executed on each request. For
+situations where this isn&#8217;t possible, perhaps because you are working with
+legacy code or with a library which doesn&#8217;t support internationalization, you
+need to use lazy translations.</p>
+<p>If we modify the above example so that the import statements and assignment to
+<code class="docutils literal"><span class="pre">text</span></code> look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pylons.i18n</span> <span class="kn">import</span> <span class="n">get_lang</span><span class="p">,</span> <span class="n">lazy_gettext</span><span class="p">,</span> <span class="n">set_lang</span>
+
+<span class="kn">from</span> <span class="nn">helloworld.lib.base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="n">lazy_gettext</span><span class="p">(</span><span class="s">&#39;Hello&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>then we get the output we expected:</p>
+<div class="highlight-text"><div class="highlight"><pre>Default: Hello
+[&#39;fr&#39;]: Bonjour
+[&#39;en&#39;]: Good morning
+[&#39;es&#39;]: Hola
+Text: Hola
+</pre></div>
+</div>
+<p>There are lazy versions of all the standard Pylons <a class="reference external" href="http://pylonshq.com/docs/module-pylons.i18n.translation.html">translation functions</a>.</p>
+<p>There is one drawback to be aware of when using the lazy translation functions:
+they are not actually strings. This means that if our example had used the
+following code it would have failed with an error <code class="docutils literal"><span class="pre">cannot</span> <span class="pre">concatenate</span> <span class="pre">'str'</span>
+<span class="pre">and</span> <span class="pre">'LazyString'</span> <span class="pre">objects</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Text: &#39;</span> <span class="o">+</span> <span class="n">text</span> <span class="o">+</span> <span class="s">&#39;&lt;br /&gt;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For this reason you should only use the lazy translations where absolutely
+necessary and should always ensure they are converted to strings by calling
+<code class="docutils literal"><span class="pre">str()</span></code> or <code class="docutils literal"><span class="pre">repr()</span></code> before they are used in operations with real strings.</p>
+</div>
+<div class="section" id="producing-a-python-egg">
+<h2>Producing a Python Egg<a class="headerlink" href="#producing-a-python-egg" title="Permalink to this headline">¶</a></h2>
+<p>Finally you can produce an egg of your project which includes the translation
+files like this:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py bdist_egg
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">setup.py</span></code> automatically includes the <code class="docutils literal"><span class="pre">.mo</span></code> language catalogs your
+application needs so that your application can be distributed as an egg. This
+is done with the following line in your <code class="docutils literal"><span class="pre">setup.py</span></code> file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">package_data</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;translate_demo&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;i18n/*/LC_MESSAGES/*.mo&#39;</span><span class="p">]},</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plural-forms">
+<h2>Plural Forms<a class="headerlink" href="#plural-forms" title="Permalink to this headline">¶</a></h2>
+<p>Pylons also provides the <code class="docutils literal"><span class="pre">ungettext()</span></code> function. It&#8217;s designed for
+internationalizing plural words, and can be used as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ungettext</span><span class="p">(</span><span class="s">&#39;There is </span><span class="si">%(num)d</span><span class="s"> file here&#39;</span><span class="p">,</span> <span class="s">&#39;There are </span><span class="si">%(num)d</span><span class="s"> files here&#39;</span><span class="p">,</span>
+          <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="p">{</span><span class="s">&#39;num&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Plural forms have a different type of entry in <code class="docutils literal"><span class="pre">.pot</span></code>/<code class="docutils literal"><span class="pre">.po</span></code> files, as
+described in <a class="reference external" href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_10.html#PO-Files">The Format of PO Files</a>
+in <a class="reference external" href="http://www.gnu.org/software/gettext/manual/gettext.html">GNU Gettext&#8217;s Manual</a>:</p>
+<div class="highlight-pot"><div class="highlight"><pre><span class="kd">#: translate_demo/controllers/hello.py:12</span>
+<span class="kt">#, python-format</span>
+<span class="nv">msgid</span> <span class="s">&quot;There is %(num)d file here&quot;</span>
+<span class="nv">msgid_plural</span> <span class="s">&quot;There are %(num)d files here&quot;</span>
+<span class="nv">msgstr[</span><span class="mi">0</span><span class="nv">]</span> <span class="s">&quot;&quot;</span>
+<span class="nv">msgstr[</span><span class="mi">1</span><span class="nv">]</span> <span class="s">&quot;&quot;</span>
+</pre></div>
+</div>
+<p>One thing to keep in mind is that other languages don&#8217;t have the same plural
+forms as English. While English only has 2 plural forms, singular and plural,
+Slovenian has 4! That means that you <em>must</em> use ugettext for proper
+pluralization. Specifically, the following will not work:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># BAD!</span>
+<span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s">&quot;There was no dog.&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s">&quot;There were no dogs.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>This document only covers the basics of internationalizing and localizing a web
+application.</p>
+<p>GNU Gettext is an extensive library, and the GNU Gettext Manual is highly
+recommended for more information.</p>
+<p>Babel also provides support for interfacing to the CLDR (Common Locale Data
+Repository), providing access to various locale display names, localized number
+and date formatting, etc.</p>
+<p>You should also be able to internationalize and then localize your application
+using Pylons&#8217; support for GNU gettext.</p>
+</div>
+<div class="section" id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/Internationalization">http://en.wikipedia.org/wiki/Internationalization</a></p>
+<p>Please feel free to report any mistakes to the Pylons mailing list or to the
+author. Any corrections or clarifications would be gratefully received.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is a work in progress. We hope the internationalization, localization
+and Unicode support in Pylons is now robust and flexible but we would
+appreciate hearing about any issues we have. Just drop a line to the
+pylons-discuss mailing list on Google Groups.</p>
+</div>
+</div>
+<div class="section" id="module-babel.core">
+<span id="babel-core-babel-core-classes"></span><h2><a class="reference internal" href="#module-babel.core" title="babel.core"><code class="xref py py-mod docutils literal"><span class="pre">babel.core</span></code></a> &#8211; Babel core classes<a class="headerlink" href="#module-babel.core" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-babel"></span><div class="section" id="id1">
+<h3>babel<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Integrated collection of utilities that assist in internationalizing and
+localizing applications.</p>
+<p>This package is basically composed of two major parts:</p>
+<blockquote>
+<div><ul class="simple">
+<li>tools to build and work with <code class="docutils literal"><span class="pre">gettext</span></code> message catalogs</li>
+<li>a Python interface to the CLDR (Common Locale Data Repository), providing
+access to various locale display names, localized number and date
+formatting, etc.</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body"><ol class="first loweralpha simple" start="3">
+<li>2013 by the Babel Team.</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body"><p class="first last">BSD, see LICENSE for more details.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-contents">
+<h3>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="babel.Locale">
+<em class="property">class </em><code class="descclassname">babel.</code><code class="descname">Locale</code><span class="sig-paren">(</span><em>language</em>, <em>territory=None</em>, <em>script=None</em>, <em>variant=None</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.Locale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation of a specific locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span> <span class="o">=</span> <span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">(</span><span class="n">locale</span><span class="p">)</span>
+<span class="go">&quot;Locale(&#39;en&#39;, territory=&#39;US&#39;)&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span><span class="o">.</span><span class="n">display_name</span>
+<span class="go">u&#39;English (United States)&#39;</span>
+</pre></div>
+</div>
+<p>A <cite>Locale</cite> object can also be instantiated from a raw locale string:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span> <span class="o">=</span> <span class="n">Locale</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;en-US&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">(</span><span class="n">locale</span><span class="p">)</span>
+<span class="go">&quot;Locale(&#39;en&#39;, territory=&#39;US&#39;)&quot;</span>
+</pre></div>
+</div>
+<p><cite>Locale</cite> objects provide access to a collection of locale data, such as
+territory and language names, number and date format patterns, and more:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span><span class="o">.</span><span class="n">number_symbols</span><span class="p">[</span><span class="s">&#39;decimal&#39;</span><span class="p">]</span>
+<span class="go">u&#39;.&#39;</span>
+</pre></div>
+</div>
+<p>If a locale is requested for which no locale data is available, an
+<cite>UnknownLocaleError</cite> is raised:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;en_XX&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">UnknownLocaleError</span>: <span class="n">unknown locale &#39;en_XX&#39;</span>
+</pre></div>
+</div>
+<p>For more information see <span class="target" id="index-0"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3066.html"><strong>RFC 3066</strong></a>.</p>
+<dl class="attribute">
+<dt id="babel.Locale.character_order">
+<code class="descname">character_order</code><a class="headerlink" href="#babel.Locale.character_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>The text direction for the language.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">character_order</span>
+<span class="go">&#39;left-to-right&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;ar&#39;</span><span class="p">,</span> <span class="s">&#39;SA&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">character_order</span>
+<span class="go">&#39;right-to-left&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.currencies">
+<code class="descname">currencies</code><a class="headerlink" href="#babel.Locale.currencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping of currency codes to translated currency names.  This
+only returns the generic form of the currency name, not the count
+specific one.  If an actual number is requested use the
+<code class="xref py py-func docutils literal"><span class="pre">babel.numbers.get_currency_name()</span></code> function.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">currencies</span><span class="p">[</span><span class="s">&#39;COP&#39;</span><span class="p">]</span>
+<span class="go">u&#39;Colombian Peso&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">currencies</span><span class="p">[</span><span class="s">&#39;COP&#39;</span><span class="p">]</span>
+<span class="go">u&#39;Kolumbianischer Peso&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.currency_formats">
+<code class="descname">currency_formats</code><a class="headerlink" href="#babel.Locale.currency_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for currency number formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">currency_formats</span><span class="p">[</span><span class="s">&#39;standard&#39;</span><span class="p">]</span>
+<span class="go">&lt;NumberPattern u&#39;\xa4#,##0.00&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">currency_formats</span><span class="p">[</span><span class="s">&#39;accounting&#39;</span><span class="p">]</span>
+<span class="go">&lt;NumberPattern u&#39;\xa4#,##0.00&#39;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.currency_symbols">
+<code class="descname">currency_symbols</code><a class="headerlink" href="#babel.Locale.currency_symbols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping of currency codes to symbols.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">currency_symbols</span><span class="p">[</span><span class="s">&#39;USD&#39;</span><span class="p">]</span>
+<span class="go">u&#39;$&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;es&#39;</span><span class="p">,</span> <span class="s">&#39;CO&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">currency_symbols</span><span class="p">[</span><span class="s">&#39;USD&#39;</span><span class="p">]</span>
+<span class="go">u&#39;US$&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.date_formats">
+<code class="descname">date_formats</code><a class="headerlink" href="#babel.Locale.date_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for date formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">date_formats</span><span class="p">[</span><span class="s">&#39;short&#39;</span><span class="p">]</span>
+<span class="go">&lt;DateTimePattern u&#39;M/d/yy&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fr&#39;</span><span class="p">,</span> <span class="s">&#39;FR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">date_formats</span><span class="p">[</span><span class="s">&#39;long&#39;</span><span class="p">]</span>
+<span class="go">&lt;DateTimePattern u&#39;d MMMM y&#39;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.datetime_formats">
+<code class="descname">datetime_formats</code><a class="headerlink" href="#babel.Locale.datetime_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for datetime formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime_formats</span><span class="p">[</span><span class="s">&#39;full&#39;</span><span class="p">]</span>
+<span class="go">u&quot;{1} &#39;at&#39; {0}&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;th&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime_formats</span><span class="p">[</span><span class="s">&#39;medium&#39;</span><span class="p">]</span>
+<span class="go">u&#39;{1} {0}&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.datetime_skeletons">
+<code class="descname">datetime_skeletons</code><a class="headerlink" href="#babel.Locale.datetime_skeletons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for formatting parts of a datetime.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime_skeletons</span><span class="p">[</span><span class="s">&#39;MEd&#39;</span><span class="p">]</span>
+<span class="go">&lt;DateTimePattern u&#39;E, M/d&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fr&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime_skeletons</span><span class="p">[</span><span class="s">&#39;MEd&#39;</span><span class="p">]</span>
+<span class="go">&lt;DateTimePattern u&#39;E dd/MM&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fr&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime_skeletons</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">]</span>
+<span class="go">&lt;DateTimePattern u&quot;HH &#39;h&#39;&quot;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.day_period_rules">
+<code class="descname">day_period_rules</code><a class="headerlink" href="#babel.Locale.day_period_rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Day period rules for the locale.  Used by <cite>get_period_id</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.day_periods">
+<code class="descname">day_periods</code><a class="headerlink" href="#babel.Locale.day_periods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale display names for various day periods (not necessarily only AM/PM).</p>
+<p>These are not meant to be used without the relevant <cite>day_period_rules</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.days">
+<code class="descname">days</code><a class="headerlink" href="#babel.Locale.days" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale display names for weekdays.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">days</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">][</span><span class="s">&#39;wide&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+<span class="go">u&#39;Donnerstag&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.decimal_formats">
+<code class="descname">decimal_formats</code><a class="headerlink" href="#babel.Locale.decimal_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for decimal number formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decimal_formats</span><span class="p">[</span><span class="k">None</span><span class="p">]</span>
+<span class="go">&lt;NumberPattern u&#39;#,##0.###&#39;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="babel.Locale.default">
+<em class="property">classmethod </em><code class="descname">default</code><span class="sig-paren">(</span><em>category=None</em>, <em>aliases={'el': 'el_GR'</em>, <em>'fi': 'fi_FI'</em>, <em>'bg': 'bg_BG'</em>, <em>'uk': 'uk_UA'</em>, <em>'tr': 'tr_TR'</em>, <em>'ca': 'ca_ES'</em>, <em>'de': 'de_DE'</em>, <em>'fr': 'fr_FR'</em>, <em>'da': 'da_DK'</em>, <em>'fa': 'fa_IR'</em>, <em>'ar': 'ar_SY'</em>, <em>'mk': 'mk_MK'</em>, <em>'bs': 'bs_BA'</em>, <em>'cs': 'cs_CZ'</em>, <em>'et': 'et_EE'</em>, <em>'gl': 'gl_ES'</em>, <em>'id': 'id_ID'</em>, <em>'es': 'es_ES'</em>, <em>'he': 'he_IL'</em>, <em>'ru': 'ru_RU'</em>, <em>'nl': 'nl_NL'</em>, <em>'pt': 'pt_PT'</em>, <em>'nn': 'nn_NO'</em>, <em>'no': 'nb_NO'</em>, <em>'ko': 'ko_KR'</em>, <em>'sv': 'sv_SE'</em>, <em>'km': 'km_KH'</em>, <em>'ja': 'ja_JP'</em>, <em>'lv': 'lv_LV'</em>, <em>'lt': 'lt_LT'</em>, <em>'en': 'en_US'</em>, <em>'sk': 'sk_SK'</em>, <em>'th': 'th_TH'</em>, <em>'sl': 'sl_SI'</em>, <em>'it': 'it_IT'</em>, <em>'hu': 'hu_HU'</em>, <em>'ro': 'ro_RO'</em>, <em>'is': 'is_IS'</em>, <em>'pl': 'pl_PL'}</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.Locale.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the system default locale for the specified category.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;LANGUAGE&#39;</span><span class="p">,</span> <span class="s">&#39;LC_ALL&#39;</span><span class="p">,</span> <span class="s">&#39;LC_CTYPE&#39;</span><span class="p">,</span> <span class="s">&#39;LC_MESSAGES&#39;</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;LANG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;fr_FR.UTF-8&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="s">&#39;LC_MESSAGES&#39;</span><span class="p">)</span>
+<span class="go">Locale(&#39;fr&#39;, territory=&#39;FR&#39;)</span>
+</pre></div>
+</div>
+<p>The following fallbacks to the variable are always considered:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">LANGUAGE</span></code></li>
+<li><code class="docutils literal"><span class="pre">LC_ALL</span></code></li>
+<li><code class="docutils literal"><span class="pre">LC_CTYPE</span></code></li>
+<li><code class="docutils literal"><span class="pre">LANG</span></code></li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>category</strong> &#8211; one of the <code class="docutils literal"><span class="pre">LC_XXX</span></code> environment variable names</li>
+<li><strong>aliases</strong> &#8211; a dictionary of aliases for locale identifiers</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.display_name">
+<code class="descname">display_name</code><a class="headerlink" href="#babel.Locale.display_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The localized display name of the locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">display_name</span>
+<span class="go">u&#39;English&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">display_name</span>
+<span class="go">u&#39;English (United States)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;sv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">display_name</span>
+<span class="go">u&#39;svenska&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>unicode</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.english_name">
+<code class="descname">english_name</code><a class="headerlink" href="#babel.Locale.english_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The english display name of the locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">english_name</span>
+<span class="go">u&#39;German&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">english_name</span>
+<span class="go">u&#39;German (Germany)&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>unicode</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.eras">
+<code class="descname">eras</code><a class="headerlink" href="#babel.Locale.eras" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale display names for eras.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">eras</span><span class="p">[</span><span class="s">&#39;wide&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">u&#39;Anno Domini&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">eras</span><span class="p">[</span><span class="s">&#39;abbreviated&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">u&#39;BC&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.first_week_day">
+<code class="descname">first_week_day</code><a class="headerlink" href="#babel.Locale.first_week_day" title="Permalink to this definition">¶</a></dt>
+<dd><p>The first day of a week, with 0 being Monday.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first_week_day</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first_week_day</span>
+<span class="go">6</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="babel.Locale.get_display_name">
+<code class="descname">get_display_name</code><span class="sig-paren">(</span><em>locale=None</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.Locale.get_display_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the display name of the locale using the given locale.</p>
+<p>The display name will include the language, territory, script, and
+variant, if those are specified.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;zh&#39;</span><span class="p">,</span> <span class="s">&#39;CN&#39;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="s">&#39;Hans&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_display_name</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span>
+<span class="go">u&#39;Chinese (Simplified, China)&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>locale</strong> &#8211; the locale to use</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="babel.Locale.get_language_name">
+<code class="descname">get_language_name</code><span class="sig-paren">(</span><em>locale=None</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.Locale.get_language_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the language of this locale in the given locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;zh&#39;</span><span class="p">,</span> <span class="s">&#39;CN&#39;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="s">&#39;Hans&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_language_name</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">)</span>
+<span class="go">u&#39;Chinesisch&#39;</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.0.</span></p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>locale</strong> &#8211; the locale to use</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="babel.Locale.get_script_name">
+<code class="descname">get_script_name</code><span class="sig-paren">(</span><em>locale=None</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.Locale.get_script_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the script name in the given locale.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="babel.Locale.get_territory_name">
+<code class="descname">get_territory_name</code><span class="sig-paren">(</span><em>locale=None</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.Locale.get_territory_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the territory name in the given locale.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.interval_formats">
+<code class="descname">interval_formats</code><a class="headerlink" href="#babel.Locale.interval_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for interval formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<p>How to format date intervals in Finnish when the day is the
+smallest changing component:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fi_FI&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interval_formats</span><span class="p">[</span><span class="s">&#39;MEd&#39;</span><span class="p">][</span><span class="s">&#39;d&#39;</span><span class="p">]</span>
+<span class="go">[u&#39;E d. \u2013 &#39;, u&#39;E d.M.&#39;]</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The primary API to use this data is <code class="xref py py-func docutils literal"><span class="pre">babel.dates.format_interval()</span></code>.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict[str, dict[str, list[str]]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.language">
+<code class="descname">language</code><em class="property"> = None</em><a class="headerlink" href="#babel.Locale.language" title="Permalink to this definition">¶</a></dt>
+<dd><p>the language code</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.language_name">
+<code class="descname">language_name</code><a class="headerlink" href="#babel.Locale.language_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The localized language name of the locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">language_name</span>
+<span class="go">u&#39;English&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.languages">
+<code class="descname">languages</code><a class="headerlink" href="#babel.Locale.languages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping of language codes to translated language names.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">languages</span><span class="p">[</span><span class="s">&#39;ja&#39;</span><span class="p">]</span>
+<span class="go">u&#39;Japanisch&#39;</span>
+</pre></div>
+</div>
+<p>See <a class="reference external" href="http://www.loc.gov/standards/iso639-2/">ISO 639</a> for
+more information.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.list_patterns">
+<code class="descname">list_patterns</code><a class="headerlink" href="#babel.Locale.list_patterns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Patterns for generating lists</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">list_patterns</span><span class="p">[</span><span class="s">&#39;start&#39;</span><span class="p">]</span>
+<span class="go">u&#39;{0}, {1}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">list_patterns</span><span class="p">[</span><span class="s">&#39;end&#39;</span><span class="p">]</span>
+<span class="go">u&#39;{0}, and {1}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en_GB&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">list_patterns</span><span class="p">[</span><span class="s">&#39;end&#39;</span><span class="p">]</span>
+<span class="go">u&#39;{0} and {1}&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.measurement_systems">
+<code class="descname">measurement_systems</code><a class="headerlink" href="#babel.Locale.measurement_systems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Localized names for various measurement systems.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fr&#39;</span><span class="p">,</span> <span class="s">&#39;FR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">measurement_systems</span><span class="p">[</span><span class="s">&#39;US&#39;</span><span class="p">]</span>
+<span class="go">u&#39;am\xe9ricain&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">measurement_systems</span><span class="p">[</span><span class="s">&#39;US&#39;</span><span class="p">]</span>
+<span class="go">u&#39;US&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.meta_zones">
+<code class="descname">meta_zones</code><a class="headerlink" href="#babel.Locale.meta_zones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale display names for meta time zones.</p>
+<p>Meta time zones are basically groups of different Olson time zones that
+have the same GMT offset and daylight savings time.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">meta_zones</span><span class="p">[</span><span class="s">&#39;Europe_Central&#39;</span><span class="p">][</span><span class="s">&#39;long&#39;</span><span class="p">][</span><span class="s">&#39;daylight&#39;</span><span class="p">]</span>
+<span class="go">u&#39;Central European Summer Time&#39;</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.min_week_days">
+<code class="descname">min_week_days</code><a class="headerlink" href="#babel.Locale.min_week_days" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum number of days in a week so that the week is counted as
+the first week of a year or month.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">min_week_days</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.months">
+<code class="descname">months</code><a class="headerlink" href="#babel.Locale.months" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale display names for months.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">months</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">][</span><span class="s">&#39;wide&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">u&#39;Oktober&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="babel.Locale.negotiate">
+<em class="property">classmethod </em><code class="descname">negotiate</code><span class="sig-paren">(</span><em>preferred</em>, <em>available</em>, <em>sep='_'</em>, <em>aliases={'el': 'el_GR'</em>, <em>'fi': 'fi_FI'</em>, <em>'bg': 'bg_BG'</em>, <em>'uk': 'uk_UA'</em>, <em>'tr': 'tr_TR'</em>, <em>'ca': 'ca_ES'</em>, <em>'de': 'de_DE'</em>, <em>'fr': 'fr_FR'</em>, <em>'da': 'da_DK'</em>, <em>'fa': 'fa_IR'</em>, <em>'ar': 'ar_SY'</em>, <em>'mk': 'mk_MK'</em>, <em>'bs': 'bs_BA'</em>, <em>'cs': 'cs_CZ'</em>, <em>'et': 'et_EE'</em>, <em>'gl': 'gl_ES'</em>, <em>'id': 'id_ID'</em>, <em>'es': 'es_ES'</em>, <em>'he': 'he_IL'</em>, <em>'ru': 'ru_RU'</em>, <em>'nl': 'nl_NL'</em>, <em>'pt': 'pt_PT'</em>, <em>'nn': 'nn_NO'</em>, <em>'no': 'nb_NO'</em>, <em>'ko': 'ko_KR'</em>, <em>'sv': 'sv_SE'</em>, <em>'km': 'km_KH'</em>, <em>'ja': 'ja_JP'</em>, <em>'lv': 'lv_LV'</em>, <em>'lt': 'lt_LT'</em>, <em>'en': 'en_US'</em>, <em>'sk': 'sk_SK'</em>, <em>'th': 'th_TH'</em>, <em>'sl': 'sl_SI'</em>, <em>'it': 'it_IT'</em>, <em>'hu': 'hu_HU'</em>, <em>'ro': 'ro_RO'</em>, <em>'is': 'is_IS'</em>, <em>'pl': 'pl_PL'}</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.Locale.negotiate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the best match between available and requested locale strings.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="o">.</span><span class="n">negotiate</span><span class="p">([</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;en_US&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;de_AT&#39;</span><span class="p">])</span>
+<span class="go">Locale(&#39;de&#39;, territory=&#39;DE&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="o">.</span><span class="n">negotiate</span><span class="p">([</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;en_US&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;de&#39;</span><span class="p">])</span>
+<span class="go">Locale(&#39;de&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="o">.</span><span class="n">negotiate</span><span class="p">([</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;de&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;en_US&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>You can specify the character used in the locale identifiers to separate
+the differnet components. This separator is applied to both lists. Also,
+case is ignored in the comparison:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="o">.</span><span class="n">negotiate</span><span class="p">([</span><span class="s">&#39;de-DE&#39;</span><span class="p">,</span> <span class="s">&#39;de&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;en-us&#39;</span><span class="p">,</span> <span class="s">&#39;de-de&#39;</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;-&#39;</span><span class="p">)</span>
+<span class="go">Locale(&#39;de&#39;, territory=&#39;DE&#39;)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>preferred</strong> &#8211; the list of locale identifers preferred by the user</li>
+<li><strong>available</strong> &#8211; the list of locale identifiers available</li>
+<li><strong>aliases</strong> &#8211; a dictionary of aliases for locale identifiers</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.number_symbols">
+<code class="descname">number_symbols</code><a class="headerlink" href="#babel.Locale.number_symbols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Symbols used in number formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fr&#39;</span><span class="p">,</span> <span class="s">&#39;FR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">number_symbols</span><span class="p">[</span><span class="s">&#39;decimal&#39;</span><span class="p">]</span>
+<span class="go">u&#39;,&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.ordinal_form">
+<code class="descname">ordinal_form</code><a class="headerlink" href="#babel.Locale.ordinal_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plural rules for the locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ordinal_form</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;one&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ordinal_form</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">&#39;two&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ordinal_form</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">&#39;few&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fr&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ordinal_form</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">&#39;other&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;ru&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ordinal_form</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">&#39;other&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="babel.Locale.parse">
+<em class="property">classmethod </em><code class="descname">parse</code><span class="sig-paren">(</span><em>identifier</em>, <em>sep='_'</em>, <em>resolve_likely_subtags=True</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.Locale.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a <cite>Locale</cite> instance for the given locale identifier.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">l</span> <span class="o">=</span> <span class="n">Locale</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;de-DE&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">display_name</span>
+<span class="go">u&#39;Deutsch (Deutschland)&#39;</span>
+</pre></div>
+</div>
+<p>If the <cite>identifier</cite> parameter is not a string, but actually a <cite>Locale</cite>
+object, that object is returned:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+<span class="go">Locale(&#39;de&#39;, territory=&#39;DE&#39;)</span>
+</pre></div>
+</div>
+<p>This also can perform resolving of likely subtags which it does
+by default.  This is for instance useful to figure out the most
+likely locale for a territory you can use <code class="docutils literal"><span class="pre">'und'</span></code> as the
+language tag:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;und_AT&#39;</span><span class="p">)</span>
+<span class="go">Locale(&#39;de&#39;, territory=&#39;AT&#39;)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>identifier</strong> &#8211; the locale identifier string</li>
+<li><strong>sep</strong> &#8211; optional component separator</li>
+<li><strong>resolve_likely_subtags</strong> &#8211; if this is specified then a locale will
+have its likely subtag resolved if the
+locale otherwise does not exist.  For
+instance <code class="docutils literal"><span class="pre">zh_TW</span></code> by itself is not a
+locale that exists but Babel can
+automatically expand it to the full
+form of <code class="docutils literal"><span class="pre">zh_hant_TW</span></code>.  Note that this
+expansion is only taking place if no
+locale exists otherwise.  For instance
+there is a locale <code class="docutils literal"><span class="pre">en</span></code> that can exist
+by itself.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ValueError</strong> &#8211; if the string does not appear to be a valid locale
+identifier</li>
+<li><strong>UnknownLocaleError</strong> &#8211; if no locale data is available for the
+requested locale</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.percent_formats">
+<code class="descname">percent_formats</code><a class="headerlink" href="#babel.Locale.percent_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for percent number formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">percent_formats</span><span class="p">[</span><span class="k">None</span><span class="p">]</span>
+<span class="go">&lt;NumberPattern u&#39;#,##0%&#39;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.periods">
+<code class="descname">periods</code><a class="headerlink" href="#babel.Locale.periods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale display names for day periods (AM/PM).</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">periods</span><span class="p">[</span><span class="s">&#39;am&#39;</span><span class="p">]</span>
+<span class="go">u&#39;AM&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.plural_form">
+<code class="descname">plural_form</code><a class="headerlink" href="#babel.Locale.plural_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plural rules for the locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plural_form</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;one&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plural_form</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">&#39;other&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fr&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plural_form</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">&#39;one&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;ru&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plural_form</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">&#39;many&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.quarters">
+<code class="descname">quarters</code><a class="headerlink" href="#babel.Locale.quarters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale display names for quarters.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">quarters</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">][</span><span class="s">&#39;wide&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">u&#39;1. Quartal&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.scientific_formats">
+<code class="descname">scientific_formats</code><a class="headerlink" href="#babel.Locale.scientific_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for scientific number formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">scientific_formats</span><span class="p">[</span><span class="k">None</span><span class="p">]</span>
+<span class="go">&lt;NumberPattern u&#39;#E0&#39;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.script">
+<code class="descname">script</code><em class="property"> = None</em><a class="headerlink" href="#babel.Locale.script" title="Permalink to this definition">¶</a></dt>
+<dd><p>the script code</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.script_name">
+<code class="descname">script_name</code><a class="headerlink" href="#babel.Locale.script_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The localized script name of the locale if available.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;sr&#39;</span><span class="p">,</span> <span class="s">&#39;ME&#39;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="s">&#39;Latn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">script_name</span>
+<span class="go">u&#39;latinica&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.scripts">
+<code class="descname">scripts</code><a class="headerlink" href="#babel.Locale.scripts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping of script codes to translated script names.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">scripts</span><span class="p">[</span><span class="s">&#39;Hira&#39;</span><span class="p">]</span>
+<span class="go">u&#39;Hiragana&#39;</span>
+</pre></div>
+</div>
+<p>See <a class="reference external" href="http://www.evertype.com/standards/iso15924/">ISO 15924</a>
+for more information.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.territories">
+<code class="descname">territories</code><a class="headerlink" href="#babel.Locale.territories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping of script codes to translated script names.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;es&#39;</span><span class="p">,</span> <span class="s">&#39;CO&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">territories</span><span class="p">[</span><span class="s">&#39;DE&#39;</span><span class="p">]</span>
+<span class="go">u&#39;Alemania&#39;</span>
+</pre></div>
+</div>
+<p>See <a class="reference external" href="http://www.iso.org/iso/en/prods-services/iso3166ma/">ISO 3166</a>
+for more information.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.territory">
+<code class="descname">territory</code><em class="property"> = None</em><a class="headerlink" href="#babel.Locale.territory" title="Permalink to this definition">¶</a></dt>
+<dd><p>the territory (country or region) code</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.territory_name">
+<code class="descname">territory_name</code><a class="headerlink" href="#babel.Locale.territory_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The localized territory name of the locale if available.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">territory_name</span>
+<span class="go">u&#39;Deutschland&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.text_direction">
+<code class="descname">text_direction</code><a class="headerlink" href="#babel.Locale.text_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>The text direction for the language in CSS short-hand form.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text_direction</span>
+<span class="go">&#39;ltr&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;ar&#39;</span><span class="p">,</span> <span class="s">&#39;SA&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text_direction</span>
+<span class="go">&#39;rtl&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.time_formats">
+<code class="descname">time_formats</code><a class="headerlink" href="#babel.Locale.time_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale patterns for time formatting.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">time_formats</span><span class="p">[</span><span class="s">&#39;short&#39;</span><span class="p">]</span>
+<span class="go">&lt;DateTimePattern u&#39;h:mm a&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;fr&#39;</span><span class="p">,</span> <span class="s">&#39;FR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">time_formats</span><span class="p">[</span><span class="s">&#39;long&#39;</span><span class="p">]</span>
+<span class="go">&lt;DateTimePattern u&#39;HH:mm:ss z&#39;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.time_zones">
+<code class="descname">time_zones</code><a class="headerlink" href="#babel.Locale.time_zones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locale display names for time zones.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">time_zones</span><span class="p">[</span><span class="s">&#39;Europe/London&#39;</span><span class="p">][</span><span class="s">&#39;long&#39;</span><span class="p">][</span><span class="s">&#39;daylight&#39;</span><span class="p">]</span>
+<span class="go">u&#39;British Summer Time&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">time_zones</span><span class="p">[</span><span class="s">&#39;America/St_Johns&#39;</span><span class="p">][</span><span class="s">&#39;city&#39;</span><span class="p">]</span>
+<span class="go">u&#39;St. John\u2019s&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.unit_display_names">
+<code class="descname">unit_display_names</code><a class="headerlink" href="#babel.Locale.unit_display_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display names for units of measurement.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">You may want to use <code class="xref py py-func docutils literal"><span class="pre">babel.units.get_unit_name()</span></code> instead.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.variant">
+<code class="descname">variant</code><em class="property"> = None</em><a class="headerlink" href="#babel.Locale.variant" title="Permalink to this definition">¶</a></dt>
+<dd><p>the variant code</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.variants">
+<code class="descname">variants</code><a class="headerlink" href="#babel.Locale.variants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping of script codes to translated script names.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">variants</span><span class="p">[</span><span class="s">&#39;1901&#39;</span><span class="p">]</span>
+<span class="go">u&#39;Alte deutsche Rechtschreibung&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.weekend_end">
+<code class="descname">weekend_end</code><a class="headerlink" href="#babel.Locale.weekend_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>The day the weekend ends, with 0 being Monday.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">weekend_end</span>
+<span class="go">6</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.weekend_start">
+<code class="descname">weekend_start</code><a class="headerlink" href="#babel.Locale.weekend_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>The day the weekend starts, with 0 being Monday.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;de&#39;</span><span class="p">,</span> <span class="s">&#39;DE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">weekend_start</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="babel.Locale.zone_formats">
+<code class="descname">zone_formats</code><a class="headerlink" href="#babel.Locale.zone_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Patterns related to the formatting of time zones.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of the value returned may change between
+Babel versions.</p>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;US&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">zone_formats</span><span class="p">[</span><span class="s">&#39;fallback&#39;</span><span class="p">]</span>
+<span class="go">u&#39;%(1)s (%(0)s)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Locale</span><span class="p">(</span><span class="s">&#39;pt&#39;</span><span class="p">,</span> <span class="s">&#39;BR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">zone_formats</span><span class="p">[</span><span class="s">&#39;region&#39;</span><span class="p">]</span>
+<span class="go">u&#39;Hor\xe1rio %s&#39;</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.9.</span></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="babel.default_locale">
+<code class="descclassname">babel.</code><code class="descname">default_locale</code><span class="sig-paren">(</span><em>category=None</em>, <em>aliases={'el': 'el_GR'</em>, <em>'fi': 'fi_FI'</em>, <em>'bg': 'bg_BG'</em>, <em>'uk': 'uk_UA'</em>, <em>'tr': 'tr_TR'</em>, <em>'ca': 'ca_ES'</em>, <em>'de': 'de_DE'</em>, <em>'fr': 'fr_FR'</em>, <em>'da': 'da_DK'</em>, <em>'fa': 'fa_IR'</em>, <em>'ar': 'ar_SY'</em>, <em>'mk': 'mk_MK'</em>, <em>'bs': 'bs_BA'</em>, <em>'cs': 'cs_CZ'</em>, <em>'et': 'et_EE'</em>, <em>'gl': 'gl_ES'</em>, <em>'id': 'id_ID'</em>, <em>'es': 'es_ES'</em>, <em>'he': 'he_IL'</em>, <em>'ru': 'ru_RU'</em>, <em>'nl': 'nl_NL'</em>, <em>'pt': 'pt_PT'</em>, <em>'nn': 'nn_NO'</em>, <em>'no': 'nb_NO'</em>, <em>'ko': 'ko_KR'</em>, <em>'sv': 'sv_SE'</em>, <em>'km': 'km_KH'</em>, <em>'ja': 'ja_JP'</em>, <em>'lv': 'lv_LV'</em>, <em>'lt': 'lt_LT'</em>, <em>'en': 'en_US'</em>, <em>'sk': 'sk_SK'</em>, <em>'th': 'th_TH'</em>, <em>'sl': 'sl_SI'</em>, <em>'it': 'it_IT'</em>, <em>'hu': 'hu_HU'</em>, <em>'ro': 'ro_RO'</em>, <em>'is': 'is_IS'</em>, <em>'pl': 'pl_PL'}</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.default_locale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the system default locale for a given category, based on
+environment variables.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;LANGUAGE&#39;</span><span class="p">,</span> <span class="s">&#39;LC_ALL&#39;</span><span class="p">,</span> <span class="s">&#39;LC_CTYPE&#39;</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;LANG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;fr_FR.UTF-8&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_locale</span><span class="p">(</span><span class="s">&#39;LC_MESSAGES&#39;</span><span class="p">)</span>
+<span class="go">&#39;fr_FR&#39;</span>
+</pre></div>
+</div>
+<p>The &#8220;C&#8221; or &#8220;POSIX&#8221; pseudo-locales are treated as aliases for the
+&#8220;en_US_POSIX&#8221; locale:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;LC_MESSAGES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;POSIX&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_locale</span><span class="p">(</span><span class="s">&#39;LC_MESSAGES&#39;</span><span class="p">)</span>
+<span class="go">&#39;en_US_POSIX&#39;</span>
+</pre></div>
+</div>
+<p>The following fallbacks to the variable are always considered:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">LANGUAGE</span></code></li>
+<li><code class="docutils literal"><span class="pre">LC_ALL</span></code></li>
+<li><code class="docutils literal"><span class="pre">LC_CTYPE</span></code></li>
+<li><code class="docutils literal"><span class="pre">LANG</span></code></li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>category</strong> &#8211; one of the <code class="docutils literal"><span class="pre">LC_XXX</span></code> environment variable names</li>
+<li><strong>aliases</strong> &#8211; a dictionary of aliases for locale identifiers</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="babel.negotiate_locale">
+<code class="descclassname">babel.</code><code class="descname">negotiate_locale</code><span class="sig-paren">(</span><em>preferred</em>, <em>available</em>, <em>sep='_'</em>, <em>aliases={'el': 'el_GR'</em>, <em>'fi': 'fi_FI'</em>, <em>'bg': 'bg_BG'</em>, <em>'uk': 'uk_UA'</em>, <em>'tr': 'tr_TR'</em>, <em>'ca': 'ca_ES'</em>, <em>'de': 'de_DE'</em>, <em>'fr': 'fr_FR'</em>, <em>'da': 'da_DK'</em>, <em>'fa': 'fa_IR'</em>, <em>'ar': 'ar_SY'</em>, <em>'mk': 'mk_MK'</em>, <em>'bs': 'bs_BA'</em>, <em>'cs': 'cs_CZ'</em>, <em>'et': 'et_EE'</em>, <em>'gl': 'gl_ES'</em>, <em>'id': 'id_ID'</em>, <em>'es': 'es_ES'</em>, <em>'he': 'he_IL'</em>, <em>'ru': 'ru_RU'</em>, <em>'nl': 'nl_NL'</em>, <em>'pt': 'pt_PT'</em>, <em>'nn': 'nn_NO'</em>, <em>'no': 'nb_NO'</em>, <em>'ko': 'ko_KR'</em>, <em>'sv': 'sv_SE'</em>, <em>'km': 'km_KH'</em>, <em>'ja': 'ja_JP'</em>, <em>'lv': 'lv_LV'</em>, <em>'lt': 'lt_LT'</em>, <em>'en': 'en_US'</em>, <em>'sk': 'sk_SK'</em>, <em>'th': 'th_TH'</em>, <em>'sl': 'sl_SI'</em>, <em>'it': 'it_IT'</em>, <em>'hu': 'hu_HU'</em>, <em>'ro': 'ro_RO'</em>, <em>'is': 'is_IS'</em>, <em>'pl': 'pl_PL'}</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.negotiate_locale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the best match between available and requested locale strings.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">negotiate_locale</span><span class="p">([</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;en_US&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;de_AT&#39;</span><span class="p">])</span>
+<span class="go">&#39;de_DE&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negotiate_locale</span><span class="p">([</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;en_US&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;en&#39;</span><span class="p">,</span> <span class="s">&#39;de&#39;</span><span class="p">])</span>
+<span class="go">&#39;de&#39;</span>
+</pre></div>
+</div>
+<p>Case is ignored by the algorithm, the result uses the case of the preferred
+locale identifier:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">negotiate_locale</span><span class="p">([</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;en_US&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;de_de&#39;</span><span class="p">,</span> <span class="s">&#39;de_at&#39;</span><span class="p">])</span>
+<span class="go">&#39;de_DE&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">negotiate_locale</span><span class="p">([</span><span class="s">&#39;de_DE&#39;</span><span class="p">,</span> <span class="s">&#39;en_US&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;de_de&#39;</span><span class="p">,</span> <span class="s">&#39;de_at&#39;</span><span class="p">])</span>
+<span class="go">&#39;de_DE&#39;</span>
+</pre></div>
+</div>
+<p>By default, some web browsers unfortunately do not include the territory
+in the locale identifier for many locales, and some don&#8217;t even allow the
+user to easily add the territory. So while you may prefer using qualified
+locale identifiers in your web-application, they would not normally match
+the language-only locale sent by such browsers. To workaround that, this
+function uses a default mapping of commonly used langauge-only locale
+identifiers to identifiers including the territory:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">negotiate_locale</span><span class="p">([</span><span class="s">&#39;ja&#39;</span><span class="p">,</span> <span class="s">&#39;en_US&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;ja_JP&#39;</span><span class="p">,</span> <span class="s">&#39;en_US&#39;</span><span class="p">])</span>
+<span class="go">&#39;ja_JP&#39;</span>
+</pre></div>
+</div>
+<p>Some browsers even use an incorrect or outdated language code, such as &#8220;no&#8221;
+for Norwegian, where the correct locale identifier would actually be &#8220;nb_NO&#8221;
+(Bokmål) or &#8220;nn_NO&#8221; (Nynorsk). The aliases are intended to take care of
+such cases, too:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">negotiate_locale</span><span class="p">([</span><span class="s">&#39;no&#39;</span><span class="p">,</span> <span class="s">&#39;sv&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;nb_NO&#39;</span><span class="p">,</span> <span class="s">&#39;sv_SE&#39;</span><span class="p">])</span>
+<span class="go">&#39;nb_NO&#39;</span>
+</pre></div>
+</div>
+<p>You can override this default mapping by passing a different <cite>aliases</cite>
+dictionary to this function, or you can bypass the behavior althogher by
+setting the <cite>aliases</cite> parameter to <cite>None</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>preferred</strong> &#8211; the list of locale strings preferred by the user</li>
+<li><strong>available</strong> &#8211; the list of locale strings available</li>
+<li><strong>sep</strong> &#8211; character that separates the different parts of the locale
+strings</li>
+<li><strong>aliases</strong> &#8211; a dictionary of aliases for locale identifiers</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="babel.parse_locale">
+<code class="descclassname">babel.</code><code class="descname">parse_locale</code><span class="sig-paren">(</span><em>identifier</em>, <em>sep='_'</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.parse_locale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a locale identifier into a tuple of the form <code class="docutils literal"><span class="pre">(language,</span>
+<span class="pre">territory,</span> <span class="pre">script,</span> <span class="pre">variant)</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_locale</span><span class="p">(</span><span class="s">&#39;zh_CN&#39;</span><span class="p">)</span>
+<span class="go">(&#39;zh&#39;, &#39;CN&#39;, None, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_locale</span><span class="p">(</span><span class="s">&#39;zh_Hans_CN&#39;</span><span class="p">)</span>
+<span class="go">(&#39;zh&#39;, &#39;CN&#39;, &#39;Hans&#39;, None)</span>
+</pre></div>
+</div>
+<p>The default component separator is &#8220;_&#8221;, but a different separator can be
+specified using the <cite>sep</cite> parameter:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_locale</span><span class="p">(</span><span class="s">&#39;zh-CN&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;-&#39;</span><span class="p">)</span>
+<span class="go">(&#39;zh&#39;, &#39;CN&#39;, None, None)</span>
+</pre></div>
+</div>
+<p>If the identifier cannot be parsed into a locale, a <cite>ValueError</cite> exception
+is raised:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_locale</span><span class="p">(</span><span class="s">&#39;not_a_LOCALE_String&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">&#39;not_a_LOCALE_String&#39; is not a valid locale identifier</span>
+</pre></div>
+</div>
+<p>Encoding information and locale modifiers are removed from the identifier:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_locale</span><span class="p">(</span><span class="s">&#39;it_IT@euro&#39;</span><span class="p">)</span>
+<span class="go">(&#39;it&#39;, &#39;IT&#39;, None, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_locale</span><span class="p">(</span><span class="s">&#39;en_US.UTF-8&#39;</span><span class="p">)</span>
+<span class="go">(&#39;en&#39;, &#39;US&#39;, None, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_locale</span><span class="p">(</span><span class="s">&#39;de_DE.iso885915@euro&#39;</span><span class="p">)</span>
+<span class="go">(&#39;de&#39;, &#39;DE&#39;, None, None)</span>
+</pre></div>
+</div>
+<p>See <span class="target" id="index-1"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4646.html"><strong>RFC 4646</strong></a> for more information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>identifier</strong> &#8211; the locale identifier string</li>
+<li><strong>sep</strong> &#8211; character that separates the different components of the locale
+identifier</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if the string does not appear to be a valid locale
+identifier</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-babel.localedata">
+<span id="babel-localedata-babel-locale-data"></span><h2><a class="reference internal" href="#module-babel.localedata" title="babel.localedata"><code class="xref py py-mod docutils literal"><span class="pre">babel.localedata</span></code></a> &#8212; Babel locale data<a class="headerlink" href="#module-babel.localedata" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="babel-localedata">
+<h3>babel.localedata<a class="headerlink" href="#babel-localedata" title="Permalink to this headline">¶</a></h3>
+<p>Low-level locale data access.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">note:</th><td class="field-body"><p class="first">The <cite>Locale</cite> class, which uses this module under the hood, provides a
+more convenient interface for accessing the locale data.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">copyright:</th><td class="field-body"><ol class="first loweralpha simple" start="3">
+<li>2013 by the Babel Team.</li>
+</ol>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">license:</th><td class="field-body"><p class="first last">BSD, see LICENSE for more details.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="function">
+<dt id="babel.localedata.exists">
+<code class="descclassname">babel.localedata.</code><code class="descname">exists</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.localedata.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether locale data is available for the given locale.</p>
+<p>Returns <cite>True</cite> if it exists, <cite>False</cite> otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; the locale identifier string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">babel.localedata.</code><code class="descname">exists</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span></dt>
+<dd><p>Check whether locale data is available for the given locale.</p>
+<p>Returns <cite>True</cite> if it exists, <cite>False</cite> otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; the locale identifier string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-babel.dates">
+<span id="babel-dates-babel-date-classes"></span><h2><a class="reference internal" href="#module-babel.dates" title="babel.dates"><code class="xref py py-mod docutils literal"><span class="pre">babel.dates</span></code></a> &#8211; Babel date classes<a class="headerlink" href="#module-babel.dates" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="babel-dates">
+<h3>babel.dates<a class="headerlink" href="#babel-dates" title="Permalink to this headline">¶</a></h3>
+<p>Locale dependent formatting and parsing of dates and times.</p>
+<p>The default locale for the functions in this module is determined by the
+following environment variables, in that order:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">LC_TIME</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">LC_ALL</span></code>, and</li>
+<li><code class="docutils literal"><span class="pre">LANG</span></code></li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body"><ol class="first loweralpha simple" start="3">
+<li>2013 by the Babel Team.</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body"><p class="first last">BSD, see LICENSE for more details.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id2">
+<h3>Module Contents<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="babel.dates.DateTimeFormat">
+<em class="property">class </em><code class="descclassname">babel.dates.</code><code class="descname">DateTimeFormat</code><span class="sig-paren">(</span><em>value</em>, <em>locale</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.dates.DateTimeFormat" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="babel.dates.DateTimeFormat.format_frac_seconds">
+<code class="descname">format_frac_seconds</code><span class="sig-paren">(</span><em>num</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.dates.DateTimeFormat.format_frac_seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return fractional seconds.</p>
+<p>Rounds the time&#8217;s microseconds to the precision given by the number         of digits passed in.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="babel.dates.DateTimeFormat.format_weekday">
+<code class="descname">format_weekday</code><span class="sig-paren">(</span><em>char='E'</em>, <em>num=4</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.dates.DateTimeFormat.format_weekday" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return weekday from parsed datetime according to format pattern.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span> <span class="o">=</span> <span class="n">DateTimeFormat</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">Locale</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;en_US&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span><span class="o">.</span><span class="n">format_weekday</span><span class="p">()</span>
+<span class="go">u&#39;Sunday&#39;</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>&#8216;E&#8217;: Day of week - Use one through three letters for the abbreviated day name, four for the full (wide) name,</dt>
+<dd>five for the narrow name, or six for the short name.</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span><span class="o">.</span><span class="n">format_weekday</span><span class="p">(</span><span class="s">&#39;E&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">u&#39;Sun&#39;</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>&#8216;e&#8217;: Local day of week. Same as E except adds a numeric value that will depend on the local starting day of the</dt>
+<dd>week, using one or two letters. For this example, Monday is the first day of the week.</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span><span class="o">.</span><span class="n">format_weekday</span><span class="p">(</span><span class="s">&#39;e&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">&#39;01&#39;</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>&#8216;c&#8217;: Stand-Alone local day of week - Use one letter for the local numeric value (same as &#8216;e&#8217;), three for the</dt>
+<dd>abbreviated day name, four for the full (wide) name, five for the narrow name, or six for the short name.</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span><span class="o">.</span><span class="n">format_weekday</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;1&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>char</strong> &#8211; pattern format character (&#8216;e&#8217;,&#8217;E&#8217;,&#8217;c&#8217;)</li>
+<li><strong>num</strong> &#8211; count of format character</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="babel.dates.DateTimeFormat.get_week_number">
+<code class="descname">get_week_number</code><span class="sig-paren">(</span><em>day_of_period</em>, <em>day_of_week=None</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.dates.DateTimeFormat.get_week_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of the week of a day within a period. This may be
+the week number in a year or the week number in a month.</p>
+<p>Usually this will return a value equal to or greater than 1, but if the
+first week of the period is so short that it actually counts as the last
+week of the previous period, this function will return 0.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span> <span class="o">=</span> <span class="n">DateTimeFormat</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2006</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Locale</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;de_DE&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span><span class="o">.</span><span class="n">get_week_number</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span> <span class="o">=</span> <span class="n">DateTimeFormat</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2006</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Locale</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;en_US&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span><span class="o">.</span><span class="n">get_week_number</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>day_of_period</strong> &#8211; the number of the day in the period (usually
+either the day of month or the day of year)</li>
+<li><strong>day_of_week</strong> &#8211; the week day; if ommitted, the week day of the
+current date is assumed</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="babel.dates.DateTimePattern">
+<em class="property">class </em><code class="descclassname">babel.dates.</code><code class="descname">DateTimePattern</code><span class="sig-paren">(</span><em>pattern</em>, <em>format</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.dates.DateTimePattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-babel.numbers">
+<span id="babel-numbers-babel-number-classes"></span><h2><a class="reference internal" href="#module-babel.numbers" title="babel.numbers"><code class="xref py py-mod docutils literal"><span class="pre">babel.numbers</span></code></a> &#8211; Babel number classes<a class="headerlink" href="#module-babel.numbers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="babel-numbers">
+<h3>babel.numbers<a class="headerlink" href="#babel-numbers" title="Permalink to this headline">¶</a></h3>
+<p>Locale dependent formatting and parsing of numeric data.</p>
+<p>The default locale for the functions in this module is determined by the
+following environment variables, in that order:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">LC_NUMERIC</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">LC_ALL</span></code>, and</li>
+<li><code class="docutils literal"><span class="pre">LANG</span></code></li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body"><ol class="first loweralpha simple" start="3">
+<li>2013 by the Babel Team.</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body"><p class="first last">BSD, see LICENSE for more details.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id3">
+<h3>Module Contents<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="babel.numbers.NumberFormatError">
+<em class="property">class </em><code class="descclassname">babel.numbers.</code><code class="descname">NumberFormatError</code><a class="headerlink" href="#babel.numbers.NumberFormatError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception raised when a string cannot be parsed into a number.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="babel.numbers.NumberPattern">
+<em class="property">class </em><code class="descclassname">babel.numbers.</code><code class="descname">NumberPattern</code><span class="sig-paren">(</span><em>pattern</em>, <em>prefix</em>, <em>suffix</em>, <em>grouping</em>, <em>int_prec</em>, <em>frac_prec</em>, <em>exp_prec</em>, <em>exp_plus</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.numbers.NumberPattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="babel.numbers.format_number">
+<code class="descclassname">babel.numbers.</code><code class="descname">format_number</code><span class="sig-paren">(</span><em>number</em>, <em>locale='zh_CN'</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.numbers.format_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the given number formatted for a specific locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">format_number</span><span class="p">(</span><span class="mi">1099</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;1,099&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">format_number</span><span class="p">(</span><span class="mi">1099</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;de_DE&#39;</span><span class="p">)</span>
+<span class="go">u&#39;1.099&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>number</strong> &#8211; the number to format</li>
+<li><strong>locale</strong> &#8211; the <cite>Locale</cite> object or locale identifier</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="babel.numbers.format_decimal">
+<code class="descclassname">babel.numbers.</code><code class="descname">format_decimal</code><span class="sig-paren">(</span><em>number</em>, <em>format=None</em>, <em>locale='zh_CN'</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.numbers.format_decimal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the given decimal number formatted for a specific locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">format_decimal</span><span class="p">(</span><span class="mf">1.2345</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;1.234&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">format_decimal</span><span class="p">(</span><span class="mf">1.2346</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;1.235&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">format_decimal</span><span class="p">(</span><span class="o">-</span><span class="mf">1.2346</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;-1.235&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">format_decimal</span><span class="p">(</span><span class="mf">1.2345</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;sv_SE&#39;</span><span class="p">)</span>
+<span class="go">u&#39;1,234&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">format_decimal</span><span class="p">(</span><span class="mf">1.2345</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;de&#39;</span><span class="p">)</span>
+<span class="go">u&#39;1,234&#39;</span>
+</pre></div>
+</div>
+<p>The appropriate thousands grouping and the decimal separator are used for
+each locale:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">format_decimal</span><span class="p">(</span><span class="mf">12345.5</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;12,345.5&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>number</strong> &#8211; the number to format</li>
+<li><strong>format</strong> &#8211; </li>
+<li><strong>locale</strong> &#8211; the <cite>Locale</cite> object or locale identifier</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="babel.numbers.format_percent">
+<code class="descclassname">babel.numbers.</code><code class="descname">format_percent</code><span class="sig-paren">(</span><em>number</em>, <em>format=None</em>, <em>locale='zh_CN'</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.numbers.format_percent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return formatted percent value for a specific locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">format_percent</span><span class="p">(</span><span class="mf">0.34</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;34%&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">format_percent</span><span class="p">(</span><span class="mf">25.1234</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;2,512%&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">format_percent</span><span class="p">(</span><span class="mf">25.1234</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;sv_SE&#39;</span><span class="p">)</span>
+<span class="go">u&#39;2\xa0512\xa0%&#39;</span>
+</pre></div>
+</div>
+<p>The format pattern can also be specified explicitly:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">format_percent</span><span class="p">(</span><span class="mf">25.1234</span><span class="p">,</span> <span class="s">u&#39;#,##0</span><span class="se">\u2030</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;25,123\u2030&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>number</strong> &#8211; the percent number to format</li>
+<li><strong>format</strong> &#8211; </li>
+<li><strong>locale</strong> &#8211; the <cite>Locale</cite> object or locale identifier</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="babel.numbers.format_scientific">
+<code class="descclassname">babel.numbers.</code><code class="descname">format_scientific</code><span class="sig-paren">(</span><em>number</em>, <em>format=None</em>, <em>locale='zh_CN'</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.numbers.format_scientific" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return value formatted in scientific notation for a specific locale.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">format_scientific</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;1E4&#39;</span>
+</pre></div>
+</div>
+<p>The format pattern can also be specified explicitly:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">format_scientific</span><span class="p">(</span><span class="mi">1234567</span><span class="p">,</span> <span class="s">u&#39;##0E00&#39;</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">u&#39;1.23E06&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>number</strong> &#8211; the number to format</li>
+<li><strong>format</strong> &#8211; </li>
+<li><strong>locale</strong> &#8211; the <cite>Locale</cite> object or locale identifier</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="babel.numbers.parse_number">
+<code class="descclassname">babel.numbers.</code><code class="descname">parse_number</code><span class="sig-paren">(</span><em>string</em>, <em>locale='zh_CN'</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.numbers.parse_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse localized number string into an integer.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_number</span><span class="p">(</span><span class="s">&#39;1,099&#39;</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">1099</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_number</span><span class="p">(</span><span class="s">&#39;1.099&#39;</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;de_DE&#39;</span><span class="p">)</span>
+<span class="go">1099</span>
+</pre></div>
+</div>
+<p>When the given string cannot be parsed, an exception is raised:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_number</span><span class="p">(</span><span class="s">&#39;1.099,98&#39;</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;de&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">NumberFormatError</span>: <span class="n">&#39;1.099,98&#39; is not a valid number</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>string</strong> &#8211; the string to parse</li>
+<li><strong>locale</strong> &#8211; the <cite>Locale</cite> object or locale identifier</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the parsed number</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NumberFormatError</strong> &#8211; if the string can not be converted to a number</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="babel.numbers.parse_decimal">
+<code class="descclassname">babel.numbers.</code><code class="descname">parse_decimal</code><span class="sig-paren">(</span><em>string</em>, <em>locale='zh_CN'</em><span class="sig-paren">)</span><a class="headerlink" href="#babel.numbers.parse_decimal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse localized decimal string into a decimal.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_decimal</span><span class="p">(</span><span class="s">&#39;1,099.98&#39;</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;en_US&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;1099.98&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_decimal</span><span class="p">(</span><span class="s">&#39;1.099,98&#39;</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;de&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;1099.98&#39;)</span>
+</pre></div>
+</div>
+<p>When the given string cannot be parsed, an exception is raised:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_decimal</span><span class="p">(</span><span class="s">&#39;2,109,998&#39;</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s">&#39;de&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">NumberFormatError</span>: <span class="n">&#39;2,109,998&#39; is not a valid decimal number</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>string</strong> &#8211; the string to parse</li>
+<li><strong>locale</strong> &#8211; the <cite>Locale</cite> object or locale identifier</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NumberFormatError</strong> &#8211; if the string can not be converted to a
+decimal number</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Internationalization and Localization</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a><ul>
+<li><a class="reference internal" href="#pot-portable-object-template-files">POT (Portable Object Template) files</a></li>
+<li><a class="reference internal" href="#po-portable-object-files">PO (Portable Object) files</a></li>
+<li><a class="reference internal" href="#mo-machine-object-files">MO (Machine Object) files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-babel">Using Babel</a></li>
+<li><a class="reference internal" href="#back-to-work">Back To Work</a></li>
+<li><a class="reference internal" href="#testing-the-application">Testing the Application</a></li>
+<li><a class="reference internal" href="#fallback-languages">Fallback Languages</a></li>
+<li><a class="reference internal" href="#translations-within-templates">Translations Within Templates</a></li>
+<li><a class="reference internal" href="#lazy-translations">Lazy Translations</a></li>
+<li><a class="reference internal" href="#producing-a-python-egg">Producing a Python Egg</a></li>
+<li><a class="reference internal" href="#plural-forms">Plural Forms</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#further-reading">Further Reading</a></li>
+<li><a class="reference internal" href="#module-babel.core"><code class="docutils literal"><span class="pre">babel.core</span></code> &#8211; Babel core classes</a><ul>
+<li><a class="reference internal" href="#id1">babel</a></li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-babel.localedata"><code class="docutils literal"><span class="pre">babel.localedata</span></code> &#8212; Babel locale data</a><ul>
+<li><a class="reference internal" href="#babel-localedata">babel.localedata</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-babel.dates"><code class="docutils literal"><span class="pre">babel.dates</span></code> &#8211; Babel date classes</a><ul>
+<li><a class="reference internal" href="#babel-dates">babel.dates</a></li>
+<li><a class="reference internal" href="#id2">Module Contents</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-babel.numbers"><code class="docutils literal"><span class="pre">babel.numbers</span></code> &#8211; Babel number classes</a><ul>
+<li><a class="reference internal" href="#babel-numbers">babel.numbers</a></li>
+<li><a class="reference internal" href="#id3">Module Contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="forms.html"
+                        title="previous chapter">Forms</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sessions.html"
+                        title="next chapter">Sessions</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sessions.html" title="Sessions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="forms.html" title="Forms"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

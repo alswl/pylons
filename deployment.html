@@ -1,0 +1,543 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Packaging and Deployment Overview &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Python 2.3 Installation Instructions" href="python23_install.html" />
+    <link rel="prev" title="Upgrading" href="upgrading.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="python23_install.html" title="Python 2.3 Installation Instructions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="upgrading.html" title="Upgrading"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="packaging-and-deployment-overview">
+<span id="deployment"></span><h1>Packaging and Deployment Overview<a class="headerlink" href="#packaging-and-deployment-overview" title="Permalink to this headline">¶</a></h1>
+<p>TODO: some of this is redundant to the (more current) <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a> doc &#8211; should be consolidated and cross-referenced</p>
+<p>This document describes how a developer can take advantage of Pylons&#8217; application setup functionality to allow webmasters to easily set up their application.</p>
+<p>Installation refers to the process of downloading and installing the application with <a class="reference internal" href="glossary.html#term-easy-install"><span class="xref std std-term">easy_install</span></a> whereas setup refers to the process of setting up an instance of an installed application so it is ready to be deployed.</p>
+<p>For example, a wiki application might need to create database tables to use. The webmaster would only install the wiki <code class="docutils literal"><span class="pre">.egg</span></code> file once using <a class="reference internal" href="glossary.html#term-easy-install"><span class="xref std std-term">easy_install</span></a> but might want to run 5 wikis on the site so would setup the wiki 5 times, each time specifying a different database to use so that 5 wikis can run from the same code, but store their data in different databases.</p>
+<div class="section" id="egg-files">
+<h2>Egg Files<a class="headerlink" href="#egg-files" title="Permalink to this headline">¶</a></h2>
+<p>Before you can understand how a user configures an application you have to understand how Pylons applications are distributed. All Pylons applications are distributed in <code class="docutils literal"><span class="pre">.egg</span></code> format. An egg is simply a Python executable package that has been put together into a single file.</p>
+<p>You create an egg from your project by going into the project root directory and running the command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py bdist_egg
+</pre></div>
+</div>
+<p>If everything goes smoothly a <code class="docutils literal"><span class="pre">.egg</span></code> file with the correct name and version number appears in a newly created <code class="docutils literal"><span class="pre">dist</span></code> directory.</p>
+<p>When a webmaster wants to install a Pylons application he will do so by downloading the egg and then installing it.</p>
+</div>
+<div class="section" id="installing-as-a-non-root-user">
+<h2>Installing as a Non-root User<a class="headerlink" href="#installing-as-a-non-root-user" title="Permalink to this headline">¶</a></h2>
+<p>It&#8217;s quite possible when using shared hosting accounts that you do not have root access to install packages. In this case you can install <a class="reference internal" href="glossary.html#term-setuptools"><span class="xref std std-term">setuptools</span></a> based packages like Pylons and Pylons web applications in your home directory using a <a class="reference internal" href="glossary.html#term-virtualenv"><span class="xref std std-term">virtualenv</span></a> setup. This way you can install all the packages you want to use without super-user access.</p>
+</div>
+<div class="section" id="understanding-the-setup-process">
+<h2>Understanding the Setup Process<a class="headerlink" href="#understanding-the-setup-process" title="Permalink to this headline">¶</a></h2>
+<p>Say you have written a Pylons wiki application called <code class="docutils literal"><span class="pre">wiki</span></code>. When a webmaster wants to install your wiki application he will run the following command to generate a config file:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster make-config wiki wiki_production.ini
+</pre></div>
+</div>
+<p>He will then edit the config file for his production environment with the settings he wants and then run this command to setup the application:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster setup-app wiki_production.ini
+</pre></div>
+</div>
+<p>Finally he might choose to deploy the wiki application through the paste server like this (although he could have chosen CGI/FastCGI/SCGI etc):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster serve wiki_production.ini
+</pre></div>
+</div>
+<p>The idea is that an application only needs to be installed once but if necessary can be set up multiple times, each with a different configuration.</p>
+<p>All Pylons applications are installed in the same way, so you as the developer need to know how the above commands work.</p>
+<div class="section" id="make-config">
+<h3>Make Config<a class="headerlink" href="#make-config" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">paster</span> <span class="pre">make-config</span></code> command looks for the file <code class="docutils literal"><span class="pre">deployment.ini_tmpl</span></code> and uses it as a basis for generating a new <code class="docutils literal"><span class="pre">.ini</span></code> file.</p>
+<p>Using our new wiki example again, the <code class="docutils literal"><span class="pre">wiki/config/deployment.ini_tmpl</span></code> file contains the text:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[DEFAULT]</span>
+<span class="na">debug</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">email_to</span> <span class="o">=</span> <span class="s">you@yourdomain.com</span>
+<span class="na">smtp_server</span> <span class="o">=</span> <span class="s">localhost</span>
+<span class="na">error_email_from</span> <span class="o">=</span> <span class="s">paste@localhost</span>
+
+<span class="k">[server:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#http</span>
+<span class="na">host</span> <span class="o">=</span> <span class="s">0.0.0.0</span>
+<span class="na">port</span> <span class="o">=</span> <span class="s">5000</span>
+
+<span class="k">[app:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:wiki</span>
+<span class="na">full_stack</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">static_files</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">cache_dir</span> <span class="o">=</span> <span class="s">%(here)s/data</span>
+<span class="na">beaker.session.key</span> <span class="o">=</span> <span class="s">wiki</span>
+<span class="na">beaker.session.secret</span> <span class="o">=</span> <span class="s">${app_instance_secret}</span>
+<span class="na">app_instance_uuid</span> <span class="o">=</span> <span class="s">${app_instance_uuid}</span>
+
+<span class="c1"># If you&#39;d like to fine-tune the individual locations of the cache data dirs</span>
+<span class="c1"># for the Cache data, or the Session saves, un-comment the desired settings</span>
+<span class="c1"># here:</span>
+<span class="c1">#beaker.cache.data_dir = %(here)s/data/cache</span>
+<span class="c1">#beaker.session.data_dir = %(here)s/data/sessions</span>
+
+<span class="c1"># WARNING: *THE LINE BELOW MUST BE UNCOMMENTED ON A PRODUCTION ENVIRONMENT*</span>
+<span class="c1"># Debug mode will enable the interactive debugging tool, allowing ANYONE to</span>
+<span class="c1"># execute malicious code after an exception is raised.</span>
+<span class="na">set debug</span> <span class="o">=</span> <span class="s">false</span>
+
+
+<span class="c1"># Logging configuration</span>
+<span class="k">[loggers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">root</span>
+
+<span class="k">[handlers]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">console</span>
+
+<span class="k">[formatters]</span>
+<span class="na">keys</span> <span class="o">=</span> <span class="s">generic</span>
+
+<span class="k">[logger_root]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">INFO</span>
+<span class="na">handlers</span> <span class="o">=</span> <span class="s">console</span>
+
+<span class="k">[handler_console]</span>
+<span class="na">class</span> <span class="o">=</span> <span class="s">StreamHandler</span>
+<span class="na">args</span> <span class="o">=</span> <span class="s">(sys.stderr,)</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">NOTSET</span>
+<span class="na">formatter</span> <span class="o">=</span> <span class="s">generic</span>
+
+<span class="k">[formatter_generic]</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">%(asctime)s %(levelname)-5.5s [%(name)s] [%(threadName)s] %(message)s</span>
+</pre></div>
+</div>
+<p>When the command <code class="docutils literal"><span class="pre">paster</span> <span class="pre">make-config</span> <span class="pre">wiki</span> <span class="pre">wiki_production.ini</span></code> is run, the contents of this file are produced so you should tweak this file to provide sensible default configuration for production deployment of your app.</p>
+</div>
+<div class="section" id="setup-app">
+<h3>Setup App<a class="headerlink" href="#setup-app" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">paster</span> <span class="pre">setup-app</span></code> command references the newly created <code class="docutils literal"><span class="pre">.ini</span></code> file and calls the function <code class="docutils literal"><span class="pre">wiki.websetup.setup_app()</span></code> to set up the application. If your application needs to be set up before it can be used, you should edit the <code class="docutils literal"><span class="pre">websetup.py</span></code> file.</p>
+<p>Here&#8217;s an example which just prints the location of the cache directory via Python&#8217;s logging facilities:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;Setup the helloworld application&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">helloworld.config.environment</span> <span class="kn">import</span> <span class="n">load_environment</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">setup_app</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="nb">vars</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Place any commands to setup helloworld here&quot;&quot;&quot;</span>
+    <span class="n">load_environment</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">global_conf</span><span class="p">,</span> <span class="n">conf</span><span class="o">.</span><span class="n">local_conf</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Using cache dirctory </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;cache.dir&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>For a more useful example, say your application needs a database set up and loaded with initial data. The user will specify the location of the database to use by editing the config file before running the <code class="docutils literal"><span class="pre">paster</span> <span class="pre">setup-app</span></code> command. The <code class="docutils literal"><span class="pre">setup_app()</span></code> function will then be able to load the configuration and act on it in the function body. This way, the <code class="docutils literal"><span class="pre">setup_app()</span></code> function can be used to initialize the database when <code class="docutils literal"><span class="pre">paster</span> <span class="pre">setup-app</span></code> is run. Using the optional <a class="reference internal" href="glossary.html#term-sqlalchemy"><span class="xref std std-term">SQLAlchemy</span></a> project template support when creating a Pylons project will set all of this up for you in a basic way. The <a class="reference internal" href="tutorials/quickwiki_tutorial.html#quickwiki-tutorial"><span class="std std-ref">Quickwiki tutorial</span></a> illustrates an example of this configuration.</p>
+</div>
+</div>
+<div class="section" id="deploying-the-application">
+<h2>Deploying the Application<a class="headerlink" href="#deploying-the-application" title="Permalink to this headline">¶</a></h2>
+<p>Once the application is setup it is ready to be deployed. There are lots of ways of deploying an application, one of which is to use the <code class="docutils literal"><span class="pre">paster</span> <span class="pre">serve</span></code> command which takes the configuration file that has already been used to setup the application and serves it on a local HTTP server for production use:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster serve wiki_production.ini
+</pre></div>
+</div>
+<p>More information on Paste deployment options is available on the Paste website at <a class="reference external" href="http://pythonpaste.org">http://pythonpaste.org</a>. See <a class="reference internal" href="#deployment-webservers"><span class="std std-ref">Running Pylons Apps with Other Web Servers</span></a> for alternative Pylons deployment scenarios.</p>
+</div>
+<div class="section" id="advanced-usage">
+<h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
+<p>So far everything we have done has happened through the <code class="docutils literal"><span class="pre">paste.script.appinstall.Installer</span></code> class which looks for the <code class="docutils literal"><span class="pre">deployment.ini_tmpl</span></code> and <code class="docutils literal"><span class="pre">websetup.py</span></code> file and behaves accordingly.</p>
+<p>If you need more control over how your application is installed you can use your own installer class. Create a file, for example <code class="docutils literal"><span class="pre">wiki/installer.py</span></code> and code your new installer class in the file by deriving it from the existing one:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paste.script.appinstall</span> <span class="kn">import</span> <span class="n">Installer</span>
+<span class="k">class</span> <span class="nc">MyInstaller</span><span class="p">(</span><span class="n">Installer</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>You then override the functionality as necessary (have a look at the source code for <code class="docutils literal"><span class="pre">Installer</span></code> as a basis. You then change your application&#8217;s <code class="docutils literal"><span class="pre">setup.py</span></code> file so that the <code class="docutils literal"><span class="pre">paste.app_install</span></code> entry point <code class="docutils literal"><span class="pre">main</span></code> points to your new installer:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">entry_points</span><span class="o">=</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">...</span>
+<span class="s">[paste.app_install]</span>
+<span class="s">main=wiki.installer:MyInstaller</span>
+<span class="s">...</span>
+<span class="s">&quot;&quot;&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Depending on how you code your <code class="docutils literal"><span class="pre">MyInstaller</span></code> class you may not even need your <code class="docutils literal"><span class="pre">websetup.py</span></code> or <code class="docutils literal"><span class="pre">deployment.ini_tmpl</span></code> as you might have decided to create the <code class="docutils literal"><span class="pre">.ini</span></code> file and setup the application in an entirely different way.</p>
+</div>
+</div>
+<div class="section" id="running-pylons-apps-with-other-web-servers">
+<span id="deployment-webservers"></span><h1>Running Pylons Apps with Other Web Servers<a class="headerlink" href="#running-pylons-apps-with-other-web-servers" title="Permalink to this headline">¶</a></h1>
+<p>This document assumes that you have already installed a Pylons web application, and <a class="reference internal" href="configuration.html#run-config"><span class="std std-ref">Runtime Configuration</span></a> for it.  Pylons applications use <a class="reference external" href="http://pythonpaste.org/deploy/">PasteDeploy</a> to  start up your Pylons WSGI application, and can use the flup package to provide a Fast-CGI, SCGI, or AJP connection to it.</p>
+<div class="section" id="using-fast-cgi">
+<h2>Using Fast-CGI<a class="headerlink" href="#using-fast-cgi" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://fastcgi.com/">Fast-CGI</a> is a gateway to connect web severs like <a class="reference external" href="http://httpd.apache.org/">Apache</a> and <a class="reference external" href="http://lighttpd.net/">lighttpd</a> to a CGI-style application. Out of the box, Pylons applications can run with Fast-CGI in either a threaded or forking mode. (Threaded is the recommended choice)</p>
+<p>Setting a Pylons application to use Fast-CGI is very easy, and merely requires you to change the config line like so:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># default</span>
+<span class="k">[server:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#http</span>
+
+<span class="c1"># Use Fastcgi threaded</span>
+<span class="k">[server:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:PasteScript#flup_fcgi_thread</span>
+<span class="na">host</span> <span class="o">=</span> <span class="s">0.0.0.0</span>
+<span class="na">port</span> <span class="o">=</span> <span class="s">6500</span>
+</pre></div>
+</div>
+<p>Note that you will need to install the <a class="reference external" href="http://www.saddi.com/software/flup/dist/">flup</a> package, which can be
+installed via easy_install:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install -U flup
+</pre></div>
+</div>
+<p>The options in the config file are passed onto flup. The two common ways to run Fast CGI is either using a socket to listen for requests, or listening on a port/host which allows a webserver to send your requests to web applications on a different machine.</p>
+<p>To configure for a socket, your <code class="docutils literal"><span class="pre">server:main</span></code> section should look like this:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[server:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:PasteScript#flup_fcgi_thread</span>
+<span class="na">socket</span> <span class="o">=</span> <span class="s">/location/to/app.socket</span>
+</pre></div>
+</div>
+<p>If you want to listen on a host/port, the configuration cited in the first example will do the trick.</p>
+</div>
+<div class="section" id="apache-configuration">
+<h2>Apache Configuration<a class="headerlink" href="#apache-configuration" title="Permalink to this headline">¶</a></h2>
+<p>For this example, we will assume you&#8217;re using Apache 2, though Apache 1 configuration will be very similar. First, make sure that you have the Apache <a class="reference external" href="http://fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html">mod_fastcgi</a> module installed in
+your Apache.</p>
+<p>There will most likely be a section where you declare your FastCGI servers, and whether they&#8217;re external:</p>
+<div class="highlight-apacheconf"><div class="highlight"><pre><span class="nt">&lt;IfModule</span> <span class="s">mod_fastcgi.c</span><span class="nt">&gt;</span>
+<span class="nb">FastCgiIpcDir</span> <span class="sx">/tmp</span>
+<span class="nb">FastCgiExternalServer</span> <span class="sx">/some/path/to/app/myapp.fcgi</span> -host some.host.com:6200
+<span class="nt">&lt;/IfModule&gt;</span>
+</pre></div>
+</div>
+<p>In our example we&#8217;ll assume you&#8217;re going to run a Pylons web application listening on a host/port. Changing <code class="docutils literal"><span class="pre">-host</span></code> to <code class="docutils literal"><span class="pre">-socket</span></code> will let you use a Pylons web application listening on a socket.</p>
+<p>The filename you give in the second option does not need to physically exist on the webserver, URIs that Apache resolve to this filename will be handled by the FastCGI application.</p>
+<p>The other important line to ensure that your Apache webserver has is to indicate that fcgi scripts should be handled with Fast-CGI:</p>
+<div class="highlight-apacheconf"><div class="highlight"><pre><span class="nb">AddHandler</span> fastcgi-script .fcgi
+</pre></div>
+</div>
+<p>Finally, to configure your website to use the Fast CGI application you will need to indicate the script to be used:</p>
+<div class="highlight-apacheconf"><div class="highlight"><pre><span class="nt">&lt;VirtualHost</span> <span class="s">*:80</span><span class="nt">&gt;</span>
+    <span class="nb">ServerAdmin</span> george@monkey.com
+    <span class="nb">ServerName</span> monkey.com
+    <span class="nb">ServerAlias</span> www.monkey.com
+    <span class="nb">DocumentRoot</span> <span class="sx">/some/path/to/app</span>
+
+    <span class="nb">ScriptAliasMatch</span> ^(/.*)$ <span class="sx">/some/path/to/app/myapp.fcgi</span>$1
+<span class="nt">&lt;/VirtualHost&gt;</span>
+</pre></div>
+</div>
+<p>Other useful directives should be added as needed, for example, the ErrorLog directive, etc. This configuration will result in all requests being sent to your FastCGI application.</p>
+</div>
+<div class="section" id="prefixmiddleware">
+<h2>PrefixMiddleware<a class="headerlink" href="#prefixmiddleware" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">PrefixMiddleware</span></code> provides a way to manually override the root prefix (<code class="docutils literal"><span class="pre">SCRIPT_NAME</span></code>) of your application for certain situations.</p>
+<p>When running an application under a prefix (such as &#8216;<code class="docutils literal"><span class="pre">/james</span></code>&#8216;) in FastCGI/apache, the <code class="docutils literal"><span class="pre">SCRIPT_NAME</span></code> environment variable is automatically set to to the appropriate value: &#8216;<code class="docutils literal"><span class="pre">/james</span></code>&#8216;. Pylons&#8217; URL generators such as <code class="docutils literal"><span class="pre">url</span></code> always take the <code class="docutils literal"><span class="pre">SCRIPT_NAME</span></code> value into account.</p>
+<p>One situation where <code class="docutils literal"><span class="pre">PrefixMiddleware</span></code> is required is when an application is accessed via a reverse proxy with a prefix. The application is accessed through the reverse proxy via the the URL prefix &#8216;<code class="docutils literal"><span class="pre">/james</span></code>&#8216;, whereas the reverse proxy forwards those requests to the application at the prefix &#8216;<code class="docutils literal"><span class="pre">/</span></code>&#8216;.</p>
+<p>The reverse proxy, being an entirely separate web server, has no way of specifying the <code class="docutils literal"><span class="pre">SCRIPT_NAME</span></code> variable; it must be manually set by a <code class="docutils literal"><span class="pre">PrefixMiddleware</span></code> instance. Without setting <code class="docutils literal"><span class="pre">SCRIPT_NAME</span></code>, <code class="docutils literal"><span class="pre">url</span></code> will generate URLs such as: &#8216;<code class="docutils literal"><span class="pre">/purchase_orders/1</span></code>&#8216;, when it should be generating: &#8216;<code class="docutils literal"><span class="pre">/james/purchase_orders/1</span></code>&#8216;.</p>
+<p>To filter your application through a <code class="docutils literal"><span class="pre">PrefixMiddleware</span></code> instance, add the following to the &#8216;<code class="docutils literal"><span class="pre">[app:main]</span></code>&#8216; section of your .ini file:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">filter-with</span> <span class="o">=</span> <span class="s">proxy-prefix</span>
+
+<span class="k">[filter:proxy-prefix]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:PasteDeploy#prefix</span>
+<span class="na">prefix</span> <span class="o">=</span> <span class="s">/james</span>
+</pre></div>
+</div>
+<p>The name <code class="docutils literal"><span class="pre">proxy-prefix</span></code> simply acts as an identifier of the filter section; feel free to rename it.</p>
+<p>These .ini settings are equivalent to adding the following to the end of your application&#8217;s <code class="docutils literal"><span class="pre">config/middleware.py</span></code>, right before the <code class="docutils literal"><span class="pre">return</span> <span class="pre">app</span></code> line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># This app is served behind a proxy via the following prefix (SCRIPT_NAME)</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">PrefixMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">global_conf</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&#39;/james&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This requires the additional import line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paste.deploy.config</span> <span class="kn">import</span> <span class="n">PrefixMiddleware</span>
+</pre></div>
+</div>
+<p>Whereas the modification to <code class="docutils literal"><span class="pre">config/middleware.py</span></code> will setup an instance of <code class="docutils literal"><span class="pre">PrefixMiddleware</span></code> under every environment (.ini).</p>
+</div>
+<div class="section" id="using-java-web-servers-with-jython">
+<h2>Using Java Web Servers with Jython<a class="headerlink" href="#using-java-web-servers-with-jython" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="jython.html#java-deployment"><span class="std std-ref">Deploying to Java Web servers</span></a>.</p>
+</div>
+</div>
+<div class="section" id="documenting-your-application">
+<span id="adding-documentation"></span><h1>Documenting Your Application<a class="headerlink" href="#documenting-your-application" title="Permalink to this headline">¶</a></h1>
+<p>TODO: this needs to be rewritten &#8211; Pudge is effectively dead</p>
+<p>While the information in this document should be correct, it may not be entirely complete... Pudge is somewhat unruly to work with at this time, and you may need to experiment to find a working combination of package versions. In particular, it has been noted that an older version of Kid, like 0.9.1, may be required. You might also need to install {{RuleDispatch}} if you get errors related to {{FormEncode}} when attempting to build documentation.</p>
+<p>Apologies for this suboptimal situation. Considerations are being taken to fix Pudge or supplant it for future versions of Pylons.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Pylons comes with support for automatic documentation generation tools like <a class="reference external" href="http://pudge.lesscode.org">Pudge</a>.</p>
+<p>Automatic documentation generation allows you to write your main documentation in the docs directory of your project as well as throughout the code itself using docstrings.</p>
+<p>When you run a simple command all the documentation is built into sophisticated HTML.</p>
+</div>
+<div class="section" id="tutorial">
+<h2>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h2>
+<p>First create a project as described in <a class="reference internal" href="gettingstarted.html#getting-started"><span class="std std-ref">快速入门</span></a>.</p>
+<p>You will notice a docs directory within your main project directory. This is where you should write your main documentation.</p>
+<p>There is already an <code class="docutils literal"><span class="pre">index.txt</span></code> file in <code class="docutils literal"><span class="pre">docs</span></code> so you can already generate documentation. First we&#8217;ll install Pudge and buildutils. By default, Pylons sets an option to use <a class="reference external" href="http://pygments.org">Pygments</a> for syntax-highlighting of code in your documentation, so you&#8217;ll need to install it too (unless you wish to remove the option from <code class="docutils literal"><span class="pre">setup.cfg</span></code>):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install pudge buildutils
+<span class="nv">$ </span>easy_install Pygments
+</pre></div>
+</div>
+<p>then run the following command from your project&#8217;s main directory where the <code class="docutils literal"><span class="pre">setup.py</span></code> file is:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py pudge
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <code class="docutils literal"><span class="pre">pudge</span></code> command is currently disabled by default. Run the following command first to enable it:</p>
+<p>..code-block:: bash</p>
+<blockquote>
+<div>$ python setup.py addcommand -p buildutils.pudge_command</div></blockquote>
+<p class="last">Thanks to Yannick Gingras for the tip.</p>
+</div>
+<p>Pudge will produce output similar to the following to tell you what it is doing and show you any problems:</p>
+<div class="highlight-text"><div class="highlight"><pre>running pudge
+generating documentation
+copying: pudge\template\pythonpaste.org\rst.css -&gt; do/docs/html\rst.css
+copying: pudge\template\base\pudge.css -&gt; do/docs/html\pudge.css
+copying: pudge\template\pythonpaste.org\layout.css -&gt; do/docs/html\layout.css
+rendering: pudge\template\pythonpaste.org\site.css.kid -&gt; site.css
+colorizing: do/docs/html\do/__init__.py.html
+colorizing: do/docs/html\do/tests/__init__.py.html
+colorizing: do/docs/html\do/i18n/__init__.py.html
+colorizing: do/docs/html\do/lib/__init__.py.html
+colorizing: do/docs/html\do/controllers/__init__.py.html
+colorizing: do/docs/html\do/model.py.html
+</pre></div>
+</div>
+<p>Once finished you will notice a <code class="docutils literal"><span class="pre">docs/html</span></code> directory. The <code class="docutils literal"><span class="pre">index.html</span></code> is the main file which was generated from <code class="docutils literal"><span class="pre">docs/index.txt</span></code>.</p>
+</div>
+<div class="section" id="learning-restructuredtext">
+<h2>Learning ReStructuredText<a class="headerlink" href="#learning-restructuredtext" title="Permalink to this headline">¶</a></h2>
+<p>Python programs typically use a rather odd format for documentation called <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a>. It is designed so that the text file used to generate the HTML is as readable as possible but as a result can be a bit confusing for beginners.</p>
+<p>Read the reStructuredText tutorial which is part of the <a class="reference external" href="http://docutils.sf.net">docutils</a> project.</p>
+<p>Once you have mastered reStructuredText you can write documentation until your heart&#8217;s content.</p>
+</div>
+<div class="section" id="using-docstrings">
+<h2>Using Docstrings<a class="headerlink" href="#using-docstrings" title="Permalink to this headline">¶</a></h2>
+<p>Docstrings are one of Python&#8217;s most useful features if used properly. They are described in detail in the Python documentation but basically allow you to document any module, class, method or function, in fact just about anything. Users can then access this documentation interactively.</p>
+<p>Try this:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pylons</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">help</span><span class="p">(</span><span class="n">pylons</span><span class="p">)</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>As you can see if you tried it you get detailed information about the pylons module including the information in the docstring.</p>
+<p>Docstrings are also extracted by Pudge so you can describe how to use all the controllers, actions and modules that make up your application. Pudge will extract that information and turn it into useful API documentation automatically.</p>
+<p>Try clicking the <code class="docutils literal"><span class="pre">Modules</span></code> link in the HTML documentation you generated earlier or look at the Pylons source code for some examples of how to use docstrings.</p>
+</div>
+<div class="section" id="using-doctest">
+<h2>Using doctest<a class="headerlink" href="#using-doctest" title="Permalink to this headline">¶</a></h2>
+<p>The final useful thing about docstrings is that you can use the <code class="docutils literal"><span class="pre">doctest</span></code> module with them. <code class="docutils literal"><span class="pre">doctest</span></code> again is described in the Python documentation but it looks through your docstrings for things that look like Python code written at a Python prompt. Consider this example:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal"><span class="pre">doctest</span></code> was run on this file it would have found the example above and executed it. If when the expression <code class="docutils literal"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> is executed the result was not <code class="docutils literal"><span class="pre">5</span></code>, <code class="docutils literal"><span class="pre">doctest</span></code> would raise an Exception.</p>
+<p>This is a very handy way of checking that the examples in your documentation are actually correct.</p>
+<p>To run <code class="docutils literal"><span class="pre">doctest</span></code> on a module use:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">&quot;__main__&quot;:</span></code> part ensures that your module won&#8217;t be tested if it is just imported, only if it is run from the command line</p>
+<p>To run <code class="docutils literal"><span class="pre">doctest</span></code> on a file use:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">doctest</span>
+<span class="n">doctest</span><span class="o">.</span><span class="n">testfile</span><span class="p">(</span><span class="s">&quot;docs/index.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You might consider incorporating this functionality in your <code class="docutils literal"><span class="pre">tests/test.py</span></code> file to improve the testing of your application.</p>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>So if you write your documentation in reStructuredText, in the <code class="docutils literal"><span class="pre">docs</span></code> directory and in your code&#8217;s docstrings, liberally scattered with example code, Pylons provides a very useful and powerful system for you.</p>
+<p>If you want to find out more information have a look at the Pudge documentation or try tinkering with your project&#8217;s <code class="docutils literal"><span class="pre">setup.cfg</span></code> file which contains the Pudge settings.</p>
+</div>
+</div>
+<div class="section" id="distributing-your-application">
+<span id="app-distribution"></span><h1>Distributing Your Application<a class="headerlink" href="#distributing-your-application" title="Permalink to this headline">¶</a></h1>
+<p>TODO: this assumes helloworld tutorial context that is no longer present, and could be consolidated with packaging info in <a class="reference internal" href="#deployment"><span class="std std-ref">Packaging and Deployment Overview</span></a></p>
+<p>As mentioned earlier eggs are a convenient format for packaging applications. You can create an egg for your project like this:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>helloworld
+<span class="nv">$ </span>python setup.py bdist_egg
+</pre></div>
+</div>
+<p>Your egg will be in the <code class="docutils literal"><span class="pre">dist</span></code> directory and will be called <code class="docutils literal"><span class="pre">helloworld-0.0.0dev-py2.4.egg</span></code>.</p>
+<p>You can change options in <code class="docutils literal"><span class="pre">setup.py</span></code> to change information about your project. For example change version to <code class="docutils literal"><span class="pre">version=&quot;0.1.0&quot;,</span></code> and run <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">bdist_egg</span></code> again to produce a new egg with an updated version number.</p>
+<p>You can then register your application with the <a class="reference external" href="http://pypi.python.org/pypi">Python Package Index</a> (PyPI) with the following command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python setup.py register
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You should not do this unless you actually want to register a package!</p>
+</div>
+<p>If users want to install your software and have installed <a class="reference internal" href="glossary.html#term-easy-install"><span class="xref std std-term">easy_install</span></a> they can install your new egg as follows:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install <span class="nv">helloworld</span><span class="o">==</span>0.1.0
+</pre></div>
+</div>
+<p>This will retrieve the package from PyPI and install it. Alternatively you can install the egg locally:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>easy_install -f C:<span class="se">\p</span>ath<span class="se">\w</span>ith<span class="se">\t</span>he<span class="se">\e</span>gg<span class="se">\f</span>iles<span class="se">\i</span>n <span class="nv">helloworld</span><span class="o">==</span>0.1.0
+</pre></div>
+</div>
+<p>In order to use the egg in a website you need to use Paste. You have already used Paste to create your Pylons template and to run a test server to test the tutorial application.</p>
+<p>Paste is a set of tools available at <a class="reference external" href="http://pythonpaste.org">http://pythonpaste.org</a> for providing a uniform way in which all compatible Python web frameworks can work together. To run a paste application such as any Pylons application you need to create a Paste configuration file. The idea is that the your paste configuration file will contain all the configuration for all the different Paste applications you run. A configuration file suitable for development is in the <code class="docutils literal"><span class="pre">helloworld/development.ini</span></code> file of the tutorial but the idea is that the person using your egg will add relevant configuration options to their own Paste configuration file so that your egg behaves they way they want. See the section below for more on this configuration.</p>
+<p>Paste configuration files can be run in many different ways, from CGI scripts, as standalone servers, with FastCGI, SCGI, mod_python and more. This flexibility means that your Pylons application can be run in virtually any environment and also take advantage of the speed benefits that the deployment option offers.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#deployment-webservers"><span class="std std-ref">Running Pylons Apps with Other Web Servers</span></a></p>
+</div>
+<div class="section" id="running-your-application">
+<h2>Running Your Application<a class="headerlink" href="#running-your-application" title="Permalink to this headline">¶</a></h2>
+<p>In order to run your application your users will need to install it as described above but then generate a config file and setup your application before deploying it. This is described in <a class="reference internal" href="configuration.html#run-config"><span class="std std-ref">Runtime Configuration</span></a> and <a class="reference internal" href="#deployment"><span class="std std-ref">Packaging and Deployment Overview</span></a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Packaging and Deployment Overview</a><ul>
+<li><a class="reference internal" href="#egg-files">Egg Files</a></li>
+<li><a class="reference internal" href="#installing-as-a-non-root-user">Installing as a Non-root User</a></li>
+<li><a class="reference internal" href="#understanding-the-setup-process">Understanding the Setup Process</a><ul>
+<li><a class="reference internal" href="#make-config">Make Config</a></li>
+<li><a class="reference internal" href="#setup-app">Setup App</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#deploying-the-application">Deploying the Application</a></li>
+<li><a class="reference internal" href="#advanced-usage">Advanced Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-pylons-apps-with-other-web-servers">Running Pylons Apps with Other Web Servers</a><ul>
+<li><a class="reference internal" href="#using-fast-cgi">Using Fast-CGI</a></li>
+<li><a class="reference internal" href="#apache-configuration">Apache Configuration</a></li>
+<li><a class="reference internal" href="#prefixmiddleware">PrefixMiddleware</a></li>
+<li><a class="reference internal" href="#using-java-web-servers-with-jython">Using Java Web Servers with Jython</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#documenting-your-application">Documenting Your Application</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#tutorial">Tutorial</a></li>
+<li><a class="reference internal" href="#learning-restructuredtext">Learning ReStructuredText</a></li>
+<li><a class="reference internal" href="#using-docstrings">Using Docstrings</a></li>
+<li><a class="reference internal" href="#using-doctest">Using doctest</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#distributing-your-application">Distributing Your Application</a><ul>
+<li><a class="reference internal" href="#running-your-application">Running Your Application</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="upgrading.html"
+                        title="previous chapter">Upgrading</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="python23_install.html"
+                        title="next chapter">Python 2.3 Installation Instructions</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="python23_install.html" title="Python 2.3 Installation Instructions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="upgrading.html" title="Upgrading"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

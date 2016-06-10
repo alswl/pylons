@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>快速入门 &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Pylons 理念" href="concepts.html" />
+    <link rel="prev" title="Pylons 参考手册" href="index.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Pylons 理念"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Pylons 参考手册"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started">
+<span id="id1"></span><h1>快速入门<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>译者：<a class="reference external" href="http://log4d.com/">alswl</a></p>
+<p>这章内容打算告诉你如何最简安装和运行 Pylons，并介绍一下工程概况。
+整个过程中会提供一些链接来鼓励用户自行探索 Pylons 的各个方面。</p>
+<div class="section" id="id2">
+<h2>安装需求<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Python 2.4 以上（包括2.4，但是目前还不支持 Python 3）</li>
+</ul>
+</div>
+<div class="section" id="installing-pylons">
+<span id="id3"></span><h2>安装<a class="headerlink" href="#installing-pylons" title="Permalink to this headline">¶</a></h2>
+<p>为了避免和系统自带的 Python 库混淆，Pylons 提供了一个初始化脚本来配置一个「虚拟」的
+Python 环境。Pylons 一会就会被安装在这个虚拟环境中。</p>
+<div class="admonition-by-the-way admonition">
+<p class="first admonition-title">By the Way</p>
+<p><a class="reference internal" href="glossary.html#term-virtualenv"><span class="xref std std-term">virtualenv</span></a> 是用来创建独立 Python 环境的工具。它可以避免在使用
+<a class="reference internal" href="glossary.html#term-easy-install"><span class="xref std std-term">easy_install</span></a> 时候将一大堆包安装到系统级 Python 环境中。</p>
+<p class="last">它的另一个优点是不需要管理员权限，因为它将所有模块安装在用户期望的目录里。
+当在虚拟空间和其他没有管理员权限的时候，它让安装 Pylons 变得可能。</p>
+</div>
+<ol class="arabic">
+<li><p class="first">下载 <a class="reference external" href="http://www.pylonshq.com/download/1.0/go-pylons.py">go-pylons.py</a> 脚本。</p>
+</li>
+<li><p class="first">运行脚本，并指定一个目录用来安装虚拟环境：</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python go-pylons.py mydevenv
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+<div class="admonition-tip admonition">
+<p class="first admonition-title">Tip</p>
+<p>在 unix 系统上，通过 curl 我们可以将上述两步并作一步：</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl http://pylonshq.com/download/1.0/go-pylons.py <span class="p">|</span> python - mydevenv
+</pre></div>
+</div>
+<p>如果不想从系统 Python 中获取现有第三方包，使用 &#8211;no-site-packages 这个参数：</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python go-pylons.py --no-site-packages mydevenv
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>工作原理</strong></div>
+</div>
+<p><code class="docutils literal"><span class="pre">go-pylons.py</span></code> 比 <a class="reference internal" href="glossary.html#term-virtualenv"><span class="xref std std-term">virtualenv</span></a> 稍微多一点点初始化步骤，运行
+<code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">Pylons==1.0</span></code>。你也可以手动获取 <code class="docutils literal"><span class="pre">virtualenv.py</span></code> ，然后安装
+Pylons，效果是一样的。</p>
+<div class="last highlight-bash"><div class="highlight"><pre>curl -O http://bitbucket.org/ianb/virtualenv/raw/8dd7663d9811/virtualenv.py
+python virtualenv.py mydevenv
+mydevenv/bin/easy_install <span class="nv">Pylons</span><span class="o">==</span>1.0
+</pre></div>
+</div>
+</div>
+<p>以上操作会安装一个 virtualenv 和 Pylons。</p>
+<p>激活虚拟环境：</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">source </span>mydevenv/bin/activate
+</pre></div>
+</div>
+<p>在 Windows 上这样激活：</p>
+<div class="highlight-text"><div class="highlight"><pre>&gt; mydevenv\Scripts\activate.bat
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>如果你获得一个错误信息：</p>
+<blockquote>
+<div>ImportError: No module named _md5</div></blockquote>
+<p class="last">一般是由于你的 Python 在安装时候没有 Pylons 必要的标准库。Debian 系的系统
+容易遇到这个问题。请确保已经安装了 <code class="docutils literal"><span class="pre">python-dev</span></code> 和 <code class="docutils literal"><span class="pre">python-hashlib</span></code> 。</p>
+</div>
+<div class="section" id="pylons">
+<h3>从源码安装 Pylons<a class="headerlink" href="#pylons" title="Permalink to this headline">¶</a></h3>
+<p>需要使用 <a class="reference external" href="http://www.selenic.com/mercurial/wiki/">Mercurial</a>
+来从 Pylons 源地址获取最新开发版。
+<a class="reference external" href="http://www.selenic.com/mercurial/wiki/index.cgi/BinaryPackages">Mercurial packages</a>
+在 Windows, MacOSX 和其他操作系统都有对应的版本。</p>
+<p>签出最新代码：</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>hg clone http://bitbucket.org/bbangert/pylons/
+</pre></div>
+</div>
+<p>在 <code class="docutils literal"><span class="pre">Pylons</span></code> 目录中给 setuptools 指定安装版本：</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>pylons
+<span class="nv">$ </span>python setup.py develop
+</pre></div>
+</div>
+<p>好了，当前的 Pylons 版本已经是刚才安装目录下的了，版本变化将反映在运行的 Pylons
+应用中。</p>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>创建 Pylons 项目<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>通过一下明来来创建一个名为 <code class="docutils literal"><span class="pre">helloworld</span></code> 的新项目：</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster create -t pylons helloworld
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Windows 用户需要参考 <a class="reference internal" href="windowsnotes.html#windows-notes"><span class="std std-ref">Windows Notes</span></a> 设定 <code class="docutils literal"><span class="pre">PATH</span></code> ，另外他们需要使用 <code class="docutils literal"><span class="pre">paster</span></code>
+的绝对路径（包括环境路径里面的 bin 目录）</p>
+</div>
+<p>这条命令运行时候会有提示要确认两个问题：</p>
+<ol class="arabic simple">
+<li>使用什么模板系统</li>
+<li>是否需要使用 :term: <cite>SQLAlchemy</cite> 支持</li>
+</ol>
+<p>直接按回车键则接受默认设置（Mako 模板系统，不使用 <a class="reference internal" href="glossary.html#term-sqlalchemy"><span class="xref std std-term">SQLAlchemy</span></a> ）。</p>
+<p>下面是生成的目录结构，里面有些链接可以提供更多信息：</p>
+<ul>
+<li><dl class="first docutils">
+<dt>helloworld</dt>
+<dd><ul class="first last simple">
+<li>MANIFEST.in</li>
+<li>README.txt</li>
+<li>development.ini - <a class="reference internal" href="configuration.html#run-config"><span class="std std-ref">Runtime Configuration</span></a></li>
+<li>docs</li>
+<li>ez_setup.py</li>
+<li>helloworld (See the nested <a class="reference internal" href="#helloworld-dir"><span class="std std-ref">helloworld directory</span></a>)</li>
+<li>helloworld.egg-info</li>
+<li>setup.cfg</li>
+<li>setup.py - <a class="reference internal" href="configuration.html#setup-config"><span class="std std-ref">Application Setup</span></a></li>
+<li>test.ini</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p id="helloworld-dir"><code class="docutils literal"><span class="pre">helloworld</span> <span class="pre">directory</span></code> 目录里面大概是这样：</p>
+<ul>
+<li><dl class="first docutils">
+<dt>helloworld</dt>
+<dd><ul class="first last">
+<li><p class="first">__init__.py</p>
+</li>
+<li><dl class="first docutils">
+<dt>config</dt>
+<dd><ul class="first last simple">
+<li>environment.py - <a class="reference internal" href="configuration.html#environment-config"><span class="std std-ref">Environment</span></a></li>
+<li>middleware.py - <a class="reference internal" href="configuration.html#middleware-config"><span class="std std-ref">Middleware</span></a></li>
+<li>routing.py - <a class="reference internal" href="configuration.html#url-config"><span class="std std-ref">URL Configuration</span></a></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">controllers - <a class="reference internal" href="controllers.html#controllers"><span class="std std-ref">控制器</span></a></p>
+</li>
+<li><dl class="first docutils">
+<dt>lib</dt>
+<dd><ul class="first last simple">
+<li>app_globals.py - <a class="reference internal" href="glossary.html#term-app-globals"><span class="xref std std-term">app_globals</span></a></li>
+<li>base.py</li>
+<li>helpers.py - <a class="reference internal" href="helpers.html#helpers"><span class="std std-ref">Helpers</span></a></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">model - <a class="reference internal" href="models.html#models"><span class="std std-ref">模型</span></a></p>
+</li>
+<li><p class="first">public</p>
+</li>
+<li><p class="first">templates - <a class="reference internal" href="views.html#templates"><span class="std std-ref">模板</span></a></p>
+</li>
+<li><p class="first">tests - <a class="reference internal" href="testing.html#testing"><span class="std std-ref">Unit and functional testing</span></a></p>
+</li>
+<li><p class="first">websetup.py - <a class="reference internal" href="configuration.html#run-config"><span class="std std-ref">Runtime Configuration</span></a></p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h2>启动应用<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>启动 Web 应用：</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>helloworld
+<span class="nv">$ </span>paster serve --reload development.ini
+</pre></div>
+</div>
+<p>这个命令从 <cite>development.ini</cite> 中获取服务器配置信息并运行 Pylons 应用。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><code class="docutils literal"><span class="pre">--reload</span></code> 可以让服务器在 Python 文件或者 <code class="file docutils literal"><span class="pre">development.ini</span></code>
+改变之后自动重新加载。使用 <strong class="command">Ctrl+c</strong>
+或者其他平台类似的按键来停止服务器。</p>
+<p class="last">只要 development.ini 文件被指定了，这个 paster serve 命令可以在任何地方执行。
+在开发过程中，一般在工程根目录下运行。</p>
+</div>
+<p>当服务器在运行时候，访问 <a class="reference external" href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> 就可以看到欢迎页面了。</p>
+</div>
+<div class="section" id="hello-world">
+<h2>Hello World<a class="headerlink" href="#hello-world" title="Permalink to this headline">¶</a></h2>
+<p>我们将在工程中创建一个 <a class="reference internal" href="glossary.html#term-controller"><span class="xref std std-term">controller</span></a> 控制器来响应请求。</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>paster controller hello
+</pre></div>
+</div>
+<p>打开我们创建的 <code class="file docutils literal"><span class="pre">helloworld/controllers/hello.py</span></code> 模块。
+默认创建的控制器将仅仅返回字符串 &#8216;Hello World&#8217;。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pylons</span> <span class="kn">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">tmpl_context</span> <span class="k">as</span> <span class="n">c</span><span class="p">,</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">pylons.controllers.util</span> <span class="kn">import</span> <span class="n">abort</span><span class="p">,</span> <span class="n">redirect</span>
+
+<span class="kn">from</span> <span class="nn">helloworld.lib.base</span> <span class="kn">import</span> <span class="n">BaseController</span><span class="p">,</span> <span class="n">render</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Return a rendered template</span>
+        <span class="c">#return render(&#39;/hello.mako&#39;)</span>
+        <span class="c"># or, Return a response</span>
+        <span class="k">return</span> <span class="s">&#39;Hello World&#39;</span>
+</pre></div>
+</div>
+<p>在这个模块的顶部，一些通用模块已经自动被引入了。</p>
+<p>打开 <a class="reference external" href="http://127.0.0.1:5000/hello/index">http://127.0.0.1:5000/hello/index</a> ，我们将看到一个简短的字符串 &#8220;Hello World&#8221;
+（需要启动服务器）。</p>
+<img alt="_images/helloworld.png" src="_images/helloworld.png" />
+<div class="admonition-tip admonition">
+<p class="first admonition-title">Tip</p>
+<p class="last"><a class="reference internal" href="configuration.html#url-config"><span class="std std-ref">URL Configuration</span></a> 描述了 URL 链接和响应方法之间的关系。</p>
+</div>
+<p>添加一个模板来返回一些 <a class="reference internal" href="glossary.html#term-environ"><span class="xref std std-term">environ</span></a> 中的信息。</p>
+<p>首先，仿照下文在 <code class="file docutils literal"><span class="pre">templates</span></code> 目录下创建文件 <code class="file docutils literal"><span class="pre">hello.mako</span></code> 。</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">Hello World, the environ variable looks like: &lt;br /&gt;</span>
+
+<span class="cp">${</span><span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>模板中的变量 <a class="reference internal" href="glossary.html#term-request"><span class="xref std std-term">request</span></a> 通常用来获取当前请求的信息。
+<a class="reference internal" href="views.html#template-globals"><span class="std std-ref">Template globals</span></a> 将列出所有模板中可用的 Pylons 变量。</p>
+<p>接下来，按照下面代码更新 <code class="file docutils literal"><span class="pre">controllers/hello.py</span></code> 中的  index 方法。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">HelloController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="s">&#39;/hello.mako&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>刷新页面，你将看到如下图这样的信息。</p>
+<img alt="_images/hellotemplate.png" src="_images/hellotemplate.png" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">快速入门</a><ul>
+<li><a class="reference internal" href="#id2">安装需求</a></li>
+<li><a class="reference internal" href="#installing-pylons">安装</a><ul>
+<li><a class="reference internal" href="#pylons">从源码安装 Pylons</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">创建 Pylons 项目</a></li>
+<li><a class="reference internal" href="#id5">启动应用</a></li>
+<li><a class="reference internal" href="#hello-world">Hello World</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Pylons 参考手册</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="concepts.html"
+                        title="next chapter">Pylons 理念</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Pylons 理念"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Pylons 参考手册"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sessions &mdash; Pylons Framework 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pylons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pylons Framework 1.1 documentation" href="index.html" />
+    <link rel="next" title="Caching" href="caching.html" />
+    <link rel="prev" title="Internationalization and Localization" href="i18n.html" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+<link rel="shortcut icon" href="_static/pylons.ico"/>
+
+  </head>
+  <body role="document">
+
+
+
+
+
+
+
+<div class="header-small">
+	
+	<div class="logo-small">
+		<a href="index.html">
+      		<img class="logo" src="_static/pylonsfw-small.png" alt="Logo"/>
+		</a>
+  	</div>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="caching.html" title="Caching"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="i18n.html" title="Internationalization and Localization"
+             accesskey="P">previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sessions">
+<span id="id1"></span><h1>Sessions<a class="headerlink" href="#sessions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id2">
+<h2>Sessions<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>Pylons includes a session object: a session is a server-side, semi-permanent
+storage for data associated with a client.</p>
+<p>The session object is provided by the <a class="reference external" href="http://beaker.groovie.org">Beaker library</a> which also provides
+caching functionality as described in <a class="reference internal" href="caching.html#caching"><span class="std std-ref">Caching</span></a>.</p>
+</div>
+<div class="section" id="the-session-object">
+<h2>The Session Object<a class="headerlink" href="#the-session-object" title="Permalink to this headline">¶</a></h2>
+<p>The Pylons session object is available at <code class="xref py py-data docutils literal"><span class="pre">pylons.session</span></code>. Controller
+modules created via <strong class="command">paster controller/restcontroller</strong> import the
+session object by default.</p>
+<p>The basic session API is simple, it implements a dict-like interface with a few
+additional methods. The following is an example of using the session to store a
+token identifying if a client is logged in.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">LoginController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">authenicate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">]</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                                             <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Successfully logged in as </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">name</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="n">url</span><span class="p">(</span><span class="s">&#39;index&#39;</span><span class="p">)</span>
+            <span class="n">session</span><span class="p">[</span><span class="s">&#39;logged_in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Invalid username/password&#39;</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="n">url</span><span class="p">(</span><span class="s">&#39;login&#39;</span><span class="p">)</span>
+        <span class="n">flash</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">redirect</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Clear all values in the session associated with the client</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Subsequent requests can then determine if a client is logged in or not by
+checking the session:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;logged_in&#39;</span><span class="p">):</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s">&#39;Please login&#39;</span><span class="p">)</span>
+    <span class="n">redirect</span><span class="p">(</span><span class="n">url</span><span class="p">(</span><span class="s">&#39;login&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The session object acts lazily: it does not load the session data (from disk or
+whichever backend is used) until the data is first accessed. This lazyness is
+facilitated via an intermediary <code class="xref py py-class docutils literal"><span class="pre">beaker.session.SessionObject</span></code> that
+wraps the actual <code class="xref py py-class docutils literal"><span class="pre">beaker.session.Session</span></code> object. Furthermore the
+session will not write changes to its backend without an explicit call to its
+<code class="xref py py-meth docutils literal"><span class="pre">beaker.session.Session.save()</span></code> method (unless configured with the <code class="docutils literal"><span class="pre">auto</span></code>
+option).</p>
+<p>Session data is generally serialized for storage via the Python <code class="xref py py-mod docutils literal"><span class="pre">pickle</span></code>
+module, so anything stored in the session must be pickleable.</p>
+<p>The lightweight SessionObject wrapper is created by the:
+<code class="xref py py-class docutils literal"><span class="pre">beaker.middleware.SessionMiddleware</span></code> WSGI middleware. SessionMiddleware
+stores the wrapper in the WSGI environ where Pylons sets a reference to it from
+pylons.session.</p>
+<p>Sessions are associated with a client via a client-side cookie. The WSGI
+middleware is also responsible for sending said cookie to the client.</p>
+</div>
+<div class="section" id="configuring-the-session">
+<h2>Configuring the Session<a class="headerlink" href="#configuring-the-session" title="Permalink to this headline">¶</a></h2>
+<p>The basic session defaults are:</p>
+<ul class="simple">
+<li>File based sessions (session data is stored on disk)</li>
+<li>Session cookies have no expiration date (cookies expire at the end of the browser session)</li>
+<li>Session cookie domain/path matches the current host/path</li>
+</ul>
+<p>Pylons projects by default sets the following couple of session options via
+their .ini files. All Beaker specific session options in the ini file are
+prefixed with <cite>beaker.session</cite>:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">cache_dir</span> <span class="o">=</span> <span class="s">%(here)s/data</span>
+<span class="na">beaker.session.key</span> <span class="o">=</span> <span class="s">foo</span>
+<span class="na">beaker.session.secret</span> <span class="o">=</span> <span class="s">somesecret</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">cache_dir</span></code> acts a base directory for both session and cache storage. Session
+data is stored in this location under a <code class="file docutils literal"><span class="pre">sessions/</span></code> sub-directory.</p>
+<p><code class="docutils literal"><span class="pre">session.key</span></code> is the name attribute of the cookie sent to the browser. This
+defaults to your project&#8217;s name.</p>
+<p><code class="docutils literal"><span class="pre">session.secret</span></code> is the secret token used to hash the cookie data sent to the
+client. This should be a secret, ideally randomly generated value on production
+environments. <strong class="command">paster make-config</strong> will generate a random secret for
+you when creating a production ini file.</p>
+<div class="section" id="other-session-options">
+<h3>Other Session Options<a class="headerlink" href="#other-session-options" title="Permalink to this headline">¶</a></h3>
+<p>Some other commonly used session options are:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">type</span></code>
+The type of the back-end for storing session data. Beaker supports many
+different backends, see <a class="reference external" href="http://beaker.groovie.org/configuration.html#session-options">Beaker Configuration Documentation</a> for the
+choices. Defaults to &#8216;file&#8217;.</li>
+<li><code class="docutils literal"><span class="pre">cookie_domain</span></code>
+The domain name to use for the session Cookie. For example, when using
+sub-domains, set this to the parent domain name so that the cookie is valid
+for all sub-domains.</li>
+</ul>
+<p>To enable pure <a class="reference external" href="http://beaker.groovie.org/sessions.html#cookie-based">Cookie-based Sessions</a> and force the cookie domain to be valid
+for all sub-domains of &#8216;example.com&#8217;, add the following to your Pylons ini
+file:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">beaker.session.type</span> <span class="o">=</span> <span class="s">cookie</span>
+<span class="na">beaker.session.cookie_domain</span> <span class="o">=</span> <span class="s">.example.com</span>
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="http://beaker.groovie.org/configuration.html#session-options">Beaker Configuration Documentation</a> for an exhaustive list of Session
+options.</p>
+</div>
+</div>
+<div class="section" id="storing-sqlalchemy-mapped-objects-in-beaker-sessions">
+<h2>Storing SQLAlchemy mapped objects in Beaker sessions<a class="headerlink" href="#storing-sqlalchemy-mapped-objects-in-beaker-sessions" title="Permalink to this headline">¶</a></h2>
+<p>Mapped objects from SQLAlchemy can be serialized into the beaker session, but
+care must be taken when retrieving these objects back from the beaker
+session. They will not be associated with the SQLAlchemy Unit-of-Work Session,
+however these objects can be reconciled via the SQLAlchemy Session&#8217;s <code class="docutils literal"><span class="pre">merge</span></code>
+method, as follows:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">address</span> <span class="o">=</span> <span class="n">DBSession</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Address</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+<span class="n">session</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">address</span>
+<span class="o">...</span>
+<span class="n">address</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+<span class="n">address</span> <span class="o">=</span> <span class="n">DBSession</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="custom-and-caching-middleware">
+<h2>Custom and caching middleware<a class="headerlink" href="#custom-and-caching-middleware" title="Permalink to this headline">¶</a></h2>
+<p>Care should be taken when deciding in which layer to place custom
+middleware. In most cases middleware should be placed between the
+Pylons WSGI application instantiation and the Routes middleware; however,
+if the middleware should run <em>before</em> the session object or routing is handled:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Routing/Session Middleware</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">RoutesMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;routes.map&#39;</span><span class="p">])</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">SessionMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+<span class="c"># MyMiddleware can only see the cache object, nothing *above* here</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">MyMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">CacheMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some of the Pylons middleware layers such as the <code class="docutils literal"><span class="pre">Session</span></code>, <code class="docutils literal"><span class="pre">Routes</span></code>, and <code class="docutils literal"><span class="pre">Cache</span></code> middleware, only add
+objects to the <cite>environ</cite> dict, or add HTTP headers to the response (the Session middleware for
+example adds the session cookie header). Others, such as the <code class="docutils literal"><span class="pre">Status</span> <span class="pre">Code</span> <span class="pre">Redirect</span></code>, and the <code class="docutils literal"><span class="pre">Error</span>
+<span class="pre">Handler</span></code> may fully intercept the request entirely, and change how its responded to.</p>
+</div>
+<div class="section" id="using-session-in-internationalization">
+<h2>Using <cite>Session</cite> in Internationalization<a class="headerlink" href="#using-session-in-internationalization" title="Permalink to this headline">¶</a></h2>
+<p>How to set the language used in a controller on the fly.</p>
+<p>For example this could be used to allow a user to set which language they
+wanted your application to work in. Save the value to the session object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">session</span><span class="p">[</span><span class="s">&#39;lang&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;en&#39;</span>
+<span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>then on each controller call the language to be used could be read from the
+session and set in the controller&#8217;s <code class="docutils literal"><span class="pre">__before__()</span></code> method so that the pages
+remained in the same language that was previously set:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">__before__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s">&#39;lang&#39;</span> <span class="ow">in</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">set_lang</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;lang&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-session-in-secure-forms">
+<h2>Using <cite>Session</cite> in Secure Forms<a class="headerlink" href="#using-session-in-secure-forms" title="Permalink to this headline">¶</a></h2>
+<p>Authorization tokens are stored in the client&#8217;s session. The web app can then
+verify the request&#8217;s submitted authorization token with the value in the
+client&#8217;s session.</p>
+<p>This ensures the request came from the originating page. See the wikipedia entry
+for <a class="reference external" href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">Cross-site request forgery</a> for more information.</p>
+<p>Pylons provides an <code class="docutils literal"><span class="pre">authenticate_form</span></code> decorator that does this verification
+on the behalf of controllers.</p>
+<p>These helpers depend on Pylons&#8217; <code class="docutils literal"><span class="pre">session</span></code> object.  Most of them can be easily
+ported to another framework by changing the API calls.</p>
+</div>
+<div class="section" id="hacking-the-session-for-no-cookies">
+<h2>Hacking the session for no cookies<a class="headerlink" href="#hacking-the-session-for-no-cookies" title="Permalink to this headline">¶</a></h2>
+<p>(From a <a class="reference external" href="http://pylonshq.com/pasties/441">paste #441</a> baked by Ben Bangert)</p>
+<p>Set the session to not use cookies in the dev.ini file</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">beaker.session.use_cookies</span> <span class="o">=</span> <span class="s">False</span>
+</pre></div>
+</div>
+<p>with this as the <em>mode d&#8217;emploi</em> in the controller action</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">beaker.session</span> <span class="kn">import</span> <span class="n">Session</span> <span class="k">as</span> <span class="n">BeakerSession</span>
+
+<span class="c"># Get the actual session object through the global proxy</span>
+<span class="n">real_session</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">_get_current_obj</span><span class="p">()</span>
+
+<span class="c"># Duplicate the session init options to avoid screwing up other sessions in</span>
+<span class="c"># other threads</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">real_session</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s">&#39;_params&#39;</span><span class="p">]</span>
+
+<span class="c"># Now set the id param used to make a session to our session maker,</span>
+<span class="c"># if id is None, a new id will be made automatically</span>
+<span class="n">params</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_id_func</span><span class="p">()</span>
+<span class="n">real_session</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s">&#39;_sess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BeakerSession</span><span class="p">({},</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+
+<span class="c"># Now we can use the session as usual</span>
+<span class="n">session</span><span class="p">[</span><span class="s">&#39;fred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+<span class="c"># At the end, we need to see if the session was used and handle its id</span>
+<span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">is_new</span><span class="p">:</span>
+    <span class="c"># do something with session.id to make sure its around next time</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-middleware-beaker-with-a-composite-app">
+<h2>Using middleware (Beaker) with a composite app<a class="headerlink" href="#using-middleware-beaker-with-a-composite-app" title="Permalink to this headline">¶</a></h2>
+<p>How to allow called WSGI apps to share a common session management utility.</p>
+<p>(From a <a class="reference external" href="http://pylonshq.com/pasties/616">paste #616</a> baked by Mark Luffel)</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># Here&#39;s an example of configuring multiple apps to use a common</span>
+<span class="c1"># middleware filter</span>
+<span class="c1"># The [app:home] section is a standard pylons app</span>
+<span class="c1"># The ``/servicebroker`` and ``/proxy`` apps both want to be able</span>
+<span class="c1"># to use the same session management</span>
+
+<span class="k">[server:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#http</span>
+<span class="na">host</span> <span class="o">=</span> <span class="s">0.0.0.0</span>
+<span class="na">port</span> <span class="o">=</span> <span class="s">5000</span>
+
+<span class="k">[filter-app:main]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:Beaker#beaker_session</span>
+<span class="na">next</span> <span class="o">=</span> <span class="s">sessioned</span>
+<span class="na">beaker.session.key</span> <span class="o">=</span> <span class="s">my_project_key</span>
+<span class="na">beaker.session.secret</span> <span class="o">=</span> <span class="s">i_wear_two_layers_of_socks</span>
+
+<span class="k">[composite:sessioned]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:Paste#urlmap</span>
+<span class="na">/</span> <span class="o">=</span> <span class="s">home</span>
+<span class="na">/servicebroker</span> <span class="o">=</span> <span class="s">servicebroker</span>
+<span class="na">/proxy</span> <span class="o">=</span> <span class="s">cross_domain_proxy</span>
+
+<span class="k">[app:servicebroker]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:Appcelerator#service_broker</span>
+
+<span class="k">[app:cross_domain_proxy]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:Appcelerator#cross_domain_proxy</span>
+
+<span class="k">[app:home]</span>
+<span class="na">use</span> <span class="o">=</span> <span class="s">egg:my_project</span>
+<span class="na">full_stack</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">cache_dir</span> <span class="o">=</span> <span class="s">%(here)s/data</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Sessions</a><ul>
+<li><a class="reference internal" href="#id2">Sessions</a></li>
+<li><a class="reference internal" href="#the-session-object">The Session Object</a></li>
+<li><a class="reference internal" href="#configuring-the-session">Configuring the Session</a><ul>
+<li><a class="reference internal" href="#other-session-options">Other Session Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#storing-sqlalchemy-mapped-objects-in-beaker-sessions">Storing SQLAlchemy mapped objects in Beaker sessions</a></li>
+<li><a class="reference internal" href="#custom-and-caching-middleware">Custom and caching middleware</a></li>
+<li><a class="reference internal" href="#using-session-in-internationalization">Using <cite>Session</cite> in Internationalization</a></li>
+<li><a class="reference internal" href="#using-session-in-secure-forms">Using <cite>Session</cite> in Secure Forms</a></li>
+<li><a class="reference internal" href="#hacking-the-session-for-no-cookies">Hacking the session for no cookies</a></li>
+<li><a class="reference internal" href="#using-middleware-beaker-with-a-composite-app">Using middleware (Beaker) with a composite app</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="i18n.html"
+                        title="previous chapter">Internationalization and Localization</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="caching.html"
+                        title="next chapter">Caching</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="caching.html" title="Caching"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="i18n.html" title="Internationalization and Localization"
+             >previous</a> |</li>
+    	<li><a href="index.html">Pylons Framework 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2008-2011, Ben Bangert, James Gardner, Philip Jenvey.
+      Last updated on Jun 10, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>
